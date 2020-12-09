@@ -9,6 +9,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var (
+	promRegistry = prometheus.NewRegistry() // local Registry so we don't get Go metrics, etc.
+)
+
 type metricCollector struct {
 	counters   []prometheus.Counter
 	gauges     []prometheus.Gauge
@@ -18,14 +22,12 @@ type metricCollector struct {
 	metricCount int
 }
 
-func newMetricCollector() metricCollector {
-	return metricCollector{}
+func newMetricCollector(metricCount int) metricCollector {
+	return metricCollector{metricCount: metricCount}
 }
 
 func (mc *metricCollector) updateMetrics() {
 	for {
-		// generate new metrics in 30 second intervals
-		time.Sleep(time.Second * 30)
 		for idx := 0; idx < mc.metricCount; idx++ {
 			mc.counters[idx].Add(rand.Float64())
 			mc.gauges[idx].Add(rand.Float64())
@@ -36,6 +38,8 @@ func (mc *metricCollector) updateMetrics() {
 				mc.summarys[idx].Observe(i)
 			}
 		}
+		// generate new metrics in 30 second intervals
+		time.Sleep(time.Second * 30)
 	}
 }
 
