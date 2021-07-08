@@ -100,12 +100,9 @@ Figure 2 - *Communication Between OpenTelemetry SDK and AWS X-Ray*
 
 ## Appendix 
 
-1. X-Ray SDK 
-
-After generating a segment, the X-Ray SDK makes a sampling decision based on the sampling rules fetched from the X-Ray service. This rule polling is conducted in a background thread that communicates with the [X-Ray Daemon](https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon.html) over TCP. If the SDK determines that this segment will be sampled (based on the rules that were fetched), it is then sent to the X-Ray Daemon over a UDP connection, which in turn sends it to the X-Ray service (by using the `PutTraceSegments` API) for storage.
-
-1. [X-Ray default port number](https://aws-otel.github.io/docs/components/x-ray-receiver#endpoint-optional) (2000)
-2. [Sampling Rules and Targets format](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sampling.html)
-3. [Sampler interface](https://github.com/open-telemetry/opentelemetry-python/blob/main/opentelemetry-sdk/src/opentelemetry/sdk/trace/sampling.py) in Python from `opentelemetry-python` repo
+1. X-Ray SDK: After generating a segment, the X-Ray SDK makes a sampling decision based on the sampling rules fetched from the X-Ray service. This rule polling is conducted in a background thread that communicates with the [X-Ray Daemon](https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon.html) over TCP. If the SDK determines that this segment will be sampled (based on the rules that were fetched), it is then sent to the X-Ray Daemon over a UDP connection, which in turn sends it to the X-Ray service (by using the `PutTraceSegments` API) for storage.
+2. [X-Ray default port number](https://aws-otel.github.io/docs/components/x-ray-receiver#endpoint-optional) (2000)
+3. [Sampling Rules and Targets format](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sampling.html)
+4. [Sampler interface](https://github.com/open-telemetry/opentelemetry-python/blob/main/opentelemetry-sdk/src/opentelemetry/sdk/trace/sampling.py) in Python from `opentelemetry-python` repo
 
 
