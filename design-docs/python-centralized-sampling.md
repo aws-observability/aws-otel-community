@@ -29,7 +29,7 @@ The proposed solution to implement centralized sampling in the OpenTelemetry Pyt
 
 ### **Current OpenTelemetry SDK**
 
-![fig1](images/centralized-sampling-python-fig1.png)
+![fig1](./images/centralized-sampling-python-fig1.png)
 
 Figure 1 - *In-depth diagram of communication between exporters and collectors* 
 
@@ -46,7 +46,7 @@ The OpenTelemetry Specification contains a [Sampler interface](https://github.co
 
 The code snippet below demonstrates how a customer would configure their tracer provider to use the proposed remote sampler. Assume that the new sampler has been named `RemoteSampler`
 
-```
+```python
 **from** **opentelemetry** **import** trace
 **from** **opentelemetry****.****sdk****.****trace** **import** TracerProvider
 **from** **opentelemetry****.****sdk****.****trace****.****export** **import** (
@@ -81,8 +81,6 @@ id_generator=AwsXRayIdGenerator()))
     print("Testing Remote Sampler!")
 ```
 
-
-
  Since the X-Ray receiver is configured with the user’s AWS credentials to act as a TCP proxy, the SDK can initiate requests to `GetSamplingRules` and `GetSamplingTargets` and route those requests through the receiver. The receiver communicates with the X-Ray service, it can send and fetch sampling rules and targets from the API and send them back to the collector, which acts as a proxy, that will communicate to the hosts. The benefit of using this proxy is that the SDKs no longer need to be configured with AWS credentials since they have been set up in the receiver. This eliminates the need for authentication in the X-Ray service and saves time by sending less requests.  
 
  This communication includes information about how many requests have been sampled, and how many more requests can be sampled to stay within the limits specified in the sampling rules. The SDK uses the `GetSamplingTargets` API to send its sampling statistics as a request body and receives details about the quota to use in the response by using [this format](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sampling.html) (see Appendix 3). This quota is valid for 10 seconds, after which this process is repeated to retrieve a new quota.
@@ -95,10 +93,9 @@ The [X-Ray API docs](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-s
 * *Reservoir*: A fixed number of matching requests to instrument per second before applying the fixed rate. (For example, the reservoir in the second sampling rule in this example indicates that 2 requests will be instrumented before applying the fixed rate of 0.1%).
 * *Borrowed from reservoir*: the number of requests sampled by borrowing from the reservoir.
 
-![fig2](images/centralized-sampling-python-fig2.png)
+![fig2](./images/centralized-sampling-python-fig2.png)i
+
 Figure 2 - *Communication Between OpenTelemetry SDK and AWS X-Ray* 
-
-
 
 
 ## Appendix 
