@@ -47,9 +47,9 @@ The OpenTelemetry Specification contains a [Sampler interface](https://github.co
 The code snippet below demonstrates how a customer would configure their tracer provider to use the proposed remote sampler. Assume that the new sampler has been named `RemoteSampler`
 
 ```python
-**from** **opentelemetry** **import** trace
-**from** **opentelemetry****.****sdk****.****trace** **import** TracerProvider
-**from** **opentelemetry****.****sdk****.****trace****.****export** **import** (
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import (
 ConsoleSpanExporter, SimpleSpanProcessor,
 )
 
@@ -57,9 +57,9 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 
 
 # import RemoteSampler from the OpenTelemetry SDK
-**from** **opentelemetry****.****sdk****.****extension****.****aws****.****trace****.****sampling** **import** AWSXRayRemoteSampler
+from opentelemetry.sdk.extension.aws.trace.sampling import AWSXRayRemoteSampler
 
-*# instantiate RemoteSampler*
+# instantiate RemoteSampler
 # endpoint for port running the X-Ray Receiver (default = 2000)
 sampler = AWSXRayRemoteSampler(endpoint="http://localhost:2000")
 
@@ -69,15 +69,15 @@ otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True
 processor = SimpleSpanProcessor(otlp_exporter)
 
 
-*# set the remote sampler onto the global tracer provider*
+# set the remote sampler onto the global tracer provider
 trace.set_tracer_provider(
 TracerProvider(
 active_span_processor=processor,
 sampler=sampler, 
 id_generator=AwsXRayIdGenerator()))
 
-*# created spans will now be sampled by the new RemoteSampler*
-**with** trace.get_tracer(__name__).start_as_current_span("Test Span"):
+# created spans will now be sampled by the new RemoteSampler
+with trace.get_tracer(__name__).start_as_current_span("Test Span"):
     print("Testing Remote Sampler!")
 ```
 
@@ -93,7 +93,7 @@ The [X-Ray API docs](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-s
 * *Reservoir*: A fixed number of matching requests to instrument per second before applying the fixed rate. (For example, the reservoir in the second sampling rule in this example indicates that 2 requests will be instrumented before applying the fixed rate of 0.1%).
 * *Borrowed from reservoir*: the number of requests sampled by borrowing from the reservoir.
 
-![fig2](./images/centralized-sampling-python-fig2.png)i
+![fig2](./images/centralized-sampling-python-fig2.png)
 
 Figure 2 - *Communication Between OpenTelemetry SDK and AWS X-Ray* 
 
