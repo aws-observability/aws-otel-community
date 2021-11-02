@@ -1,0 +1,337 @@
+nameOverride: ""
+fullnameOverride: ""
+global:
+  namespaceOverride: ""
+awsRegion: ""
+clusterName: ""
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+fluentbit:
+  enabled: true
+  namespaceOverride: ""
+  name: "fluent-bit"
+  configName: "fluent-bit-config"
+  namespace: "amazon-cloudwatch"
+  image:
+    repository: "amazon/aws-for-fluent-bit"
+    tag: "2.20.0"
+    pullPolicy: "Always"
+  input:
+    applicationLog:
+      tag: "application.*"
+      excludePath: "/var/log/containers/cloudwatch-agent*, /var/log/containers/fluent-bit*, /var/log/containers/aws-node*, /var/log/containers/kube-proxy*"
+      path: "/var/log/containers/*.log"
+      dockerMode: "On"
+      dockerModeFlush: 5
+      parser: "docker"
+      dockerModeParser: "container_firstline"
+      db: "/var/fluent-bit/state/flb_container.db"
+      memBufLimit: "50MB"
+      skipLongLines: "On"
+      refreshInterval: 10
+      rotateWait: 30
+      storageType: "filesystem"
+      fluentbit:
+        path: "/var/log/containers/fluent-bit*"
+        db: "/var/fluent-bit/state/flb_log.db"
+        memBufLimit: "5MB"
+      cloudwatchAgent:
+        path: "/var/log/containers/cloudwatch-agent*"
+        dockerModeParser: "cwagent_firstline"
+        db: "/var/fluent-bit/state/flb_cwagent.db"
+        memBufLimit: "5MB"
+    dataplaneLog:
+      systemd:
+        tag: "dataplane.systemd.*"
+        dockerUnit: "_SYSTEMD_UNIT=docker.service"
+        kubeletUnit: "_SYSTEMD_UNIT=kubelet.service"
+        db: "/var/fluent-bit/state/systemd.db"
+        path: "/var/log/journal"
+      tail:
+        tag: "dataplane.tail.*"
+        path: "/var/log/containers/aws-node*, /var/log/containers/kube-proxy*"
+        dockerMode: "On"
+        dockerModeFlush: 5
+        parser: "docker"
+        dockerModeParser: "container_firstline"
+        db: "/var/fluent-bit/state/flb_dataplane_tail.db"
+        memBufLimit: "50MB"
+        skipLongLines: "On"
+        refreshInterval: 10
+        rotateWait: 30
+        storageType: "filesystem"
+    hostLog:
+      dmesg:
+        tag: "host.dmesg"
+        path: "/var/log/dmesg"
+        db: "/var/fluent-bit/state/flb_dmesg.db"
+      messages:
+        tag: "host.messages"
+        path: "/var/log/messages"
+        db: "/var/fluent-bit/state/flb_messages.db"
+      secure:
+        tag: "host.secure"
+        path: "/var/log/secure"
+        db: "/var/fluent-bit/state/flb_secure.db"
+      parser: "syslog"
+      memBufLimit: "5MB"
+      skipLongLines: "On"
+      refreshInterval: 10
+  kubernetesFilter:
+    match: "application.*"
+    kubeURL: "https://kubernetes.default.svc:443"
+    kubeTagPrefix: "application.var.log.containers."
+    mergeLog: "On"
+    mergeLogKey: "log_processed"
+    k8sLoggingParser: "On"
+    k8sLoggingExclude: "Off"
+    labels: "Off"
+    annotations: "Off"
+  resources:
+    limits:
+      memory: "200Mi"
+    requests:
+      cpu: "500m"
+      memory: "100Mi"
+  volumeMounts:
+    - name: "fluentbitstate"
+      mountPath: "/var/fluent-bit/state"
+    - name: "varlog"
+      mountPath: "/var/log"
+      readOnly: true
+    - name: "varlibdockercontainers"
+      mountPath: "/var/lib/docker/containers"
+      readOnly: true
+    - name: "fluent-bit-config"
+      mountPath: "/fluent-bit/etc/"
+    - name: "runlogjournal"
+      mountPath: "/run/log/journal"
+      readOnly: true
+    - name: "dmesg"
+      mountPath: "/var/log/dmesg"
+      readOnly: true
+  volumes:
+    - name: "fluentbitstate"
+      hostPath:
+        path: "/var/fluent-bit/state"
+    - name: "varlog"
+      hostPath:
+        path: "/var/log"
+    - name: "varlibdockercontainers"
+      hostPath:
+        path: "/var/lib/docker/containers"
+    - name: "fluent-bit-config"
+      configMap:
+        name: "fluent-bit-config"
+    - name: "runlogjournal"
+      hostPath:
+        path: "/run/log/journal"
+    - name: "dmesg"
+      hostPath:
+        path: "/var/log/dmesg"
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - operator: "Exists"
+      effect: "NoExecute"
+    - operator: "Exists"
+      effect: "NoSchedule"
+  env:
+    httpServer: "On"
+    httpPort: "2020"
+    readFromHead: false
+    readFromTail: "On"
+
+adotCollector:
+  image:
+    name: "aws-otel-collector"
+    repository: "amazon/aws-otel-collector"
+    tag: "v0.13.0"
+    daemonSetPullPolicy: "IfNotPresent"
+    sidecarPullPolicy: "Always"
+  daemonSet:
+    enabled: true
+    daemonSetName: "adot-collector-daemonset"
+    namespace: "aws-cloudwatch-metrics"
+    namespaceOverride: ""
+    serviceAccount:
+      create: true
+      name: "adot-collector-sa"
+    clusterRoleName: "adot-collector-role"
+    clusterRoleBindingName: "adot-collector-role-binding"
+    configMap:
+      name: "adot-conf"
+      app: "opentelemetry"
+      component: "adot-conf"
+    containersName: "adot-collector-container"
+    env:
+      - name: "K8S_NODE_NAME"
+        valueFrom:
+          fieldRef:
+            fieldPath: "spec.nodeName"
+      - name: "HOST_IP"
+        valueFrom:
+          fieldRef:
+            fieldPath: "status.hostIP"
+      - name: "HOST_NAME"
+        valueFrom:
+          fieldRef:
+            fieldPath: "spec.nodeName"
+      - name: "K8S_NAMESPACE"
+        valueFrom:
+          fieldRef:
+            fieldPath: "metadata.namespace"
+    command:
+      - "/awscollector"
+      - "--config=/conf/adot-config.yaml"
+    resources:
+      limits:
+        cpu: "200m"
+        memory: "200Mi"
+      requests:
+        cpu: "200m"
+        memory: "200Mi"
+    volumes:
+      - configMap:
+          name: "adot-conf"
+          items:
+            - key: "adot-config"
+              path: "adot-config.yaml"
+        name: "adot-config-vol"
+      - name: "rootfs"
+        hostPath:
+          path: "/"
+      - name: "dockersock"
+        hostPath:
+          path: "/var/run/docker.sock"
+      - name: "varlibdocker"
+        hostPath:
+          path: "/var/lib/docker"
+      - name: "sys"
+        hostPath:
+          path: "/sys"
+      - name: "devdisk"
+        hostPath:
+          path: "/dev/disk/"
+    volumeMounts:
+      - name: "rootfs"
+        mountPath: "/rootfs"
+        readOnly: true
+      - name: "dockersock"
+        mountPath: "/var/run/docker.sock"
+        readOnly: true
+      - name: "varlibdocker"
+        mountPath: "/var/lib/docker"
+        readOnly: true
+      - name: "sys"
+        mountPath: "/sys"
+        readOnly: true
+      - name: "devdisk"
+        mountPath: "/dev/disk"
+        readOnly: true
+      - name: "adot-config-vol"
+        mountPath: "/conf"
+    extensions:
+      healthCheck: ""
+    receivers:
+      collectionInterval: ""
+      containerOrchestrator: ""
+      addServiceAsAttribute: ""
+      preferFullPodName: ""
+    processors:
+      timeout: 60s
+    exporters:
+      namespace: "ContainerInsights"
+      logGroupName: ""
+      logStreamName: "InputNodeName"
+      enabled: true
+      dimensionRollupOption: "NoDimensionRollup"
+      parseJsonEncodedAttrValues: ["Sources", "kubernetes"]
+    metricDeclarations: |
+      # node metrics
+      - dimensions: [[NodeName, InstanceId, ClusterName]]
+        metric_name_selectors:
+          - node_cpu_utilization
+          - node_memory_utilization
+          - node_network_total_bytes
+          - node_cpu_reserved_capacity
+          - node_memory_reserved_capacity
+          - node_number_of_running_pods
+          - node_number_of_running_containers
+      - dimensions: [[ClusterName]]
+        metric_name_selectors:
+          - node_cpu_utilization
+          - node_memory_utilization
+          - node_network_total_bytes
+          - node_cpu_reserved_capacity
+          - node_memory_reserved_capacity
+          - node_number_of_running_pods
+          - node_number_of_running_containers
+          - node_cpu_usage_total
+          - node_cpu_limit
+          - node_memory_working_set
+          - node_memory_limit
+      # pod metrics
+      - dimensions: [[PodName, Namespace, ClusterName], [Service, Namespace, ClusterName], [Namespace, ClusterName], [ClusterName]]
+        metric_name_selectors:
+          - pod_cpu_utilization
+          - pod_memory_utilization
+          - pod_network_rx_bytes
+          - pod_network_tx_bytes
+          - pod_cpu_utilization_over_pod_limit
+          - pod_memory_utilization_over_pod_limit
+      - dimensions: [[PodName, Namespace, ClusterName], [ClusterName]]
+        metric_name_selectors:
+          - pod_cpu_reserved_capacity
+          - pod_memory_reserved_capacity
+      - dimensions: [[PodName, Namespace, ClusterName]]
+        metric_name_selectors:
+          - pod_number_of_container_restarts
+      # cluster metrics
+      - dimensions: [[ClusterName]]
+        metric_name_selectors:
+          - cluster_node_count
+          - cluster_failed_node_count
+      # service metrics
+      - dimensions: [[Service, Namespace, ClusterName], [ClusterName]]
+        metric_name_selectors:
+          - service_number_of_running_pods
+      # node fs metrics
+      - dimensions: [[NodeName, InstanceId, ClusterName], [ClusterName]]
+        metric_name_selectors:
+          - node_filesystem_utilization
+      # namespace metrics
+      - dimensions: [[Namespace, ClusterName], [ClusterName]]
+        metric_name_selectors:
+          - namespace_number_of_running_pods
+    service:
+      metrics:
+        receivers: ["awscontainerinsightreceiver"]
+        processors: ["batch/metrics"]
+        exporters: ["awsemf"]
+      extensions: ["health_check"]
+
+  sidecar:
+    enabled: false
+    name: "adot-sidecar"
+    namespace: "adot-sidecar-namespace"
+    namespaceOverride: ""
+    regionS3: ""
+    replicas: 1
+    image:
+      name: "adot-emitter"
+      repository: "aottestbed/aws-otel-collector-java-sample-app"
+      tag: "0.6.0"
+      pullPolicy: "Always"
+    otelOtlpEndPointValue: "localhost:4317"
+    otelResourceAttributesValue: "service.namespace=AWSObservability,service.name=CloudWatchEKSService"
+    resources:
+      limits:
+        cpu: "256m"
+        memory: "512Mi"
+      requests:
+        cpu: "32m"
+        memory: "24Mi"

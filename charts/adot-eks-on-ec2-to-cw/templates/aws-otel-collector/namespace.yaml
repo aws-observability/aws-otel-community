@@ -1,0 +1,8 @@
+{{- if .Values.adotCollector.daemonSet.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "adotCollector.daemonSet.namespace" . }}
+  labels:
+    name: {{ include "adotCollector.daemonSet.namespace" . }}
+{{- end }}
