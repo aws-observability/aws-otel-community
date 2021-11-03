@@ -33,7 +33,7 @@ spec:
           image: "{{ .Values.adotCollector.image.repository }}:{{ .Values.adotCollector.image.tag }}"
           env:
             - name: AWS_REGION
-              value: {{ .Values.adotCollector.sidecar.region }}
+              value: {{ .Values.awsRegion }}
           imagePullPolicy: {{ .Values.adotCollector.image.sidecarPullPolicy }}
           resources:
             {{- toYaml .Values.adotCollector.sidecar.resources | nindent 12 }}
