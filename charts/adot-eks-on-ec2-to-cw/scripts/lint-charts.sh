@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_PROJECT=$(git rev-parse --show-toplevel)
 BUILD_DIR="${ROOT_PROJECT}/build"
 TOOLS_DIR="${BUILD_DIR}/tools"
-CHART_DIR="${ROOT_PROJECT}/adot-helm-eks-ec2"
+CHART_DIR="${ROOT_PROJECT}/charts/adot-eks-on-ec2-to-cw"
 export PATH="${TOOLS_DIR}:${PATH}"
 
 FAILED_V3=()
