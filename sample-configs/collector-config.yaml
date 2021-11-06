@@ -1,0 +1,37 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: my-collector
+spec:
+  image: "public.ecr.aws/aws-observability/aws-otel-collector:v0.14.0"
+  mode: deployment # This configuration is omittable.
+  serviceAccount: adot-collector
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+    processors:
+
+    exporters:
+      awsprometheusremotewrite:
+        endpoint: <YOUR_REMOTE_WRITE_ENDPOINT>
+        aws_auth:
+          region: <YOUR_AWS_REGION>
+          service: "aps"
+      awsxray:
+        region: <YOUR_AWS_REGION>
+      awsemf:
+        region: <YOUR_AWS_REGION>
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [awsxray]
+        metrics:
+          receivers: [otlp]
+          processors: []
+          exporters: [awsprometheusremotewrite, awsemf]

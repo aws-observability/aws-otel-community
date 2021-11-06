@@ -1,0 +1,64 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: my-collector
+spec:
+  image: "public.ecr.aws/aws-observability/aws-otel-collector:v0.14.0"
+  mode: deployment # This configuration is omittable.
+  serviceAccount: adot-collector
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+      prometheus:
+        config:
+          global:
+            scrape_interval: 15s
+            scrape_timeout: 10s
+          scrape_configs:
+            - job_name: 'storefront'
+              sample_limit: 10000
+              metrics_path: /metrics
+              kubernetes_sd_configs:
+                - role: pod
+              relabel_configs:
+                - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                  action: keep
+                  regex: true
+                - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+                  action: replace
+                  regex: (.+)
+                  target_label: __metrics_path__
+                - source_labels: [__address__]
+                  action: replace
+                  regex: ([^:]+)(?::\d+)?;(\d+)
+                  replacement: $1:$2
+                  target_label: __address__
+                - action: labelmap
+                  regex: __meta_kubernetes_pod_label_(.+)
+                - source_labels: [__meta_kubernetes_namespace]
+                  action: replace
+                  target_label: EKS_Namespace
+                - source_labels: [__meta_kubernetes_pod_name]
+                  action: replace
+                  target_label: EKS_PodName
+                - source_labels: [__meta_kubernetes_pod_container_name]
+                  action: replace
+                  target_label: EKS_Container
+    processors:
+
+    exporters:
+      awsprometheusremotewrite:
+        endpoint: "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-86f550cf-15da-4138-82ec-3461b84575f4/api/v1/remote_write"
+        aws_auth:
+          region: "us-west-2"
+          service: "aps"
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp, prometheus]
+          processors: []
+          exporters: [awsprometheusremotewrite]

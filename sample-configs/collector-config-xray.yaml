@@ -1,0 +1,26 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: my-collector
+spec:
+  image: "public.ecr.aws/aws-observability/aws-otel-collector:v0.14.0"
+  mode: deployment # This configuration is omittable.
+  serviceAccount: adot-collector
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+    processors:
+
+    exporters:
+      awsxray:
+        region: <YOUR_AWS_REGION>
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [awsxray]

@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: sample-app-claim0
+  name: sample-app-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: sample-app
+  name: sample-app
+spec:
+  ports:
+    - name: "4567"
+      port: 4567
+      targetPort: 4567
+  selector:
+    io.kompose.service: sample-app
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: sample-app
+  name: sample-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sample-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: sample-app
+    spec:
+      containers:
+        - env:
+            - name: AWS_REGION
+              value: <YOUR_AWS_REGION>
+            - name: LISTEN_ADDRESS
+              value: 0.0.0.0:4567
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://my-collector-collector:4317
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.namespace=AOCDockerDemo,service.name=AOCDockerDemoService
+          image: public.ecr.aws/aws-otel-test/aws-otel-java-test-spark:v0.11.0
+          name: sample-app
+          ports:
+            - containerPort: 4567
+          resources: {}
+          volumeMounts:
+            - mountPath: /root/.aws
+              name: sample-app-claim0
+      restartPolicy: Always
+      volumes:
+        - name: sample-app-claim0
+  persistentVolumeClaim:
+status: {}

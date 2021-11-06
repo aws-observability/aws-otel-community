@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: traffic-generator
+  name: traffic-generator
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    io.kompose.service: traffic-generator
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: traffic-generator
+  name: traffic-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: traffic-generator
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: traffic-generator
+    spec:
+      containers:
+        - args:
+            - /bin/bash
+            - -c
+            - sleep 10; while :; do curl sample-app:4567/outgoing-http-call > /dev/null 1>&1; sleep 2; curl sample-app:4567/aws-sdk-call > /dev/null 2>&1; sleep 5; done
+          image: ellerbrock/alpine-bash-curl-ssl:latest
+          name: traffic-generator
+          ports:
+            - containerPort: 80
+          resources: {}
+      restartPolicy: Always
+status: {}
