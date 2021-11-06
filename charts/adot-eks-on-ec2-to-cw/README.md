@@ -5,7 +5,7 @@ The repository contains a [Helm](https://helm.sh/) chart to provide easy to oper
 Therefore, this Helm chart is useful for customers who use EKS on EC2 and want to collect metrics and logs to send to CloudWatch Container Insights. 
 This chart makes it easy for the user to install and configure their setup to collect telemetry data and send to the monitoring service they use, and in this case, CloudWatch.
 
-The Helm chart configured in this repository is ready to collect metrics and logs and send them to CloudWatch Container Insights.
+The Helm chart configured in this repository deploys ADOT Collector and Fluent Bit as DaemonSets and is ready to collect metrics and logs and send them to CloudWatch Container Insights.
 
 ## Prerequisite
 
@@ -19,7 +19,7 @@ The Helm chart configured in this repository is ready to collect metrics and log
 
 Once Helm is set up properly, add this repo as follows:
 ```console
-$ helm repo add [repo_name] https://TO_BE_RELEASED.github.io/adot-helm-eks-ec2
+$ helm repo add [repo_name] https://TO_BE_RELEASED.github.io/adot-eks-on-ec2-to-cw
 # You can then run following command to see the chart.
 $ helm search repo [repo_name]
 ```
@@ -28,7 +28,7 @@ $ helm search repo [repo_name]
 
 ```console
 $ helm install \
-  [RELEASE_NAME] [REPO_NAME]/adot-helm-eks-ec2 \
+  [RELEASE_NAME] [REPO_NAME]/adot-eks-on-ec2-to-cw \
   --set clusterName=[Cluster_Name] --set awsRegion=[AWS_Region]
 ```
 Cluster_Name and AWS_Region must be specified with your own EKS cluster and the region.
@@ -75,7 +75,7 @@ aws-cloudwatch-metrics   adot-collector-daemonset-x7n8x   1/1     Running   0   
 See Customizing the Chart Before Installing. To see all configurable options with detailed comments:
 
 ```console
-$ helm show values [REPO_NAME]/adot-helm-eks-ec2
+$ helm show values [REPO_NAME]/adot-eks-on-ec2-to-cw
 ```
 
 By changing values in `values.yaml`, you are able to customize the chart to use your preferred configuration.
@@ -83,12 +83,12 @@ Following options are some useful configurations that can be applied in this Hel
 
 ### Optional: Deploy ADOT Collector as Sidecar
 
-Use `helm install` command from [Install Chart](https://github.com/open-o11y/adot-helm-eks-ec2#install-chart) to deploy ADOT Collector and Fluent Bit as DaemonSet.
+Use `helm install` command from [Install Chart](https://github.com/open-o11y/aws-otel-community/blob/16b908d51b540383f1e1e8be46c799ce51066137/charts/adot-eks-on-ec2-to-cw/README.md#install-chart) to deploy ADOT Collector and Fluent Bit as DaemonSet.
 However, ADOT Collector can be deployed as Sidecar with the following command.
 
 ```console
 $ helm install \
-  [RELEASE_NAME] [REPO_NAME]/adot-helm-eks-ec2 \
+  [RELEASE_NAME] [REPO_NAME]/adot-eks-on-ec2-to-cw \
   --set clusterName=[Cluster_Name] --set awsRegion=[AWS_Region] \
   --set adotCollector.daemonSet.enabled=false --set adotCollector.sidecar.enabled=true
 ```
@@ -104,12 +104,13 @@ amazon-cloudwatch        fluent-bit-9dcql                1/1     Running   0    
 amazon-cloudwatch        fluent-bit-wqhmd                1/1     Running   0          5m18s
 ```
 
-
-### Optional: Deploy ADOT Collector as Deployment and StatefulSet
+### Optional: ADOT Collector as Deployment and StatefulSet, Prometheus  
 
 Deploying ADOT Collector as Deployment mode and StatefulSet mode requires installing ADOT Operator. 
 See [OpenTelemetry Operator Helm Chart](https://github.com/open-telemetry/opentelemetry-helm-charts/tree/main/charts/opentelemetry-operator) 
-for detailed explanation.
+for detailed explanation. <br>
+
+Please refer to [deployment template](https://github.com/aws-observability/aws-otel-collector/blob/main/deployment-template/eks/otel-container-insights-prometheus.yaml) to configure ADOT Collector with Prometheus Receiver for AWS Container Insights on EKS with [configurations](https://github.com/aws-observability/aws-otel-collector/blob/main/config/eks/prometheus/config-all.yaml) in the Helm chart.
 
 ## Uninstall Chart
 
@@ -123,7 +124,7 @@ $ helm uninstall [RELEASE_NAME]
 ## Upgrade Chart
 
 ```console
-$ helm upgrade [RELEASE_NAME] [REPO_NAME]/adot-helm-eks-ec2
+$ helm upgrade [RELEASE_NAME] [REPO_NAME]/adot-eks-on-ec2-to-cw
 ```
 
 ## Contributing
