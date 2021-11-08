@@ -28,14 +28,19 @@ data:
         resource_to_telemetry_conversion:
           enabled: {{ .Values.adotCollector.daemonSet.exporters.enabled }}
         dimension_rollup_option: {{ .Values.adotCollector.daemonSet.exporters.dimensionRollupOption }}
-        parse_json_encoded_attr_values: {{ .Values.adotCollector.daemonSet.exporters.parseJsonEncodedAttrValues }}
+        parse_json_encoded_attr_values: {{- range .Values.adotCollector.daemonSet.exporters.parseJsonEncodedAttrValues }}
+        - {{.}}{{- end }}
         metric_declarations:
           {{ .Values.adotCollector.daemonSet.metricDeclarations | nindent 10 }}
     service:
       pipelines:
         metrics:
-          receivers: {{ .Values.adotCollector.daemonSet.service.metrics.receivers }}
-          processors: {{ .Values.adotCollector.daemonSet.service.metrics.processors }}
-          exporters: {{ .Values.adotCollector.daemonSet.service.metrics.exporters }}
-      extensions: {{ .Values.adotCollector.daemonSet.service.extensions }}
+          receivers: {{- range .Values.adotCollector.daemonSet.service.metrics.receivers }}
+          - {{.}}{{- end }}
+          processors: {{- range .Values.adotCollector.daemonSet.service.metrics.processors }}
+          - {{.}}{{- end }}
+          exporters: {{- range .Values.adotCollector.daemonSet.service.metrics.exporters }}
+          - {{.}}{{- end }}
+      extensions: {{- range .Values.adotCollector.daemonSet.service.extensions }}
+      - {{.}}{{- end }}
 {{- end }}
