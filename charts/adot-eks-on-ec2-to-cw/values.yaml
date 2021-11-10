@@ -16,7 +16,7 @@ fluentbit:
   namespace: "amazon-cloudwatch"
   image:
     repository: "amazon/aws-for-fluent-bit"
-    tag: "2.20.0"
+    tag: "2.21.1"
     pullPolicy: "Always"
   input:
     applicationLog:
@@ -172,7 +172,7 @@ adotCollector:
   image:
     name: "aws-otel-collector"
     repository: "amazon/aws-otel-collector"
-    tag: "v0.13.0"
+    tag: "v0.14.0"
     daemonSetPullPolicy: "IfNotPresent"
     sidecarPullPolicy: "Always"
   daemonSet:
