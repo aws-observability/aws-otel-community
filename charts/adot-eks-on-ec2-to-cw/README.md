@@ -50,7 +50,7 @@ adot-eks-on-ec2-to-cw/
 
 ## Prerequisite
 
-You are required to have following items in order to install this Helm chart.
+The following pre-requisites need to be set up and installed in order to install this Helm chart.
 
 - EKS Cluster on EC2
 - IAM Role
@@ -90,8 +90,8 @@ $ kubectl get pods --all-namespaces
 NAMESPACE                NAME                             READY   STATUS    RESTARTS   AGE
 amazon-cloudwatch        fluent-bit-f27cz                 1/1     Running   0          4s
 amazon-cloudwatch        fluent-bit-m2mkr                 1/1     Running   0          4s
-aws-cloudwatch-metrics   adot-collector-daemonset-7nrst   1/1     Running   0          4s
-aws-cloudwatch-metrics   adot-collector-daemonset-x7n8x   1/1     Running   0          4s
+amzn-cloudwatch-metrics   adot-collector-daemonset-7nrst   1/1     Running   0          4s
+amzn-cloudwatch-metrics   adot-collector-daemonset-x7n8x   1/1     Running   0          4s
 ```
 
 If you see these four running pods, two for Fluent Bit and two for ADOT Collector as DaemonSets within the specified namespaces, they are successfully deployed.  
@@ -127,8 +127,8 @@ Following options are some useful configurations that can be applied to this Hel
 
 ### Deploy ADOT Collector as Sidecar
 
-Sidecar is a microservice design pattern where a companion service runs next to your primary microservice, augmenting its abilities or intercepting resources it is utilizing. If you want to monitor in a single application, then the sidecar pattern would be the best fit. Use `helm install` command from [Install Chart](#install-chart) to deploy ADOT Collector and Fluent Bit as DaemonSet.
-However, ADOT Collector can be deployed as Sidecar with the following command.
+Sidecar is a microservice design pattern where a companion service runs next to your primary microservice, augmenting its abilities or intercepting resources it is utilizing. The sidecar pattern would be the best fit for a single application monitoring.
+In order to deploy the ADOT Collector in Sidecar mode using the Helm chart, 1) update `sidecar.yaml` and `values.yaml` files in the Helm chart with the application configurations and 2) include the use of `--set` flag in the `helm install` command from [Install Chart](#install-chart).
 
 ```console
 $ helm install \
@@ -152,9 +152,11 @@ amazon-cloudwatch        fluent-bit-wqhmd                1/1     Running   0    
 
 Deploying ADOT Collector as Deployment and StatefulSet mode requires installing ADOT Operator. See [OpenTelemetry Operator Helm Chart](https://github.com/open-telemetry/opentelemetry-helm-charts/tree/main/charts/opentelemetry-operator) for detailed explanation.
 
-### Deploy Prometheus
 
-Please refer to [deployment template](https://github.com/aws-observability/aws-otel-collector/blob/main/deployment-template/eks/otel-container-insights-prometheus.yaml) to configure ADOT Collector with Prometheus Receiver for AWS Container Insights on EKS with [configurations](https://github.com/aws-observability/aws-otel-collector/blob/main/config/eks/prometheus/config-all.yaml) in the Helm chart.
+### Deploy ADOT Collector with Prometheus Receiver for AWS Container Insights on EKS
+
+Please refer to [deployment template](https://github.com/aws-observability/aws-otel-collector/blob/main/deployment-template/eks/otel-container-insights-prometheus.yaml) to deploy ADOT Collector with [Prometheus Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/d46048ac4dd01062c803867cb6a13377ea287a23/receiver/prometheusreceiver/README.md#prometheus-receiver) and [Amazon CloudWatch Embedded Metric Format (EMF) Exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/awsemfexporter#aws-cloudwatch-emf-exporter-for-opentelemetry-collector) for AWS Container Insights on EKS 
+via [configurations](https://github.com/aws-observability/aws-otel-collector/blob/main/config/eks/prometheus/config-all.yaml) in the Helm chart.
 
 ## Uninstall Chart
 

@@ -145,6 +145,29 @@ fluentbit:
     readFromHead: false
     readFromTail: "On"
 
+fargateLog:
+  enabled: false
+  name: "aws-logging"
+  namespace: "aws-observability"
+  awsObservability: "enabled"
+  outputConf:
+    name: "cloudwatch_logs"
+    match: "*"
+    logGroupName: "fluent-bit-cloudwatch"
+    logStreamPrefix: "from-fluent-bit-"
+    autoCreateGroup: true
+  parsersConf:
+    name: "crio"
+    timeKey: "time"
+    timeFormat: "%Y-%m-%dT%H:%M:%S.%L%z"
+  filtersConf:
+    name: "parser"
+    match: "*"
+    keyName: "log"
+    parser: "crio"
+    reserveData: "On"
+    preserveKey: true
+
 adotCollector:
   image:
     name: "aws-otel-collector"
@@ -155,7 +178,7 @@ adotCollector:
   daemonSet:
     enabled: true
     daemonSetName: "adot-collector-daemonset"
-    namespace: "aws-cloudwatch-metrics"
+    namespace: "amzn-cloudwatch-metrics"
     namespaceOverride: ""
     serviceAccount:
       create: true
@@ -322,12 +345,12 @@ adotCollector:
     regionS3: ""
     replicas: 1
     image:
-      name: "adot-emitter"
-      repository: "aottestbed/aws-otel-collector-java-sample-app"
-      tag: "0.6.0"
+      name: "user-application-image-name"
+      repository: "user-application-repository"
+      tag: ""
       pullPolicy: "Always"
-    otelOtlpEndPointValue: "localhost:4317"
-    otelResourceAttributesValue: "service.namespace=AWSObservability,service.name=CloudWatchEKSService"
+    otelOtlpEndPointValue: ""
+    otelResourceAttributesValue: ""
     resources:
       limits:
         cpu: "256m"

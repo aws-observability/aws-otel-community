@@ -1,0 +1,33 @@
+{{- if .Values.fargateLog.enabled }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Values.fargateLog.name }}
+  namespace: {{ .Values.fargateLog.namespace }}
+data:
+  output.conf: |
+    [OUTPUT]
+        Name {{ .Values.fargateLog.outputConf.name }}
+        Match {{ .Values.fargateLog.outputConf.match }}
+        region {{ .Values.awsRegion }}
+        log_group_name {{ .Values.fargateLog.outputConf.logGroupName }}
+        log_stream_prefix {{ .Values.fargateLog.outputConf.logStreamPrefix }}
+        auto_create_group {{ .Values.fargateLog.outputConf.autoCreateGroup }}
+
+  parsers.conf: |
+    [PARSER]
+        Name {{ .Values.fargateLog.parsersConf.name }}
+        Format Regex
+        Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>P|F) (?<log>.*)$
+        Time_Key {{ .Values.fargateLog.parsersConf.timeKey }}
+        Time_Format {{ .Values.fargateLog.parsersConf.timeFormat }}
+
+  filters.conf: |
+    [FILTER]
+       Name {{ .Values.fargateLog.filtersConf.name }}
+       Match {{ .Values.fargateLog.filtersConf.match }}
+       Key_name {{ .Values.fargateLog.filtersConf.keyName }}
+       Parser {{ .Values.fargateLog.filtersConf.parser }}
+       Reserve_Data {{ .Values.fargateLog.filtersConf.reserveData }}
+       Preserve_Key {{ .Values.fargateLog.filtersConf.preserveKey }}
+{{- end }}
