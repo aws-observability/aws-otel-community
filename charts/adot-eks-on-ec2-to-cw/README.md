@@ -9,6 +9,10 @@ The Helm chart configured in this repository deploys ADOT Collector and Fluent B
 ## Helm Chart Structure
 ```console
 adot-eks-on-ec2-to-cw/
+|-- scripts/ 
+|   |-- install-tools.sh
+|   |-- lint-charts.sh
+|   |-- validate-charts.sh
 |-- templates/
 |   |-- NOTES.txt
 |   |-- aws-for-fluent-bit/
@@ -29,11 +33,6 @@ adot-eks-on-ec2-to-cw/
 |   |   |-- serviceaccount.yaml
 |   |   |-- sidecar.yaml
 |   |   |-- sidecarnamespace.yaml
-|-- scripts/ 
-|   |-- install-tools.sh
-|   |-- lint-charts.sh
-|   |-- validate-charts.sh
-|-- .helmignore
 |-- Chart.yaml
 |-- values.schema.json
 |-- values.yaml
@@ -47,7 +46,7 @@ adot-eks-on-ec2-to-cw/
 
 `values.schema.json` file contains schemas of each values in values.yaml. It defines each values’ type, required keys, and constraints.
 
-
+`_helpers.tpl` files are used to define GO template helpers to create name variables.
 
 ## Prerequisite
 
@@ -112,6 +111,8 @@ If you see these four running pods, two for Fluent Bit and two for ADOT Collecto
 - Choose Performance monitoring in the drop-down menu on the top-left side.
 - Choose the levels such as EKS pods, EKS nodes, and EKS namespaces from the drop-down menu in the automated dashboard.
 - If you observe metrics of the running pods for CPU Utilization, Memory Utilization, etc, the metrics are successfully collected and visualized in Container Insights.
+
+![CWCI_dashboard](https://user-images.githubusercontent.com/38146012/141032708-9080ed8a-ff68-4227-8ea5-98c8fd5deff8.jpeg)
 
 ## Configuration
 To see all configurable options with detailed comments:
