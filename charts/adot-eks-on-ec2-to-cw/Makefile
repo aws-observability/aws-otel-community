@@ -1,4 +1,5 @@
-# Makefile to run the chart validation test and lint
+# Source Code from: https://github.com/aws/eks-charts
+# Run `make install-tools`, then `make all` for chart validation test and lint
 REPO_ROOT ?= $(shell git rev-parse --show-toplevel)
 
 .PHONY:all
@@ -18,5 +19,3 @@ lint:
 .PHONY: clean
 clean:
 	rm -rf ${REPO_ROOT}/build/
-
-# Source Code from: https://github.com/aws/eks-charts
