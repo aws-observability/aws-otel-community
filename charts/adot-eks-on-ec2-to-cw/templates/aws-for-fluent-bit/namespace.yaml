@@ -1,0 +1,9 @@
+# Specify namespace for Fluent Bit.
+{{- if .Values.fluentbit.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "aws-for-fluent-bit.namespace" . }}
+  labels:
+    name: {{ include "aws-for-fluent-bit.namespace" . }}
+{{- end }}

@@ -1,0 +1,47 @@
+# ConfigMap for ADOT Collector as a DaemonSet with the specified configurations, including configured values from values.yaml.
+{{- if .Values.adotCollector.daemonSet.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.adotCollector.daemonSet.configMap.name }}
+  namespace: {{ .Values.adotCollector.daemonSet.namespace }}
+  labels:
+    app: {{ .Values.adotCollector.daemonSet.configMap.app }}
+    component: {{ .Values.adotCollector.daemonSet.configMap.component }}
+data:
+  adot-config: |
+    extensions:
+      health_check: {{ .Values.adotCollector.daemonSet.extensions.healthCheck }}
+    receivers:
+      awscontainerinsightreceiver:
+        collection_interval: {{ .Values.adotCollector.daemonSet.receivers.collectionInterval }}
+        container_orchestrator: {{ .Values.adotCollector.daemonSet.receivers.containerOrchestrator }}
+        add_service_as_attribute: {{ .Values.adotCollector.daemonSet.receivers.addServiceAsAttribute }}
+        prefer_full_pod_name: {{ .Values.adotCollector.daemonSet.receivers.preferFullPodName }}
+    processors:
+      batch/metrics:
+        timeout: {{ .Values.adotCollector.daemonSet.processors.timeout }}
+    exporters:
+      awsemf:
+        namespace: {{ .Values.adotCollector.daemonSet.exporters.namespace }}
+        log_group_name: '/aws/containerinsights/{{ .Values.clusterName }}/performance'
+        log_stream_name: {{ .Values.adotCollector.daemonSet.exporters.logStreamName }}
+        resource_to_telemetry_conversion:
+          enabled: {{ .Values.adotCollector.daemonSet.exporters.enabled }}
+        dimension_rollup_option: {{ .Values.adotCollector.daemonSet.exporters.dimensionRollupOption }}
+        parse_json_encoded_attr_values: {{- range .Values.adotCollector.daemonSet.exporters.parseJsonEncodedAttrValues }}
+        - {{.}}{{- end }}
+        metric_declarations:
+          {{ .Values.adotCollector.daemonSet.metricDeclarations | nindent 10 }}
+    service:
+      pipelines:
+        metrics:
+          receivers: {{- range .Values.adotCollector.daemonSet.service.metrics.receivers }}
+          - {{.}}{{- end }}
+          processors: {{- range .Values.adotCollector.daemonSet.service.metrics.processors }}
+          - {{.}}{{- end }}
+          exporters: {{- range .Values.adotCollector.daemonSet.service.metrics.exporters }}
+          - {{.}}{{- end }}
+      extensions: {{- range .Values.adotCollector.daemonSet.service.extensions }}
+      - {{.}}{{- end }}
+{{- end }}

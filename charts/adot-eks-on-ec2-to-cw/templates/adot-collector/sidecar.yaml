@@ -1,0 +1,32 @@
+# ADOT Collector as a Sidecar for deployment.
+{{- if .Values.adotCollector.sidecar.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.adotCollector.sidecar.name }}
+  namespace: {{ .Values.adotCollector.sidecar.namespace }}
+  labels:
+    name: {{ .Values.adotCollector.sidecar.name }}
+spec:
+  replicas: {{ .Values.adotCollector.sidecar.replicas }}
+  selector:
+    matchLabels:
+      name: {{ .Values.adotCollector.sidecar.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.adotCollector.sidecar.name }}
+    spec:
+      containers:
+        - name: "{{ .Values.adotCollector.sidecar.image.name }}"
+          image: "{{ .Values.adotCollector.sidecar.image.repository }}:{{ .Values.adotCollector.sidecar.image.tag }}"
+          imagePullPolicy: {{ .Values.adotCollector.sidecar.image.pullPolicy }}
+        - name: "{{ .Values.adotCollector.image.name }}"
+          image: "{{ .Values.adotCollector.image.repository }}:{{ .Values.adotCollector.image.tag }}"
+          env:
+            - name: AWS_REGION
+              value: {{ .Values.awsRegion }}
+          imagePullPolicy: {{ .Values.adotCollector.image.sidecarPullPolicy }}
+          resources:
+            {{- toYaml .Values.adotCollector.sidecar.resources | nindent 12 }}
+{{- end }}

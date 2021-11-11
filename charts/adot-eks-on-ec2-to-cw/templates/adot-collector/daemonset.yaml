@@ -1,0 +1,32 @@
+# ADOT Collector as a DaemonSet for deployment.
+{{- if .Values.adotCollector.daemonSet.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.adotCollector.daemonSet.daemonSetName }}
+  namespace: {{ .Values.adotCollector.daemonSet.namespace }}
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Values.adotCollector.daemonSet.daemonSetName }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.adotCollector.daemonSet.daemonSetName }}
+    spec:
+      containers:
+        - name: {{ .Values.adotCollector.daemonSet.containersName }}
+          image: "{{ .Values.adotCollector.image.repository }}:{{ .Values.adotCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.adotCollector.image.daemonSetPullPolicy }}
+          env:
+            {{- toYaml .Values.adotCollector.daemonSet.env | nindent 12}}
+          command:
+            {{- toYaml .Values.adotCollector.daemonSet.command | nindent 12}}
+          volumeMounts:
+            {{- toYaml .Values.adotCollector.daemonSet.volumeMounts | nindent 12 }}
+          resources:
+            {{- toYaml .Values.adotCollector.daemonSet.resources | nindent 12 }}
+      volumes:
+        {{- toYaml .Values.adotCollector.daemonSet.volumes | nindent 10 }}
+      serviceAccountName: {{ .Values.adotCollector.daemonSet.serviceAccount.name  }}
+{{- end }}

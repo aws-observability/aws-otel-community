@@ -1,0 +1,9 @@
+# Specify namespace for Fargate logging.
+{{- if .Values.fargateLog.enabled }}
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: {{ .Values.fargateLog.namespace }}
+  labels:
+    aws-observability: {{ .Values.fargateLog.awsObservability }}
+{{- end }}
