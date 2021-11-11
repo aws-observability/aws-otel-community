@@ -1,3 +1,4 @@
+# ConfigMap for Fluent Bit with the specified configurations, including configured values from values.yaml, to collect and send data to desired destination(s).
 {{- if .Values.fluentbit.enabled }}
 apiVersion: v1
 kind: ConfigMap

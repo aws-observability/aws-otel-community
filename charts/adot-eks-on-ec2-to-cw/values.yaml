@@ -345,12 +345,10 @@ adotCollector:
     regionS3: ""
     replicas: 1
     image:
-      name: "user-application-image-name"
-      repository: "user-application-repository"
+      name: ""
+      repository: ""
       tag: ""
-      pullPolicy: "Always"
-    otelOtlpEndPointValue: ""
-    otelResourceAttributesValue: ""
+      pullPolicy: ""
     resources:
       limits:
         cpu: "256m"

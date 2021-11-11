@@ -1,3 +1,4 @@
+# Specify namespace for Fargate logging.
 {{- if .Values.fargateLog.enabled }}
 kind: Namespace
 apiVersion: v1

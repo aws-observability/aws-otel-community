@@ -1,4 +1,5 @@
 {{/* vim: set filetype=mustache: */}}
+{{/* chart specific names and labels that may be re-used in the chart */}}
 {{/*
 Expand the name of the chart.
 */}}

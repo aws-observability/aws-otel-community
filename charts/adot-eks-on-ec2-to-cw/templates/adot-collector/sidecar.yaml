@@ -1,3 +1,4 @@
+# ADOT Collector as a Sidecar for deployment.
 {{- if .Values.adotCollector.sidecar.enabled }}
 apiVersion: apps/v1
 kind: Deployment
@@ -17,19 +18,10 @@ spec:
         name: {{ .Values.adotCollector.sidecar.name }}
     spec:
       containers:
-        - name: {{ .Values.adotCollector.sidecar.image.name }}
+        - name: "{{ .Values.adotCollector.sidecar.image.name }}"
           image: "{{ .Values.adotCollector.sidecar.image.repository }}:{{ .Values.adotCollector.sidecar.image.tag }}"
           imagePullPolicy: {{ .Values.adotCollector.sidecar.image.pullPolicy }}
-          env:
-            - name: OTEL_OTLP_ENDPOINT
-              value: {{ .Values.adotCollector.sidecar.otelOtlpEndPointValue | quote }}
-            - name: OTEL_RESOURCE
-              value: ClusterName={{ .Values.clusterName }}
-            - name: OTEL_RESOURCE_ATTRIBUTES
-              value: {{ .Values.adotCollector.sidecar.otelResourceAttributesValue | quote}}
-            - name: S3_REGION
-              value: {{ .Values.adotCollector.sidecar.regionS3 }}
-        - name: {{ .Values.adotCollector.image.name }}
+        - name: "{{ .Values.adotCollector.image.name }}"
           image: "{{ .Values.adotCollector.image.repository }}:{{ .Values.adotCollector.image.tag }}"
           env:
             - name: AWS_REGION

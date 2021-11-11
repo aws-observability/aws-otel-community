@@ -1,3 +1,4 @@
+# Makefile to run the chart validation test and lint
 REPO_ROOT ?= $(shell git rev-parse --show-toplevel)
 
 .PHONY:all

@@ -1088,14 +1088,14 @@
                                 },
                                 "repository": {
                                     "type": "string",
-                                    "pattern": "^[/a-z0-9-_]+$"
+                                    "pattern": "(^$|^[/a-z0-9-_]+)$"
                                 },
                                 "tag": {
                                     "type": "string"
                                 },
                                 "pullPolicy": {
                                     "type": "string",
-                                    "pattern": "^(Always|Never|IfNotPresent)$"
+                                    "pattern": "(^$|^(Always|Never|IfNotPresent))$"
                                 }
                             }
                         },

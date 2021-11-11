@@ -1,3 +1,4 @@
+# ClusterRole for ADOT Collector as a DaemonSet contains rules, and defines and grants permissions to specified resources/endpoints.
 {{- if .Values.adotCollector.daemonSet.enabled }}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1

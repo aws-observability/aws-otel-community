@@ -40,7 +40,7 @@ adot-eks-on-ec2-to-cw/
 
 `templates` folder contains two subfolders, `aws-for-fluent-bit` and `aws-otel-collector`, and each subfolder contains template files that will be evaluated with the default values configured in `values.yaml.`
 
-`script` folder contains shell script files to run chart validation and lint tests with [Helm](https://helm.sh/), [Kubeval](https://kubeval.instrumenta.dev/), and [BATS](https://bats-core.readthedocs.io/en/stable/index.html) (bash automated testing system).
+`script` folder contains shell script files to run chart validation and lint tests with [Helm Lint](https://helm.sh/docs/helm/helm_lint/) and [Kubeval](https://kubeval.instrumenta.dev/).
 
 `values.yaml` file stores parameterized template defaults in the Helm chart. Using this file, we can provide more flexibility to our users to expose configuration that can be overriden at installation and upgrade time.
 
@@ -64,6 +64,14 @@ Once Helm is set up properly, add this repo as follows:
 ```console
 $ helm repo add [REPO_NAME] https://TO_BE_RELEASED.github.io/adot-helm-eks-ec2
 $ helm search repo [REPO_NAME] # Run this command in order to see the charts.
+```
+
+### Verify the Helm chart works as expected
+- Run chart validation test and lint from`MakeFile`.
+```console
+$ cd adot-eks-on-ec2-to-cw
+$ make install-tools # required initially
+$ make all           # to run chart validation test and lint 
 ```
 
 ## Install Chart
@@ -90,13 +98,13 @@ $ kubectl get pods --all-namespaces
 NAMESPACE                NAME                             READY   STATUS    RESTARTS   AGE
 amazon-cloudwatch        fluent-bit-f27cz                 1/1     Running   0          4s
 amazon-cloudwatch        fluent-bit-m2mkr                 1/1     Running   0          4s
-amzn-cloudwatch-metrics   adot-collector-daemonset-7nrst   1/1     Running   0          4s
-amzn-cloudwatch-metrics   adot-collector-daemonset-x7n8x   1/1     Running   0          4s
+amzn-cloudwatch-metrics  adot-collector-daemonset-7nrst   1/1     Running   0          4s
+amzn-cloudwatch-metrics  adot-collector-daemonset-x7n8x   1/1     Running   0          4s
 ```
 
-If you see these four running pods, two for Fluent Bit and two for ADOT Collector as DaemonSets within the specified namespaces, they are successfully deployed.  
+If you see these four running pods, two for Fluent Bit and two for ADOT Collector as DaemonSets within the specified namespaces, they are successfully deployed.
 
-### Verify whether the metrics and logs were sent to Amazon CloudWatch
+### Verify the metrics and logs are sent to Amazon CloudWatch
 
 - Open Amazon CloudWatch console
 - Select "Logs -> Log groups" on the left navigation bar.
@@ -166,9 +174,35 @@ Amazon EKS on Fargate features a Fluent Bit based built-in log router to send co
 Fargate utilizes [AWS for Fluent Bit](https://github.com/aws/aws-for-fluent-bit), 
 and the required configurations for Fargate to automatically detect and configure the log router are included in the Helm chart in `configmap.yaml` and `values.yaml` files based on the [Fargate logging](https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html) user guide.
 The configurations in `configmap.yaml` must include the name: `aws-logging` and the namespace: `aws-observability` for Fargate logging. To deploy your application to Amazon EKS on Fargate, you need to include your application yaml file 
-in the `aws-fargate-logging` folder of the Helm chart with the same namespace as your [AWS Fargate profile](https://docs.aws.amazon.com/eks/latest/userguide/fargate-profile.html). For more detailed information about Fargate logging, such as deployment of a sample-app or your application and 
-the instructions to download, create, and attach IAM policy to the [pod execution role](https://docs.aws.amazon.com/eks/latest/userguide/pod-execution-role.html) for Fargate profile, please refer to the user guide for [Fargate logging](https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html) and [Getting started with AWS Fargate using Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html).
+in the `aws-fargate-logging` folder of the Helm chart with the same namespace as your [AWS Fargate profile](https://docs.aws.amazon.com/eks/latest/userguide/fargate-profile.html). For more detailed information about Fargate logging, such as deployment of a `sample-app.yaml` or your application and 
+the instructions to download, create, and attach IAM policy to the [pod execution role](https://docs.aws.amazon.com/eks/latest/userguide/pod-execution-role.html) for Fargate profile, 
+please refer to the user guide for [Fargate logging](https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html) and [Getting started with AWS Fargate using Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html).
 
+This is an example of using the Helm chart for Fargate logging with the `sample-app.yaml` from [Fargate logging](https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html).
+```console
+$ helm install \
+  [RELEASE_NAME] [REPO_NAME]/adot-eks-on-ec2-to-cw \
+  --set clusterName=[CLUSTER_NAME] --set awsRegion=[AWS_REGION] \
+  --set fargateLogging.enabled=true
+```
+To confirm the `sample-app` is deployed and troubleshoot the logging is enabled/disabled, you can run the following commands.
+```console
+$ kubectl get pods --all-namespaces
+
+NAMESPACE               NAME                            READY   STATUS    RESTARTS   AGE
+aws-observability       sample-app-86b8cc866b-cr5x6     1/1     Running   0          13m
+aws-observability       sample-app-86b8cc866b-q75z7     1/1     Running   0          13m
+aws-observability       sample-app-86b8cc866b-t615c     1/1     Running   0          13m
+```
+
+```console
+$ kubectl describe po -n aws-observability sample-app-86b8cc866b-cr5x6
+
+Events:
+  Type    Reason          Age  From               Message 
+  ----    ------          ---  ----               -------
+  Normal  LoggingEnabled  13m  fargate-scheduler  Successfully enabled logging for pod 
+```
 ## Uninstall Chart
 
 The following command uninstalls the chart. 

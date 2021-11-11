@@ -10,8 +10,8 @@ TOOLS_DIR="${BUILD_DIR}/tools"
 mkdir -p "${TOOLS_DIR}"
 export PATH="${TOOLS_DIR}:${PATH}"
 
-HELMV3_VERSION="v3.7.1"
-BATS_VERSION=1.4.1
+HELM_VERSION_TAG=$(curl -sSL https://github.com/helm/helm/releases/latest | sed -n '/<title>/,$p' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+HELM_VERSION=v${HELM_VERSION_TAG}
 
 ## Install kubeval
 mkdir -p "${TMP_DIR}/kubeval"
@@ -20,13 +20,9 @@ mv "${TMP_DIR}/kubeval/kubeval" "${TOOLS_DIR}/kubeval"
 
 ## Install helm v3
 mkdir -p "${TMP_DIR}/helmv3"
-curl -sSL https://get.helm.sh/helm-${HELMV3_VERSION}-${PLATFORM}-${ARCH}.tar.gz | tar xz -C "${TMP_DIR}/helmv3"
+curl -sSL https://get.helm.sh/helm-${HELM_VERSION}-${PLATFORM}-${ARCH}.tar.gz | tar xz -C "${TMP_DIR}/helmv3"
 mv "${TMP_DIR}/helmv3/${PLATFORM}-${ARCH}/helm" "${TOOLS_DIR}/helmv3"
 rm -rf "${PLATFORM}-${ARCH}"
-
-## Install Bats
-curl -sSL https://github.com/bats-core/bats-core/archive/v${BATS_VERSION}.tar.gz | tar xz -C "${TOOLS_DIR}"
-ln -s ${TOOLS_DIR}/bats-core-${BATS_VERSION}/bin/bats ${TOOLS_DIR}/bats
 
 ## Remove TMP directory
 rm -rf ${TMP_DIR}
