@@ -50,11 +50,11 @@ adot-eks-on-ec2-to-cw/
 
 ## Prerequisite
 
-The following pre-requisites need to be set up and installed in order to install this Helm chart.
+The following prerequisites need to be set up in order to install this Helm chart.
 
-- EKS Cluster on EC2
-- IAM Role
-- Helm v3+
+- Your EKS Cluster on EC2 
+- [Amazon CloudWatch Container Insights prerequisites](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-prerequisites.html)
+- [Helm v3+](https://helm.sh/docs/helm/helm_install/)
 
 ## Get Repository Information
 
@@ -64,14 +64,6 @@ Once Helm is set up properly, add this repo as follows:
 ```console
 $ helm repo add [REPO_NAME] https://TO_BE_RELEASED.github.io/adot-helm-eks-ec2
 $ helm search repo [REPO_NAME] # Run this command in order to see the charts.
-```
-
-### Verify the Helm chart works as expected
-- Run chart validation test and lint from`MakeFile`.
-```console
-$ cd adot-eks-on-ec2-to-cw
-$ make install-tools # required initially
-$ make all           # to run chart validation test and lint 
 ```
 
 ## Install Chart
@@ -103,6 +95,14 @@ amzn-cloudwatch-metrics  adot-collector-daemonset-x7n8x   1/1     Running   0   
 ```
 
 If you see these four running pods, two for Fluent Bit and two for ADOT Collector as DaemonSets within the specified namespaces, they are successfully deployed.
+
+### Verify the Helm chart works as expected
+- Run chart validation test and lint from`MakeFile`.
+```console
+$ cd adot-eks-on-ec2-to-cw
+$ make install-tools # required initially
+$ make all           # to run chart validation test and lint 
+```
 
 ### Verify the metrics and logs are sent to Amazon CloudWatch
 
