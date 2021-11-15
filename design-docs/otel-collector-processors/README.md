@@ -214,3 +214,37 @@ sense as a user experience.
 
 An implementation of the query language would likely parse expressions into this sort of structure so given an SQL-like
 implementation, it would likely be little overhead to support a YAML approach in addition.
+
+## Implementing a processor function
+
+The `replace_wildcards` function may look like this.
+
+```go
+
+package replacewildcards
+
+import "regexp"
+
+import "github.com/open-telemetry/opentelemetry/processors"
+
+// Assuming this is not in "core"
+processors.register("replace_wildcards", replace_wildcards)
+
+func replace_wildcards(pattern regexp.Regexp, replacement string, path processors.TelemetryPath) processors.Result  {
+    val := path.Get()
+	if val == nil {
+		return processors.CONTINUE
+    }
+	
+	// replace finds placeholders in "replacement" and swaps them in for regex matched substrings.
+	replaced := replace(val, pattern, replacement)
+	path.Set(replaced)
+	return processors.CONTINUE
+}
+```
+
+Here, the processor framework recognizes the first parameter of the function is `regexp.Regexp` so will compile the string
+provided by the user in the config when processing it. Similarly for `path`, it recognizes properties of type `TelemetryPath`
+and will resolve it to the path within a matched telemetry during execution and pass it to the function. The path allows
+scalar operations on the field within the telemetry. The processor does not need to be aware of telemetry filtering,
+the `where ...` clause as that will be handled by the framework before passing to the function.
