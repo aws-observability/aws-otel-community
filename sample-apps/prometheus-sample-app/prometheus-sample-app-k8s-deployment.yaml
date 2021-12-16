@@ -1,0 +1,28 @@
+# deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-sample-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: prometheus-sample-app
+  replicas: 5 # tells deployment to run 5 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: prometheus-sample-app
+      annotations:
+        prometheus.io/scrape: 'true'
+    spec:
+      containers:
+        - name: prometheus-sample-app
+          image: 786911222539.dkr.ecr.us-east-2.amazonaws.com/prometheus_sample_app:latest
+         # image: prometheus-sample-app:latest
+          imagePullPolicy: Never
+          command:
+            - "/bin/main"
+          args:
+            - "--metric_count=1"
+          ports:
+            - containerPort: 8080
