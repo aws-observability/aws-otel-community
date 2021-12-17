@@ -17,6 +17,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// mean and standard deviation for histogram and summary normal distribution
+var (
+	normDomain = flag.Float64("normal.domain", 0.5, "The domain for the normal distribution.")
+	normMean   = flag.Float64("normal.mean", 0.18, "The mean for the normal distribution.")
+)
+
 type Config struct {
 	Address        string `yaml:"Address"`
 	Type           string `yaml:"Type"`
@@ -137,7 +143,7 @@ func createSummary(count int, mc metricCollector) {
 }
 
 // createAll generates all 4 metric types
-// If isRandom is sent as true, createAll will generate randomized metrics. Otherwise createALl will steadily create the 4 types of metrics with a fixed count (provided by the user
+// If isRandom is sent as true, createAll will generate randomized metrics. Other-wise createALl will steadily create the 4 types of metrics with a fixed count (provided by the user
 func createAll(count int, mc metricCollector, isRandom bool) {
 
 	if isRandom {
@@ -177,7 +183,7 @@ func createAll(count int, mc metricCollector, isRandom bool) {
 }
 
 // Run reads the config file and uses the data as default arguments.
-// These arguments can be overriden by CLI input (see README)
+// These arguments can be overridden by CLI input (see README)
 func (cli *CommandLine) Run() {
 	data, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
@@ -192,7 +198,7 @@ func (cli *CommandLine) Run() {
 	// Handling it without viper / cobra for now - still follows flags >  configuration file > defaults
 	// defaults are set first
 	// config file is read - if there are valid values, config file overrides defaults
-	// flags will use config values as default values and overide them with CLI input
+	// flags will use config values as default values and override them with CLI input
 	usedType := defaultType
 	usedMetricsCount := defaultMetricsCount
 	usedLabelsCount := defaultLabelsCount

@@ -1,19 +1,12 @@
 package metrics
 
 import (
-	"flag"
 	"fmt"
 	"log"
-	"math"
 	"math/rand"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-)
-
-var (
-	normDomain = flag.Float64("normal.domain", 0.0002, "The domain for the normal distribution.")
-	normMean   = flag.Float64("normal.mean", 0.00001, "The mean for the normal distribution.")
 )
 
 type metricCollector struct {
@@ -35,6 +28,7 @@ func newMetricCollector() metricCollector {
 	return metricCollector{}
 }
 
+// Periodically record metric values and labels for counter metric.
 func (mc *metricCollector) updateCounter() {
 	for _, c := range mc.counters {
 		for i := 0; i < mc.datapointCount; i++ {
@@ -44,6 +38,7 @@ func (mc *metricCollector) updateCounter() {
 	}
 }
 
+// Periodically record metric values and labels for gauge metric.
 func (mc *metricCollector) updateGauge() {
 	for _, c := range mc.gauges {
 		for i := 0; i < mc.datapointCount; i++ {
@@ -53,24 +48,24 @@ func (mc *metricCollector) updateGauge() {
 	}
 }
 
+// Periodically record metric values and labels for histogram metric.
 func (mc *metricCollector) updateHistogram() {
 	for idx := 0; idx < len(mc.histograms); idx++ {
 		for i := 0; i < mc.datapointCount; i++ {
-			lowerBound := math.Mod(rand.Float64(), 1)
-			increment := math.Mod(rand.Float64(), 0.05)
 			labels := datapointLabels(i, mc.labelKeys, mc.labelValues)
-			for j := lowerBound; j < 1; j += increment {
-				mc.histograms[idx].With(labels).Observe(j)
-			}
+			// generate fictional values for histogram with random normal distribution
+			v := (rand.NormFloat64() * *normDomain) + *normMean
+			mc.histograms[idx].With(labels).Observe(v)
 		}
-
 	}
 }
 
+// Periodically record metric values and labels for summary metric.
 func (mc *metricCollector) updateSummary() {
 	for idx := 0; idx < len(mc.summarys); idx++ {
 		for i := 0; i < mc.datapointCount; i++ {
 			labels := datapointLabels(i, mc.labelKeys, mc.labelValues)
+			// generate fictional values for summary with random normal distribution
 			v := (rand.NormFloat64() * *normDomain) + *normMean
 			mc.summarys[idx].With(labels).Observe(v)
 		}
@@ -105,6 +100,7 @@ func (mc *metricCollector) updateMetrics() {
 
 }
 
+// Register the counter and label keys with Prometheus's default registry.
 func (mc *metricCollector) registerCounter(count int) {
 	for idx := 0; idx < count; idx++ {
 		namespace := "test"
@@ -120,6 +116,7 @@ func (mc *metricCollector) registerCounter(count int) {
 	}
 }
 
+// Register the gauge and label keys with Prometheus's default registry.
 func (mc *metricCollector) registerGauge(count int) {
 	for idx := 0; idx < count; idx++ {
 		namespace := "test"
@@ -135,6 +132,7 @@ func (mc *metricCollector) registerGauge(count int) {
 	}
 }
 
+// Register the histogram and label keys with Prometheus's default registry.
 func (mc *metricCollector) registerHistogram(count int) {
 	for idx := 0; idx < count; idx++ {
 		namespace := "test"
@@ -151,15 +149,20 @@ func (mc *metricCollector) registerHistogram(count int) {
 	}
 }
 
+// Register the summary and label keys with Prometheus's default registry.
 func (mc *metricCollector) registerSummary(count int) {
 	for idx := 0; idx < count; idx++ {
 		namespace := "test"
 		summary := prometheus.NewSummaryVec(
 			prometheus.SummaryOpts{
-				Namespace:  namespace,
-				Name:       fmt.Sprintf("summary%v", idx),
-				Help:       "This is my summary",
-				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+				Namespace: namespace,
+				Name:      fmt.Sprintf("summary%v", idx),
+				Help:      "This is my summary",
+				Objectives: map[float64]float64{
+					0.1:  0.5,
+					0.5:  0.5,
+					0.99: 0.5,
+				},
 			},
 			append([]string{"datapoint_id"}, mc.labelKeys...))
 		promRegistry.MustRegister(summary)
@@ -167,6 +170,8 @@ func (mc *metricCollector) registerSummary(count int) {
 	}
 }
 
+// Method to generate constant labels for each metric as per given label count.
+// This method uses foo and bar strings as key value pair
 func generateLabels(labelCount int) ([]string, []string) {
 	labelKeys := make([]string, labelCount, labelCount)
 	for idx := 0; idx < labelCount; idx++ {
@@ -179,6 +184,7 @@ func generateLabels(labelCount int) ([]string, []string) {
 	return labelValues, labelKeys
 }
 
+// Method to generate unique data-point label for each metric
 func datapointLabels(datapointID int, labelKeys []string, labelValues []string) prometheus.Labels {
 	labelsDatapoint := prometheus.Labels{
 		"datapoint_id": fmt.Sprintf("%v", datapointID),

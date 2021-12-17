@@ -87,17 +87,13 @@ Deploy the example deployment configuration of 5 instances of Prometheus-Sample-
 ### Pre-requisites:
 - Docker
 - Docker Image Prometheus-Sample-App
-- Minikube
+- A Kubernetes cluster
 
-### Deployment on Kubernetes:
+### Deployment on Minikube:
 - Run Docker
 - Start Minikube
   ```bash
     $ minikube start
-  ```
-- Start Minikube dashboard
-  ```bash
-    $ minikube dashboard
   ```
 - Run following command to deploy: 
     ```bash
@@ -135,4 +131,4 @@ Deploy the example deployment configuration of 5 instances of Prometheus-Sample-
     $ kubectl logs <otel-collector-pod-name>
     ```
 
-Currently, OTEL Collector is configured with Logging exporter. Since all 5 replica Prometheus-Sample-App pods will produce identical metric names and labels, so Prometheus Exporter should be configured with additional details to ensure distinct metrics identity. 
+Currently, OTEL Collector is configured with Logging exporter. In this example, all replica Prometheus-Sample-App pods will produce identical metrics, and the Prometheus Exporter doesn't ingest identical metrics (same name and label) from different sources.
