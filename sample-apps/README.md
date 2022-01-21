@@ -1,6 +1,6 @@
 ###Sample Apps
 
-List of sample apps across repositories in [aws-observabilty](https://github.com/aws-observability) Org
+List of sample apps across repositories in [aws-observability](https://github.com/aws-observability) Org
 
 |Sample App                   |Location                                                                                                                                    |App functionlity                                                                                               |Language  |
 |-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|----------|
