@@ -1,4 +1,4 @@
-##Sample Apps
+# Sample Apps
 
 List of sample apps across all repositories in [aws-observability](https://github.com/aws-observability) org.
 
