@@ -12,6 +12,10 @@ If you’re an open source observability user or contributor, we invite you to g
 
 All preview features and AWS services integrations available for ADOT are supported under the guidelines of the ADOT [Public Preview Program](https://github.com/aws-observability/aws-otel-community/tree/master/preview-program).
 
+## ADOT Technical Documentation Site
+
+The [ADOT technical documentation](https://aws-otel.github.io/docs/introduction) is also an open source documentation site hosted on GitHub. This means you can [file issues](https://github.com/aws-otel/aws-otel.github.io/issues) to report documentation errors and updates. You can also [file PRs](https://github.com/aws-otel/aws-otel.github.io/pulls) to submit doc fixes and updates. Please take a look at the ADOT site [developer guide](https://github.com/aws-otel/aws-otel.github.io) to make changes and file PRs.
+
 ## License
 
 This project is licensed under the Apache-2.0 License.
