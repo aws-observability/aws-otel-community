@@ -42,7 +42,7 @@ spec:
               - __meta_kubernetes_endpoint_port_name
             - action: keep
               regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
+              source_labels: [__meta_kubernetes_endpoint_node_name]
             scheme: https
             tls_config:
               ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -64,7 +64,7 @@ spec:
               target_label: __metrics_path__
             - action: keep
               regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
+              source_labels: [__meta_kubernetes_node_name]
             scheme: https
             tls_config:
               ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -86,7 +86,7 @@ spec:
               target_label: __metrics_path__
             - action: keep
               regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
+              source_labels: [__meta_kubernetes_node_name]
             scheme: https
             tls_config:
               ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -136,7 +136,7 @@ spec:
               target_label: kubernetes_node
             - action: keep
               regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
+              source_labels: [__meta_kubernetes_endpoint_node_name]
 
           - job_name: kubernetes-service-endpoints-slow
             kubernetes_sd_configs:
@@ -182,54 +182,9 @@ spec:
               target_label: kubernetes_node
             - action: keep
               regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
+              source_labels: [__meta_kubernetes_endpoint_node_name]
             scrape_interval: 5m
             scrape_timeout: 30s
-            
-          - job_name: prometheus-pushgateway
-            honor_labels: true
-            kubernetes_sd_configs:
-            - role: service
-            relabel_configs:
-            - action: keep
-              regex: pushgateway
-              source_labels:
-              - __meta_kubernetes_service_annotation_prometheus_io_probe
-            - action: keep
-              regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
-
-          - job_name: kubernetes-services
-            kubernetes_sd_configs:
-            - role: service
-            metrics_path: /probe
-            params:
-              module:
-              - http_2xx
-            relabel_configs:
-            - action: keep
-              regex: true
-              source_labels:
-              - __meta_kubernetes_service_annotation_prometheus_io_probe
-            - source_labels:
-              - __address__
-              target_label: __param_target
-            - replacement: blackbox
-              target_label: __address__
-            - source_labels:
-              - __param_target
-              target_label: instance
-            - action: labelmap
-              regex: __meta_kubernetes_service_label_(.+)
-            - source_labels:
-              - __meta_kubernetes_namespace
-              target_label: kubernetes_namespace
-            - source_labels:
-              - __meta_kubernetes_service_name
-              target_label: kubernetes_name
-            - action: keep
-              regex: $K8S_NODE_NAME
-              source_labels: [__meta_kubernetes_pod_node_name]
 
           - job_name: kubernetes-pods
             kubernetes_sd_configs:

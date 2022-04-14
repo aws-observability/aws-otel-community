@@ -165,7 +165,6 @@ spec:
             scrape_timeout: 30s
             
           - job_name: prometheus-pushgateway
-            honor_labels: true
             kubernetes_sd_configs:
             - role: service
             relabel_configs:
