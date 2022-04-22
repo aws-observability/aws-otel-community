@@ -18,6 +18,10 @@ spec:
       value: <YOUR_EKS_CLUSTER_NAME>
   config: |
     receivers:
+      #
+      # Scrape configuration for the Prometheus Receiver
+      # This is the same configuration used when Prometheus is installed using the community Helm chart
+      # 
       prometheus:
         config:
           global:
@@ -295,7 +299,10 @@ spec:
                                                             
     processors:
       batch/metrics:
-        timeout: 60s       
+        timeout: 60s
+      #
+      # Processor to transform the names of existing labels and/or add new labels to the metrics identified
+      #   
       metricstransform/labelling:
         transforms:
           - include: .*
@@ -311,6 +318,11 @@ spec:
               - action: update_label
                 label: kubernetes_namespace
                 new_label: EKS_Namespace
+      #
+      # Filter processor to include only the metrics that we are interested in
+      # Add each metric under the metric_names field. 
+      # Regular expressions may be used to identify the metrics
+      #  
       filter/include:
         metrics:
           include:
@@ -319,6 +331,15 @@ spec:
               - ^<YOUR_APPLICATION_METRIC>$                   
 
     exporters:
+      #
+      # AWS EMF exporter that sends metrics data as performance log events to CloudWatch
+      # Only the metrics that were filtered out by the processors get to this stage of the pipeline
+      # Under the metric_declarations field, add one or more sets of CloudWatch dimensions
+      # Each dimension must alredy exist as a label on the Prometheus metric
+      # For each set of dimensions, add a list of metrics under the metric_name_selectors field
+      # Metrics names may be listed explicitly or using regular expressions
+      # Data from performance log events will be aggregated by CloudWatch using these dimensions to create a CloudWatch custom metric
+      #    
       awsemf:
         region: "<YOUR_AWS_REGION>"
         namespace: ContainerInsights/Prometheus
