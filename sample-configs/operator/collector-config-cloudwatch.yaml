@@ -6,7 +6,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: my-collector
+  name: my-collector-cloudwatch
 spec:
   mode: deployment
   serviceAccount: adot-demo
