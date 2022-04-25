@@ -6,7 +6,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: my-collector
+  name: my-collector-amp
 spec:
   mode: deployment
   serviceAccount: adot-demo
@@ -15,6 +15,10 @@ spec:
     prometheus.io/port: '8888'
   config: |
     receivers:
+      #
+      # Scrape configuration for the Prometheus Receiver
+      # This is the same configuration used when Prometheus is installed using the community Helm chart
+      # 
       prometheus:
         config:
           global:
