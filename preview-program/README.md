@@ -8,6 +8,11 @@ This program covers all preview features and AWS services integrations available
 What’s *not in scope* for this program:
 
 * The [default tracing pipelines](https://github.com/aws-observability/aws-otel-collector/blob/main/config.yaml), which includes trace collection for X-Ray.
+* Metrics support 
+  * Includes the ADOT Collector and collection pipelines using [Prometheus](https://aws-otel.github.io/docs/getting-started/advanced-prometheus-remote-write-configurations) components 
+  to send metrics to [Amazon Managed Service for Prometheus](https://aws-otel.github.io/docs/getting-started/prometheus-remote-write-exporter) 
+  and [CloudWatch Metrics](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
+  * Java, .NET, and Python SDK support
 * Any partner components and integrations.
 * The following [components](https://aws-otel.github.io/docs/releases) of ADOT:
     * AWS X-Ray Playground for OpenTelemetry
@@ -16,9 +21,8 @@ What’s *not in scope* for this program:
 
 What *is included* in this program:
 
-* Metrics support, including collection pipelines using [Prometheus](https://aws-otel.github.io/docs/getting-started/advanced-prometheus-remote-write-configurations) components 
-  to send metrics to [Amazon Managed Service for Prometheus](https://aws-otel.github.io/docs/getting-started/prometheus-remote-write-exporter) 
-  and [CloudWatch Metrics](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
+* Metrics support for the following SDKs
+  * Go, Ruby, JavaScript
 * Logs support, which includes collection pipelines using component to send logs to [CloudWatch Logs](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
 * The following [components](https://aws-otel.github.io/docs/releases):
     * AWS Distro for OpenTelemetry [Collector](https://aws-otel.github.io/docs/getting-started/collector)
@@ -51,7 +55,7 @@ Further we provide the following artifacts:
 
 * Configurations:
     * All Collector configurations are available on our ADOT GitHub repo [aws-observability/aws-otel-collector](https://github.com/aws-observability/aws-otel-collector/tree/main/config).
-    * GA SDKs for [Java](https://opentelemetry.io/docs/java/), [JavaScript](https://opentelemetry.io/docs/js/), 
+    * GA tracing SDKs for [Java](https://opentelemetry.io/docs/java/), [JavaScript](https://opentelemetry.io/docs/js/), 
       [Python](https://opentelemetry.io/docs/python/), [.NET](https://opentelemetry.io/docs/net/), and [Go](https://opentelemetry.io/docs/go/).
 * For Kubernetes and specifically EKS, we provide Helm charts via the [aws-observability/aws-otel-helm-charts](https://github.com/aws-observability/aws-otel-helm-charts) repo.
 * Security policies and good practice:
