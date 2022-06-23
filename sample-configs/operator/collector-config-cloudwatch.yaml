@@ -395,5 +395,5 @@ roleRef:
   name: otel-prometheus-role
 subjects:
   - kind: ServiceAccount
-    name: adot-demo
+    name: adot-collector
     namespace: default
