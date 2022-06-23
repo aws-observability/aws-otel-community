@@ -300,7 +300,7 @@ spec:
 
     exporters:
       awsprometheusremotewrite:
-        endpoint: "<YOUR_REMOTE_WRITE_ENDPOINT>""
+        endpoint: "<YOUR_REMOTE_WRITE_ENDPOINT>"
         aws_auth:
           region: "<YOUR_AWS_REGION>"
           service: "aps"
