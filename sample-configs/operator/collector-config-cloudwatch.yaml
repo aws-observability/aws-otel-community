@@ -9,7 +9,7 @@ metadata:
   name: my-collector-cloudwatch
 spec:
   mode: deployment
-  serviceAccount: adot-demo
+  serviceAccount: adot-collector
   podAnnotations:
     prometheus.io/scrape: 'true'
     prometheus.io/port: '8888'
