@@ -4,7 +4,7 @@ metadata:
   name: my-collector-xray
 spec:
   mode: deployment 
-  serviceAccount: adot-demo
+  serviceAccount: adot-collector
   config: |
     receivers:
       otlp:
