@@ -1,6 +1,6 @@
 #
 # OpenTelemetry Collector configuration
-# Metrics pipeline with Prometheus Receiver and AWS CloudWatch EMF Exporter sending metrics to CloudWatch
+# Metrics pipeline with Prometheus Receiver and Amazon CloudWatch EMF Exporter sending metrics to Amazon CloudWatch
 # 
 ---
 apiVersion: opentelemetry.io/v1alpha1
@@ -321,13 +321,13 @@ spec:
 
     exporters:
       #
-      # AWS EMF exporter that sends metrics data as performance log events to CloudWatch
+      # AWS EMF exporter that sends metrics data as performance log events to Amazon CloudWatch
       # Only the metrics that were filtered out by the processors get to this stage of the pipeline
-      # Under the metric_declarations field, add one or more sets of CloudWatch dimensions
+      # Under the metric_declarations field, add one or more sets of Amazon CloudWatch dimensions
       # Each dimension must alredy exist as a label on the Prometheus metric
       # For each set of dimensions, add a list of metrics under the metric_name_selectors field
       # Metrics names may be listed explicitly or using regular expressions
-      # Data from performance log events will be aggregated by CloudWatch using these dimensions to create a CloudWatch custom metric
+      # Data from performance log events will be aggregated by Amazon CloudWatch using these dimensions to create an Amazon CloudWatch custom metric
       #    
       awsemf:
         region: "<YOUR_AWS_REGION>"
