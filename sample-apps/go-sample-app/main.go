@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
@@ -35,10 +36,13 @@ var (
 	// Default values for random based metrics
 	defaultHost                    = "0.0.0.0"
 	defaultPort                    = "4567"
-	defaultTimeAliveInrementer     = 1
+	defaultTimeAliveIncrementer    = 1
 	defaultTotalHeapSizeUpperBound = 100
 	defaultThreadsActiveUpperBound = 10
 	defaultCpuUsageUpperBound      = 100
+
+	threadsActive int64 = 0
+	threadsBool         = true
 )
 
 // Random based metrics; values inputed by configuration file
@@ -130,7 +134,7 @@ func (c *conf) getConf() *conf {
 func (c *conf) getDefaultConfig() *conf {
 	c.Host = defaultHost
 	c.Port = defaultPort
-	c.TimeAliveIncrementer = int64(defaultTimeAliveInrementer)
+	c.TimeAliveIncrementer = int64(defaultTimeAliveIncrementer)
 	c.TotalheapSizeUpperBound = int64(defaultTotalHeapSizeUpperBound)
 	c.ThreadsActiveUpperBound = int64(defaultThreadsActiveUpperBound)
 	c.CpuUsageUpperBound = int64(defaultCpuUsageUpperBound)
@@ -146,20 +150,90 @@ func counterObserver(ctx context.Context) {
 	counter.Add(ctx, 1)
 }
 
+func asyncGaugeObserver(ctx context.Context) {
+	gauge, _ := meter.AsyncInt64().Gauge(
+		"CPU Usage",
+		instrument.WithUnit("%"),
+		instrument.WithDescription("Cpu usage percent"),
+	)
+
+	if err := meter.RegisterCallback(
+		[]instrument.Asynchronous{
+			gauge,
+		},
+		// SDK periodically calls this function to collect data.
+		func(ctx context.Context) {
+			min := 0
+			max := defaultCpuUsageUpperBound
+			cpuUsage := int64(rand.Intn(max-min) + min)
+			gauge.Observe(ctx, cpuUsage)
+			fmt.Println(cpuUsage)
+		},
+	); err != nil {
+		panic(err)
+	}
+}
+
+func asyncUpDownCounterObserver(ctx context.Context) {
+	upDownCounter, _ := meter.AsyncInt64().UpDownCounter(
+		"Total Heap Size",
+		instrument.WithUnit("1"),
+		instrument.WithDescription("The current total heap size"),
+	)
+
+	if err := meter.RegisterCallback(
+		[]instrument.Asynchronous{
+			upDownCounter,
+		},
+		// SDK periodically calls this function to collect data.
+		func(ctx context.Context) {
+			min := 0
+			max := defaultTotalHeapSizeUpperBound
+			totalHeapSize := int64(rand.Intn(max-min) + min)
+			upDownCounter.Observe(ctx, totalHeapSize)
+			fmt.Println(totalHeapSize)
+		},
+	); err != nil {
+		panic(err)
+	}
+
+}
+
 func upDownCounterObserver(ctx context.Context) {
 	upDownCounter, _ := meter.SyncInt64().UpDownCounter(
 		"Threads Active",
 		instrument.WithUnit("1"),
-		instrument.WithDescription("Number of threads currently active"),
+		instrument.WithDescription("The total amount of threads active"),
 	)
-	upDownCounter.Add(ctx, 1)
+
+	if threadsBool {
+		if threadsActive < int64(defaultThreadsActiveUpperBound) {
+			upDownCounter.Add(ctx, 1)
+			threadsActive++
+		} else {
+			threadsBool = false
+			threadsActive--
+		}
+
+	} else {
+		if threadsActive > 0 {
+			upDownCounter.Add(ctx, -1)
+			threadsActive--
+		} else {
+			threadsBool = true
+			threadsActive++
+		}
+	}
+	fmt.Println(threadsActive)
+
 }
 
 func updateLoop(ctx context.Context) {
 	go func() {
 		for {
 			upDownCounterObserver(ctx)
-			counterObserver(ctx)
+			//gaugeObserver(ctx)
+			//counterObserver(ctx)
 			time.Sleep(time.Second * 1)
 			log.Print("Updating TimeAlive...")
 		}
