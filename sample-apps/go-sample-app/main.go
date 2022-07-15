@@ -6,11 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
@@ -67,6 +70,22 @@ func main() {
 	ch := make(chan os.Signal, 3)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
 	<-ch
+
+	r := mux.NewRouter()
+	r.Use(otelmux.Middleware("my-server"))
+
+	// Three endpoints we are using; WIP not complete
+	r.HandleFunc("/aws-sdk-call", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	}))
+
+	r.HandleFunc("/outgoing-http-call", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	}))
+
+	http.Handle("/outgoing-sampleapp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+	}))
 
 }
 
