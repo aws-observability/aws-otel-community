@@ -93,7 +93,7 @@ func (rmc *randomMetricCollector) registerThreadsActive() {
 
 // UpdateMetricsClient generates new metric values for Synchronous instruments every TimeInterval and
 // Asynchronous instruments every CollectPeriod configured by the controller.
-func (rmc *randomMetricCollector) UpdateMetricsClient(ctx context.Context, cfg Config) {
+func (rmc *randomMetricCollector) RegisterMetricsClient(ctx context.Context, cfg Config) {
 	go func() {
 		for {
 			rmc.updateTimeAlive(ctx, cfg)
@@ -152,7 +152,6 @@ func (rmc *randomMetricCollector) updateTotalHeapSize(ctx context.Context, cfg C
 
 // updateThreadsActive updates ThreadsActive by a value between 0 and 10 in increments or decrements of 1 based on previous value.
 func (rmc *randomMetricCollector) updateThreadsActive(ctx context.Context, cfg Config) {
-
 	if threadsBool {
 		if threadsActive < int64(cfg.ThreadsActiveUpperBound) {
 			rmc.threadsActive.Add(ctx, 1)
