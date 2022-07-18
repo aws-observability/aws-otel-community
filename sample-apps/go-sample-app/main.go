@@ -17,9 +17,12 @@ func main() {
 	// Creates and configures random based metrics based on a configuration file (config.yaml).
 	cfg := collection.GetConfiguration()
 	rmc := collection.NewRandomMetricCollector()
+	rmc.RegisterMetricsClient(ctx, *cfg)
+
+	// Starts request based metric and registers necessary callbacks
 	rqmc := collection.NewRequestBasedMetricCollector(ctx)
 	rqmc.StartTotalRequestCallback()
-	rmc.RegisterMetricsClient(ctx, *cfg)
+
 	collection.StartClient(ctx)
 
 	// Creates a router and web server with several endpoints

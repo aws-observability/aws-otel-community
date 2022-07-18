@@ -49,11 +49,11 @@ func (rqmc *requestBasedMetricCollector) GetApiRequest() int {
 // NewRequestBasedMetricCollector returns a new type struct that holds and registers the 3 request based metric instruments used in the Go-Sample-App;
 // TotalBytesSent, TotalRequests, LatencyTime
 func NewRequestBasedMetricCollector(ctx context.Context) requestBasedMetricCollector {
-	rbmc := requestBasedMetricCollector{context: ctx}
-	rbmc.registerTotalBytesSent()
-	rbmc.registerTotalRequests()
-	rbmc.registerLatencyTime()
-	return rbmc
+	rqmc := requestBasedMetricCollector{context: ctx}
+	rqmc.registerTotalBytesSent()
+	rqmc.registerTotalRequests()
+	rqmc.registerLatencyTime()
+	return rqmc
 }
 
 // registerTotalBytesSent registers a Synchronous counter called TotalBytesSent.
