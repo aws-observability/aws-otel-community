@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net"
 	"net/http"
 
 	"github.com/aws-otel-commnunity/sample-apps/go-sample-app/collection"
@@ -29,6 +30,9 @@ func main() {
 
 	http.Handle("/", r)
 
-	http.ListenAndServe("localhost:8080", nil)
+	srv := &http.Server{
+		Addr: net.JoinHostPort(cfg.Host, cfg.Port),
+	}
+	srv.ListenAndServe()
 
 }
