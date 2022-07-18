@@ -17,6 +17,8 @@ func main() {
 	// Creates and configures random based metrics based on a configuration file (config.yaml).
 	cfg := collection.GetConfiguration()
 	rmc := collection.NewRandomMetricCollector()
+	rqmc := collection.NewRequestBasedMetricCollector(ctx)
+	rqmc.StartTotalRequestCallback()
 	rmc.RegisterMetricsClient(ctx, *cfg)
 	collection.StartClient(ctx)
 
@@ -24,9 +26,9 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(otelmux.Middleware("Go-Sampleapp-Server"))
 
-	r.HandleFunc("/outgoing-http-call", collection.OutgoingHttpCall)
-	r.HandleFunc("/aws-sdk-call", collection.AwsSdkCall)
-	r.HandleFunc("/outgoing-sampleapp", collection.OutgoingSampleApp)
+	r.HandleFunc("/outgoing-http-call", rqmc.OutgoingHttpCall)
+	r.HandleFunc("/aws-sdk-call", rqmc.AwsSdkCall)
+	r.HandleFunc("/outgoing-sampleapp", rqmc.OutgoingSampleApp)
 
 	http.Handle("/", r)
 

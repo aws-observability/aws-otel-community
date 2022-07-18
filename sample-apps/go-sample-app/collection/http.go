@@ -20,7 +20,7 @@ var tracer = otel.Tracer("sample-app")
 
 // AwsSdkCall mocks a request to s3. ListBuckets are nil so no credentials are needed.
 // Generates an Xray Trace ID.
-func AwsSdkCall(w http.ResponseWriter, r *http.Request) {
+func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	s, err := session.NewSession(&aws.Config{
@@ -39,6 +39,11 @@ func AwsSdkCall(w http.ResponseWriter, r *http.Request) {
 	)
 	defer span.End()
 
+	// Request based metrics provided by rqmc
+	rqmc.AddApiRequest()
+	rqmc.UpdateTotalBytesSent()
+	rqmc.UpdateLatencyTime()
+
 	xrayTraceID := getXrayTraceID(span)
 	json := simplejson.New()
 	json.Set("traceId", xrayTraceID)
@@ -48,12 +53,18 @@ func AwsSdkCall(w http.ResponseWriter, r *http.Request) {
 }
 
 // OutgoingSampleApp makes a request to another Sampleapp and generates an Xray Trace ID.
-func OutgoingSampleApp(w http.ResponseWriter, r *http.Request) {
+func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter, r *http.Request) {
 	// TODO
+
+	// Request based metrics provided by rqmc
+	rqmc.AddApiRequest()
+	rqmc.UpdateTotalBytesSent()
+	rqmc.UpdateLatencyTime()
+
 }
 
 // OutgoingHttpCall makes an HTTP GET request to https://aws.amazon.com and generates an Xray Trace ID.
-func OutgoingHttpCall(w http.ResponseWriter, r *http.Request) {
+func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	ctx := r.Context()
@@ -73,6 +84,11 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request) {
 		"CollectorExporter-Example",
 	)
 	defer span.End()
+
+	// Request based metrics provided by rqmc
+	rqmc.AddApiRequest()
+	rqmc.UpdateTotalBytesSent()
+	rqmc.UpdateLatencyTime()
 
 	json := simplejson.New()
 	json.Set("traceId", xrayTraceID)
