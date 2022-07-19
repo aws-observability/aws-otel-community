@@ -35,7 +35,7 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 
 	_, span := tracer.Start(
 		context.Background(),
-		"Example Trace",
+		"AWS-SDK-CALL-TRACE",
 	)
 	defer span.End()
 
@@ -81,7 +81,7 @@ func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter,
 
 	_, span := tracer.Start(
 		ctx,
-		"CollectorExporter-Example",
+		"OUTGOING-HTTP-CALL-TRACE",
 	)
 	defer span.End()
 
