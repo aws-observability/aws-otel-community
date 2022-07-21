@@ -41,9 +41,9 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 	defer span.End()
 
 	// Request based metrics provided by rqmc
-	// rqmc.AddApiRequest()
-	// rqmc.UpdateTotalBytesSent()
-	// rqmc.UpdateLatencyTime()
+	rqmc.AddApiRequest()
+	rqmc.UpdateTotalBytesSent()
+	rqmc.UpdateLatencyTime()
 
 	xrayTraceID := getXrayTraceID(span)
 	json := simplejson.New()
@@ -78,9 +78,9 @@ func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter
 	}
 	defer res.Body.Close()
 	// Request based metrics provided by rqmc
-	//rqmc.AddApiRequest()
-	//rqmc.UpdateTotalBytesSent()
-	//rqmc.UpdateLatencyTime()
+	rqmc.AddApiRequest()
+	rqmc.UpdateTotalBytesSent()
+	rqmc.UpdateLatencyTime()
 
 }
 
@@ -130,9 +130,9 @@ func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter,
 	defer span.End()
 
 	// Request based metrics provided by rqmc
-	// rqmc.AddApiRequest()
-	// rqmc.UpdateTotalBytesSent()
-	// rqmc.UpdateLatencyTime()
+	rqmc.AddApiRequest()
+	rqmc.UpdateTotalBytesSent()
+	rqmc.UpdateLatencyTime()
 
 	json := simplejson.New()
 	json.Set("traceId", xrayTraceID)

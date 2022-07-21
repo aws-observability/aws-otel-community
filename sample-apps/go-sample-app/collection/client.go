@@ -37,7 +37,7 @@ func StartClient(ctx context.Context) {
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		// the service name used to display traces in backends
-		semconv.ServiceNameKey.String("sampleapp-service1"),
+		semconv.ServiceNameKey.String("sampleapp-service1"), // Should have a unique name
 	)
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
