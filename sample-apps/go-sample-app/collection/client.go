@@ -3,7 +3,6 @@ package collection
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -26,10 +25,7 @@ import (
 // StartClient starts the OTEL controller which periodically collects signals and exports them.
 // Trace exporter and Metric exporter are both configured.
 func StartClient(ctx context.Context) {
-	endpoint := os.Getenv("OTLP_EXPORTER_OTLP_ENDPOINT")
-	if endpoint == "" {
-		endpoint = "0.0.0.0:4318"
-	}
+	endpoint := "0.0.0.0:4318"
 
 	// Setup trace related
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), otlptracegrpc.WithEndpoint("0.0.0.0:4317"), otlptracegrpc.WithDialOption(grpc.WithBlock()))
@@ -41,7 +37,7 @@ func StartClient(ctx context.Context) {
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		// the service name used to display traces in backends
-		semconv.ServiceNameKey.String("test-service"),
+		semconv.ServiceNameKey.String("sampleapp-service1"),
 	)
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),

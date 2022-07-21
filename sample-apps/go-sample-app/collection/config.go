@@ -13,10 +13,12 @@ type Config struct {
 	TotalheapSizeUpperBound int64
 	ThreadsActiveUpperBound int64
 	CpuUsageUpperBound      int64
+	SampleAppPorts          []string
 }
 
 // GetConfiguration returns a configured Config struct with the precedence; Default Values < Configuration File.
 func GetConfiguration() *Config {
+	var arr []string
 	viper.SetConfigFile("config.yaml")
 	viper.ReadInConfig()
 	// Default values
@@ -27,6 +29,7 @@ func GetConfiguration() *Config {
 	viper.SetDefault("RandomTotalHeapSizeUpperBound", 100)
 	viper.SetDefault("RandomThreadsActiveUpperBound", 10)
 	viper.SetDefault("RandomCpuUsageUpperBound", 100)
+	viper.SetDefault("SampleAppPorts", arr)
 
 	host, _ := viper.Get("Host").(string)
 	port, _ := viper.Get("Port").(string)
@@ -35,6 +38,7 @@ func GetConfiguration() *Config {
 	totalHeapSizeUpperBound, _ := viper.Get("RandomTotalHeapSizeUpperBound").(int)
 	threadsActiveUpperBound, _ := viper.Get("RandomThreadsActiveUpperBound").(int)
 	cpuUsageUpperBound, _ := viper.Get("RandomCpuUsageUpperBound").(int)
+	sampleAppPorts := viper.GetStringSlice("SampleAppPorts")
 	cfg := Config{
 		Host:                    host,
 		Port:                    port,
@@ -43,6 +47,7 @@ func GetConfiguration() *Config {
 		TotalheapSizeUpperBound: int64(totalHeapSizeUpperBound),
 		ThreadsActiveUpperBound: int64(threadsActiveUpperBound),
 		CpuUsageUpperBound:      int64(cpuUsageUpperBound),
+		SampleAppPorts:          sampleAppPorts,
 	}
 
 	return &cfg

@@ -18,6 +18,7 @@ type requestBasedMetricCollector struct {
 	latencyTime    syncint64.Histogram
 	context        context.Context
 	n              int64
+	config         Config
 }
 
 // AddApiRequest adds 1 to the rqmc counter
@@ -32,8 +33,8 @@ func (rqmc *requestBasedMetricCollector) GetApiRequest() int {
 
 // NewRequestBasedMetricCollector returns a new type struct that holds and registers the 3 request based metric instruments used in the Go-Sample-App;
 // TotalBytesSent, TotalRequests, LatencyTime
-func NewRequestBasedMetricCollector(ctx context.Context) requestBasedMetricCollector {
-	rqmc := requestBasedMetricCollector{context: ctx}
+func NewRequestBasedMetricCollector(ctx context.Context, cfg Config) requestBasedMetricCollector {
+	rqmc := requestBasedMetricCollector{context: ctx, config: cfg}
 	rqmc.registerTotalBytesSent()
 	rqmc.registerTotalRequests()
 	rqmc.registerLatencyTime()

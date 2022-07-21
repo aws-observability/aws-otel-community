@@ -20,7 +20,7 @@ func main() {
 	rmc.RegisterMetricsClient(ctx, *cfg)
 
 	// Starts request based metric and registers necessary callbacks
-	rqmc := collection.NewRequestBasedMetricCollector(ctx)
+	rqmc := collection.NewRequestBasedMetricCollector(ctx, *cfg)
 	rqmc.StartTotalRequestCallback()
 
 	collection.StartClient(ctx)

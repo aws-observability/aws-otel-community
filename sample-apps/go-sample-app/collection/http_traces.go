@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -40,9 +41,9 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 	defer span.End()
 
 	// Request based metrics provided by rqmc
-	rqmc.AddApiRequest()
-	rqmc.UpdateTotalBytesSent()
-	rqmc.UpdateLatencyTime()
+	// rqmc.AddApiRequest()
+	// rqmc.UpdateTotalBytesSent()
+	// rqmc.UpdateLatencyTime()
 
 	xrayTraceID := getXrayTraceID(span)
 	json := simplejson.New()
@@ -52,14 +53,57 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 	w.Write(payload)
 }
 
-// OutgoingSampleApp makes a request to another Sampleapp and generates an Xray Trace ID.
+// OutgoingSampleApp makes a request to another Sampleapp and generates an Xray Trace ID. It will also make a request to amazon.com.
 func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter, r *http.Request) {
-	// TODO
 
+	ctx := r.Context()
+	traceId := getXrayTraceID(trace.SpanFromContext(ctx))
+	w.Header().Set("Content-Type", "application/json")
+
+	json := simplejson.New()
+	json.Set("traceId", traceId)
+	rqmc.invokeSampleApps(ctx)
+	payload, _ := json.MarshalJSON()
+
+	_, _ = w.Write(payload)
+
+	// Second call
+	client := http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
+	req, _ := http.NewRequestWithContext(ctx, "GET", "https://www.amazon.com", nil)
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer res.Body.Close()
 	// Request based metrics provided by rqmc
-	rqmc.AddApiRequest()
-	rqmc.UpdateTotalBytesSent()
-	rqmc.UpdateLatencyTime()
+	//rqmc.AddApiRequest()
+	//rqmc.UpdateTotalBytesSent()
+	//rqmc.UpdateLatencyTime()
+
+}
+
+func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context) {
+	for _, port := range rqmc.config.SampleAppPorts {
+		if port != "" {
+			invoke(ctx, port)
+		}
+	}
+}
+
+func invoke(ctx context.Context, port string) {
+	client := http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
+	addr := "http://" + net.JoinHostPort("0.0.0.0", port) + "/outgoing-sampleapp"
+	fmt.Println(addr)
+	req, _ := http.NewRequestWithContext(ctx, "GET", addr, nil)
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer res.Body.Close()
 
 }
 
@@ -86,9 +130,9 @@ func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter,
 	defer span.End()
 
 	// Request based metrics provided by rqmc
-	rqmc.AddApiRequest()
-	rqmc.UpdateTotalBytesSent()
-	rqmc.UpdateLatencyTime()
+	// rqmc.AddApiRequest()
+	// rqmc.UpdateTotalBytesSent()
+	// rqmc.UpdateLatencyTime()
 
 	json := simplejson.New()
 	json.Set("traceId", xrayTraceID)
