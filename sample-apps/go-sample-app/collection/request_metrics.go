@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"sync/atomic"
 
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/metric/instrument/asyncint64"
 	"go.opentelemetry.io/otel/metric/instrument/syncint64"
@@ -16,9 +17,9 @@ type requestBasedMetricCollector struct {
 	totalBytesSent syncint64.Counter
 	totalRequests  asyncint64.Counter
 	latencyTime    syncint64.Histogram
-	context        context.Context
 	n              int64
 	config         Config
+	meter          metric.Meter
 }
 
 // AddApiRequest adds 1 to the rqmc counter
@@ -33,8 +34,10 @@ func (rqmc *requestBasedMetricCollector) GetApiRequest() int {
 
 // NewRequestBasedMetricCollector returns a new type struct that holds and registers the 3 request based metric instruments used in the Go-Sample-App;
 // TotalBytesSent, TotalRequests, LatencyTime
-func NewRequestBasedMetricCollector(ctx context.Context, cfg Config) requestBasedMetricCollector {
-	rqmc := requestBasedMetricCollector{context: ctx, config: cfg}
+func NewRequestBasedMetricCollector(ctx context.Context, cfg Config, mp metric.MeterProvider) requestBasedMetricCollector {
+
+	rqmc := requestBasedMetricCollector{config: cfg}
+	rqmc.meter = mp.Meter("GO_SAMPLE_APP_METRICS")
 	rqmc.registerTotalBytesSent()
 	rqmc.registerTotalRequests()
 	rqmc.registerLatencyTime()
@@ -43,8 +46,8 @@ func NewRequestBasedMetricCollector(ctx context.Context, cfg Config) requestBase
 
 // registerTotalBytesSent registers a Synchronous counter called TotalBytesSent.
 func (rqmc *requestBasedMetricCollector) registerTotalBytesSent() {
-	totalBytesSent, err := meter.SyncInt64().Counter(
-		"Total Bytes Sent",
+	totalBytesSent, err := rqmc.meter.SyncInt64().Counter(
+		"Total_Bytes_Sent",
 		instrument.WithDescription("Keeps a sum of the total amount of bytes sent while the application is alive"),
 		instrument.WithUnit("mb"),
 	)
@@ -56,8 +59,8 @@ func (rqmc *requestBasedMetricCollector) registerTotalBytesSent() {
 
 // registerTotalRequests registers an Asynchronous counter called TotalApiRequests.
 func (rqmc *requestBasedMetricCollector) registerTotalRequests() {
-	totalRequests, err := meter.AsyncInt64().Counter(
-		"Total API Requests",
+	totalRequests, err := rqmc.meter.AsyncInt64().Counter(
+		"Total_API_Requests",
 		instrument.WithDescription("Increments by one every time a sampleapp endpoint is used"),
 		instrument.WithUnit("1"),
 	)
@@ -69,8 +72,8 @@ func (rqmc *requestBasedMetricCollector) registerTotalRequests() {
 
 // registerLatencyTime registers a Synchronous histogram called LatencyTime.
 func (rqmc *requestBasedMetricCollector) registerLatencyTime() {
-	latencyTime, err := meter.SyncInt64().Histogram(
-		"Latency Time",
+	latencyTime, err := rqmc.meter.SyncInt64().Histogram(
+		"Latency_Time",
 		instrument.WithDescription("Measures latency time"),
 		instrument.WithUnit("ms"),
 	)
@@ -82,7 +85,7 @@ func (rqmc *requestBasedMetricCollector) registerLatencyTime() {
 
 // StartTotalRequestCallBack starts the callback for the TotalApiRequests.
 func (rqmc *requestBasedMetricCollector) StartTotalRequestCallback() {
-	if err := meter.RegisterCallback(
+	if err := rqmc.meter.RegisterCallback(
 		[]instrument.Asynchronous{
 			rqmc.totalRequests,
 		},
@@ -97,15 +100,15 @@ func (rqmc *requestBasedMetricCollector) StartTotalRequestCallback() {
 }
 
 // UpdateTotalBytesSent updates TotalBytesSent with a value between 0 and 1024
-func (rqmc *requestBasedMetricCollector) UpdateTotalBytesSent() {
+func (rqmc *requestBasedMetricCollector) UpdateTotalBytesSent(ctx context.Context) {
 	min := 0
 	max := 1024
-	rqmc.totalBytesSent.Add(rqmc.context, int64(rand.Intn(max-min)+min))
+	rqmc.totalBytesSent.Add(ctx, int64(rand.Intn(max-min)+min))
 }
 
 // UpdateLatencyTime updates LatencyTime adds an aditional value between 0 and 512 to the histogram distribution.
-func (rqmc *requestBasedMetricCollector) UpdateLatencyTime() {
+func (rqmc *requestBasedMetricCollector) UpdateLatencyTime(ctx context.Context) {
 	min := 0
 	max := 512
-	rqmc.latencyTime.Record(rqmc.context, int64(rand.Intn(max-min)+min))
+	rqmc.latencyTime.Record(ctx, int64(rand.Intn(max-min)+min))
 }

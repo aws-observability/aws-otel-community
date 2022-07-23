@@ -6,22 +6,19 @@ import (
 
 // Config contains random based metrics; values inputed by configuration file or defaulted values
 type Config struct {
-	Host                    string
-	Port                    string
-	TimeInterval            int64
-	TimeAliveIncrementer    int64
-	TotalheapSizeUpperBound int64
-	ThreadsActiveUpperBound int64
-	CpuUsageUpperBound      int64
-	SampleAppPorts          []string
+	Host                    string   `mapstructure:"Host"`
+	Port                    string   `mapstructure:"Port"`
+	TimeInterval            int64    `mapstructure:"TimeInterval"`
+	TimeAliveIncrementer    int64    `mapstructure:"RandomTimeAliveIncrementer"`
+	TotalHeapSizeUpperBound int64    `mapstructure:"RandomTotalHeapSizeUpperBound"`
+	ThreadsActiveUpperBound int64    `mapstructure:"RandomThreadsActiveUpperBound"`
+	CpuUsageUpperBound      int64    `mapstructure:"RandomCpuUsageUpperBound"`
+	SampleAppPorts          []string `mapstructure:"SampleAppPorts"`
 }
 
 // GetConfiguration returns a configured Config struct with the precedence; Default Values < Configuration File.
 func GetConfiguration() *Config {
 	var arr []string
-	viper.SetConfigFile("config.yaml")
-	viper.ReadInConfig()
-	// Default values
 	viper.SetDefault("Host", "0.0.0.0")
 	viper.SetDefault("Port", "4567")
 	viper.SetDefault("TimeInterval", 1)
@@ -31,24 +28,11 @@ func GetConfiguration() *Config {
 	viper.SetDefault("RandomCpuUsageUpperBound", 100)
 	viper.SetDefault("SampleAppPorts", arr)
 
-	host, _ := viper.Get("Host").(string)
-	port, _ := viper.Get("Port").(string)
-	timeInterval := viper.Get("TimeInterval").(int)
-	timeAliveIncrementer, _ := viper.Get("RandomTimeAliveIncrementer").(int)
-	totalHeapSizeUpperBound, _ := viper.Get("RandomTotalHeapSizeUpperBound").(int)
-	threadsActiveUpperBound, _ := viper.Get("RandomThreadsActiveUpperBound").(int)
-	cpuUsageUpperBound, _ := viper.Get("RandomCpuUsageUpperBound").(int)
-	sampleAppPorts := viper.GetStringSlice("SampleAppPorts")
-	cfg := Config{
-		Host:                    host,
-		Port:                    port,
-		TimeInterval:            int64(timeInterval),
-		TimeAliveIncrementer:    int64(timeAliveIncrementer),
-		TotalheapSizeUpperBound: int64(totalHeapSizeUpperBound),
-		ThreadsActiveUpperBound: int64(threadsActiveUpperBound),
-		CpuUsageUpperBound:      int64(cpuUsageUpperBound),
-		SampleAppPorts:          sampleAppPorts,
-	}
+	viper.SetConfigFile("config.yaml")
+	viper.ReadInConfig()
 
-	return &cfg
+	cfg := &Config{}
+	viper.Unmarshal(cfg)
+
+	return cfg
 }
