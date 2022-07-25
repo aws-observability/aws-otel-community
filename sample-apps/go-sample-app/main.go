@@ -10,6 +10,7 @@ import (
 	"github.com/aws-otel-commnunity/sample-apps/go-sample-app/collection"
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/metric/global"
 )
 
@@ -33,14 +34,22 @@ func main() {
 	}
 	defer shutdown(ctx)
 
-	// Creates a router and web server with several endpoints
+	// Creates a router, client and web server with several endpoints
 	r := mux.NewRouter()
+	client := http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
 	r.Use(otelmux.Middleware("Go-Sampleapp-Server"))
 
-	r.HandleFunc("/outgoing-http-call", rqmc.OutgoingHttpCall)
 	r.HandleFunc("/aws-sdk-call", rqmc.AwsSdkCall)
-	r.HandleFunc("/outgoing-sampleapp", rqmc.OutgoingSampleApp)
 
+	r.HandleFunc("/outgoing-http-call", func(w http.ResponseWriter, r *http.Request) {
+		rqmc.OutgoingHttpCall(w, r, client)
+	})
+
+	r.HandleFunc("/outgoing-sampleapp", func(w http.ResponseWriter, r *http.Request) {
+		rqmc.OutgoingSampleApp(w, r, client)
+	})
 	http.Handle("/", r)
 
 	srv := &http.Server{

@@ -10,7 +10,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -53,7 +52,7 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 }
 
 // OutgoingSampleApp makes a request to another Sampleapp and generates an Xray Trace ID. It will also make a request to amazon.com.
-func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter, r *http.Request) {
+func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Client) {
 
 	ctx := r.Context()
 	w.Header().Set("Content-Type", "application/json")
@@ -62,13 +61,10 @@ func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter
 		"OUTGOING-LEAF-CALL",
 	)
 
-	count := rqmc.invokeSampleApps(ctx)
+	count := rqmc.invokeSampleApps(ctx, client)
 
 	// Second call
 	if count == 0 {
-		client := http.Client{
-			Transport: otelhttp.NewTransport(http.DefaultTransport),
-		}
 
 		defer span.End()
 
@@ -86,19 +82,17 @@ func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter
 	writeResponse(span, w)
 }
 
-func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context) int {
+func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context, client http.Client) int {
 	for _, port := range rqmc.config.SampleAppPorts {
 		if port != "" {
-			invoke(ctx, port)
+			invoke(ctx, port, client)
 		}
 	}
 	return len(rqmc.config.SampleAppPorts)
 }
 
-func invoke(ctx context.Context, port string) {
-	client := http.Client{
-		Transport: otelhttp.NewTransport(http.DefaultTransport),
-	}
+func invoke(ctx context.Context, port string, client http.Client) {
+
 	_, span := tracer.Start(
 		ctx,
 		"OUTGOING-SAMPLEAPP-CALL",
@@ -117,10 +111,9 @@ func invoke(ctx context.Context, port string) {
 }
 
 // OutgoingHttpCall makes an HTTP GET request to https://aws.amazon.com and generates an Xray Trace ID.
-func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter, r *http.Request) {
+func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client) {
 
 	w.Header().Set("Content-Type", "application/json")
-	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	ctx := r.Context()
 
 	_, span := tracer.Start(
