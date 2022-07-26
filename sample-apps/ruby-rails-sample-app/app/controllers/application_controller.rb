@@ -10,7 +10,10 @@ class ApplicationController < ActionController::Base
     end
     
     def outgoing_http_call
-        Faraday.get('https://aws.amazon.com/')
+
+        @@tracer.in_span("foo") do |span|
+            Faraday.get('https://aws.amazon.com/')
+        end
 
         render json: get_xray_trace_id(OpenTelemetry::Trace.current_span.context.hex_trace_id)
     end
