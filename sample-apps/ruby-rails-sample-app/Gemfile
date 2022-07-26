@@ -22,3 +22,14 @@ group :development do
   # gem "spring"
 end
 
+gem 'aws-sdk-s3', '~> 1'
+gem 'faraday'
+
+gem 'opentelemetry-exporter-otlp', '>= 0.21.2'
+gem 'opentelemetry-sdk'
+
+gem 'opentelemetry-propagator-xray'
+
+gem 'opentelemetry-instrumentation-aws_sdk', '>= 0.2.1'
+gem 'opentelemetry-instrumentation-faraday'
+gem 'opentelemetry-instrumentation-rails'
