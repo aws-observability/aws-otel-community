@@ -92,7 +92,6 @@ func (rqmc *requestBasedMetricCollector) StartTotalRequestCallback() {
 		// SDK periodically calls this function to collect data.
 		func(ctx context.Context) {
 			rqmc.totalRequests.Observe(ctx, int64(rqmc.GetApiRequest()))
-			fmt.Println("Total requests observed")
 		},
 	); err != nil {
 		panic(err)

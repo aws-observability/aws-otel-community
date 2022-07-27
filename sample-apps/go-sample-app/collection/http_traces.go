@@ -15,7 +15,7 @@ import (
 )
 
 // Contains all of the endpoint logic.
-var tracer = otel.Tracer("sample-app")
+var tracer = otel.Tracer("go-sample-app-tracer")
 
 type response struct {
 	TraceID string `json:"traceID"`
@@ -39,7 +39,7 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 
 	_, span := tracer.Start(
 		ctx,
-		"AWS-SDK-CALL-TRACE",
+		"get-aws-s3-buckets",
 	)
 	defer span.End()
 
@@ -55,18 +55,19 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Client) {
 
 	ctx := r.Context()
-	w.Header().Set("Content-Type", "application/json")
-	_, span := tracer.Start(
+	ctx, span := tracer.Start(
 		ctx,
-		"OUTGOING-LEAF-CALL",
+		"invoke-sample-apps",
 	)
+	defer span.End()
+	count := len(rqmc.config.SampleAppPorts)
 
-	count := rqmc.invokeSampleApps(ctx, client)
-
-	// Second call
+	// If there are no sample app port list is empty then make a request to amazon.com (leaf request)
 	if count == 0 {
-
-		defer span.End()
+		ctx, span := tracer.Start(
+			ctx,
+			"leaf-request",
+		)
 
 		req, _ := http.NewRequestWithContext(ctx, "GET", "https://www.amazon.com", nil)
 		res, err := client.Do(req)
@@ -78,35 +79,42 @@ func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter
 		rqmc.AddApiRequest()
 		rqmc.UpdateTotalBytesSent(ctx)
 		rqmc.UpdateLatencyTime(ctx)
+
+		span.End()
+
+	} else { // If there are sample app ports to make a request to (chain request)
+		rqmc.invokeSampleApps(ctx, client)
 	}
 	writeResponse(span, w)
+
 }
 
-func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context, client http.Client) int {
+func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context, client http.Client) {
+
 	for _, port := range rqmc.config.SampleAppPorts {
 		if port != "" {
 			invoke(ctx, port, client)
 		}
 	}
-	return len(rqmc.config.SampleAppPorts)
 }
 
 func invoke(ctx context.Context, port string, client http.Client) {
 
-	_, span := tracer.Start(
+	ctx, span := tracer.Start(
 		ctx,
-		"OUTGOING-SAMPLEAPP-CALL",
+		"invoke-sampleapp",
 	)
-	defer span.End()
-
 	addr := "http://" + net.JoinHostPort("0.0.0.0", port) + "/outgoing-sampleapp"
 	fmt.Println(addr)
 	req, _ := http.NewRequestWithContext(ctx, "GET", addr, nil)
 	res, err := client.Do(req)
+
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	defer res.Body.Close()
+	defer span.End()
 
 }
 
@@ -116,13 +124,13 @@ func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter,
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
 
-	_, span := tracer.Start(
+	newCtx, span := tracer.Start(
 		ctx,
-		"OUTGOING-HTTP-CALL-TRACE",
+		"outgoing-http-call",
 	)
 	defer span.End()
 
-	req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
+	req, _ := http.NewRequestWithContext(newCtx, "GET", "https://aws.amazon.com", nil)
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
@@ -131,8 +139,8 @@ func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter,
 
 	// Request based metrics provided by rqmc
 	rqmc.AddApiRequest()
-	rqmc.UpdateTotalBytesSent(ctx)
-	rqmc.UpdateLatencyTime(ctx)
+	rqmc.UpdateTotalBytesSent(newCtx)
+	rqmc.UpdateLatencyTime(newCtx)
 	writeResponse(span, w)
 
 }
@@ -146,6 +154,6 @@ func getXrayTraceID(span trace.Span) string {
 func writeResponse(span trace.Span, w http.ResponseWriter) {
 	xrayTraceID := getXrayTraceID(span)
 	payload, _ := json.Marshal(response{TraceID: xrayTraceID})
-
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(payload)
 }

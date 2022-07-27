@@ -55,6 +55,7 @@ func main() {
 	srv := &http.Server{
 		Addr: net.JoinHostPort(cfg.Host, cfg.Port),
 	}
+	fmt.Println("Listening on port:", srv.Addr)
 	log.Fatal(srv.ListenAndServe())
 
 }

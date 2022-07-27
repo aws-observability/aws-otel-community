@@ -99,7 +99,6 @@ func (rmc *randomMetricCollector) RegisterMetricsClient(ctx context.Context, cfg
 		for {
 			rmc.updateTimeAlive(ctx, cfg)
 			rmc.updateThreadsActive(ctx, cfg)
-			fmt.Println("Updating time alive && threads active...")
 			time.Sleep(time.Second * time.Duration(cfg.TimeInterval))
 		}
 	}()
@@ -125,7 +124,6 @@ func (rmc *randomMetricCollector) updateCpuUsage(ctx context.Context, cfg Config
 			max := int(cfg.CpuUsageUpperBound)
 			cpuUsage := int64(rand.Intn(max-min) + min)
 			rmc.cpuUsage.Observe(ctx, cpuUsage)
-			fmt.Println("CPU Usage asked by SDK")
 		},
 	); err != nil {
 		panic(err)
@@ -144,7 +142,6 @@ func (rmc *randomMetricCollector) updateTotalHeapSize(ctx context.Context, cfg C
 			max := int(cfg.TotalHeapSizeUpperBound)
 			totalHeapSize := int64(rand.Intn(max-min) + min)
 			rmc.heapSize.Observe(ctx, totalHeapSize)
-			fmt.Println("Heapsize asked by SDK")
 		},
 	); err != nil {
 		panic(err)
