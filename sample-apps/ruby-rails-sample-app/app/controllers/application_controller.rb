@@ -7,7 +7,7 @@ end
 
 class ApplicationController < ActionController::Base
     def aws_sdk_call
-        @@tracer.in_span("foo") do |span|
+        @@tracer.in_span("get-aws-s3-buckets") do |span|
             s3 = Aws::S3::Client.new
             s3.list_buckets
         end
@@ -16,8 +16,9 @@ class ApplicationController < ActionController::Base
     
     def outgoing_http_call
 
-        @@tracer.in_span("foo") do |span|
-            Faraday.get('https://aws.amazon.com/')
+        @@tracer.in_span("outgoing-http-call") do |span|
+            uri = URI('https://aws.amazon.com')
+            Net::HTTP.get(uri) 
         end
 
         render json: get_xray_trace_id(OpenTelemetry::Trace.current_span.context.hex_trace_id)
@@ -32,24 +33,15 @@ class ApplicationController < ActionController::Base
                 # Make a leaf request
                 @@tracer.in_span("leaf-request") do |span|
             
-                    url = URI.parse("https://amazon.com")
-                    req = Net::HTTP::Get.new(url.to_s)
-                    res = Net::HTTP.start(url.host, url.port) {|http|
-                    http.request(req)
-                    }
-                    puts res.body
+                    uri = URI('https://amazon.com')
+                    Net::HTTP.get(uri) 
                 end
             else
                 # Call sample apps
                 for port in $sample_app_ports do
                     @@tracer.in_span("invoke-sampleapp") do |span|
-            
-                        url = URI.parse("http://0.0.0.0:"+ port + "/outgoing-sampleapp")
-                        req = Net::HTTP::Get.new(url.to_s)
-                        res = Net::HTTP.start(url.host, url.port) {|http|
-                        http.request(req)
-                        }
-                        puts res.body
+                        uri = URI("http://0.0.0.0:"+ port + "/outgoing-sampleapp")
+                        Net::HTTP.get(uri)
                     end
                 end     
             end
@@ -61,6 +53,6 @@ class ApplicationController < ActionController::Base
 
     # Health check
     def root
-        render "layouts/root"
+        render json: "healthcheck"
     end
 end
