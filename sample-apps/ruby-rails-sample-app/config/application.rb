@@ -14,7 +14,7 @@ module RubyRailsSampleApp
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
 
-    
+
     configurations_from_yaml_file = YAML.load(File.read("config.yaml"))
     $host = configurations_from_yaml_file["Host"]
     $port = configurations_from_yaml_file["Port"]

@@ -1,3 +1,4 @@
+require 'net/http'
 
 def get_xray_trace_id(otel_trace_id_hex)
     xray_trace_id = "1-#{otel_trace_id_hex[0..7]}-#{otel_trace_id_hex[8..otel_trace_id_hex.length]}"
@@ -6,7 +7,11 @@ end
 
 class ApplicationController < ActionController::Base
     def aws_sdk_call
-        render json: "sdk"
+        @@tracer.in_span("foo") do |span|
+            s3 = Aws::S3::Client.new
+            s3.list_buckets
+        end
+        render json: get_xray_trace_id(OpenTelemetry::Trace.current_span.context.hex_trace_id)
     end
     
     def outgoing_http_call
@@ -19,7 +24,39 @@ class ApplicationController < ActionController::Base
     end
 
     def outgoing_sampleapp
-        render json: "outgoing sample app"
+
+        @@tracer.in_span("invoke-sample-apps") do |span|
+            count = $sample_app_ports.length()
+
+            if count == 0 
+                # Make a leaf request
+                @@tracer.in_span("leaf-request") do |span|
+            
+                    url = URI.parse("https://amazon.com")
+                    req = Net::HTTP::Get.new(url.to_s)
+                    res = Net::HTTP.start(url.host, url.port) {|http|
+                    http.request(req)
+                    }
+                    puts res.body
+                end
+            else
+                # Call sample apps
+                for port in $sample_app_ports do
+                    @@tracer.in_span("invoke-sampleapp") do |span|
+            
+                        url = URI.parse("http://0.0.0.0:"+ port + "/outgoing-sampleapp")
+                        req = Net::HTTP::Get.new(url.to_s)
+                        res = Net::HTTP.start(url.host, url.port) {|http|
+                        http.request(req)
+                        }
+                        puts res.body
+                    end
+                end     
+            end
+        end
+        
+        render json: get_xray_trace_id(OpenTelemetry::Trace.current_span.context.hex_trace_id)
+
     end
 
     # Health check
