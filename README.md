@@ -16,6 +16,10 @@ All preview features and AWS services integrations available for ADOT are suppor
 
 The [ADOT technical documentation](https://aws-otel.github.io/docs/introduction) is also an open source documentation site hosted on GitHub. This means you can [file issues](https://github.com/aws-otel/aws-otel.github.io/issues) to report documentation errors and updates. You can also [file PRs](https://github.com/aws-otel/aws-otel.github.io/pulls) to submit doc fixes and updates. Please take a look at the ADOT site [developer guide](https://github.com/aws-otel/aws-otel.github.io) to make changes and file PRs.
 
+## Support
+
+Please note that as per policy, we're providing support via GitHub on a best effort basis. However, if you have AWS Enterprise Support you can create a ticket and we will provide direct support within the respective SLAs.
+
 ## License
 
 This project is licensed under the Apache-2.0 License.
