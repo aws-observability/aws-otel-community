@@ -10,12 +10,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
 // Contains all of the endpoint logic.
-var tracer = otel.Tracer("go-sample-app-tracer")
 
 type response struct {
 	TraceID string `json:"traceID"`
@@ -23,7 +22,7 @@ type response struct {
 
 // AwsSdkCall mocks a request to s3. ListBuckets are nil so no credentials are needed.
 // Generates an Xray Trace ID.
-func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *http.Request) {
+func AwsSdkCall(w http.ResponseWriter, r *http.Request, rqmc *requestBasedMetricCollector) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
 	s, err := session.NewSession(&aws.Config{
@@ -37,10 +36,12 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 		fmt.Println(err)
 	}
 
-	_, span := tracer.Start(
+	ctx, span := tracer.Start(
 		ctx,
 		"get-aws-s3-buckets",
+		trace.WithAttributes(traceCommonLabels...),
 	)
+	span.SetAttributes(attribute.Int("statusCode", 200))
 	defer span.End()
 
 	// Request based metrics provided by rqmc
@@ -52,7 +53,7 @@ func (rqmc *requestBasedMetricCollector) AwsSdkCall(w http.ResponseWriter, r *ht
 }
 
 // OutgoingSampleApp makes a request to another Sampleapp and generates an Xray Trace ID. It will also make a request to amazon.com.
-func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Client) {
+func OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Client, rqmc *requestBasedMetricCollector) {
 
 	ctx := r.Context()
 	ctx, span := tracer.Start(
@@ -74,6 +75,8 @@ func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter
 		if err != nil {
 			fmt.Println(err)
 		}
+		span.SetAttributes(attribute.Int("statusCode", res.StatusCode))
+
 		defer res.Body.Close()
 		// Request based metrics provided by rqmc
 		rqmc.AddApiRequest()
@@ -83,13 +86,14 @@ func (rqmc *requestBasedMetricCollector) OutgoingSampleApp(w http.ResponseWriter
 		span.End()
 
 	} else { // If there are sample app ports to make a request to (chain request)
-		rqmc.invokeSampleApps(ctx, client)
+		invokeSampleApps(ctx, client, rqmc)
 	}
 	writeResponse(span, w)
 
 }
 
-func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context, client http.Client) {
+// invokeSampleApps loops through the list of sample app ports provided in the configuration file and makes a call to invoke().
+func invokeSampleApps(ctx context.Context, client http.Client, rqmc *requestBasedMetricCollector) {
 
 	for _, port := range rqmc.config.SampleAppPorts {
 		if port != "" {
@@ -98,6 +102,7 @@ func (rqmc *requestBasedMetricCollector) invokeSampleApps(ctx context.Context, c
 	}
 }
 
+// invoke uses the port given in the parameters to make an http request.
 func invoke(ctx context.Context, port string, client http.Client) {
 
 	ctx, span := tracer.Start(
@@ -108,6 +113,7 @@ func invoke(ctx context.Context, port string, client http.Client) {
 	fmt.Println(addr)
 	req, _ := http.NewRequestWithContext(ctx, "GET", addr, nil)
 	res, err := client.Do(req)
+	span.SetAttributes(attribute.Int("statusCode", res.StatusCode))
 
 	if err != nil {
 		fmt.Println(err)
@@ -119,28 +125,30 @@ func invoke(ctx context.Context, port string, client http.Client) {
 }
 
 // OutgoingHttpCall makes an HTTP GET request to https://aws.amazon.com and generates an Xray Trace ID.
-func (rqmc *requestBasedMetricCollector) OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client) {
+func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client, rqmc *requestBasedMetricCollector) {
 
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
 
-	newCtx, span := tracer.Start(
+	ctx, span := tracer.Start(
 		ctx,
 		"outgoing-http-call",
 	)
+
 	defer span.End()
 
-	req, _ := http.NewRequestWithContext(newCtx, "GET", "https://aws.amazon.com", nil)
+	req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
 	}
+	span.SetAttributes(attribute.Int("statusCode", res.StatusCode))
 	defer res.Body.Close()
 
 	// Request based metrics provided by rqmc
 	rqmc.AddApiRequest()
-	rqmc.UpdateTotalBytesSent(newCtx)
-	rqmc.UpdateLatencyTime(newCtx)
+	rqmc.UpdateTotalBytesSent(ctx)
+	rqmc.UpdateLatencyTime(ctx)
 	writeResponse(span, w)
 
 }

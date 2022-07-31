@@ -17,9 +17,9 @@ type requestBasedMetricCollector struct {
 	totalBytesSent syncint64.Counter
 	totalRequests  asyncint64.Counter
 	latencyTime    syncint64.Histogram
-	n              int64
 	config         Config
 	meter          metric.Meter
+	n              int64
 }
 
 // AddApiRequest adds 1 to the rqmc counter
@@ -37,7 +37,7 @@ func (rqmc *requestBasedMetricCollector) GetApiRequest() int {
 func NewRequestBasedMetricCollector(ctx context.Context, cfg Config, mp metric.MeterProvider) requestBasedMetricCollector {
 
 	rqmc := requestBasedMetricCollector{config: cfg}
-	rqmc.meter = mp.Meter("GO_SAMPLE_APP_METRICS")
+	rqmc.meter = mp.Meter(SERVICE_NAME + ".aws-otel-metrics")
 	rqmc.registerTotalBytesSent()
 	rqmc.registerTotalRequests()
 	rqmc.registerLatencyTime()
@@ -47,9 +47,9 @@ func NewRequestBasedMetricCollector(ctx context.Context, cfg Config, mp metric.M
 // registerTotalBytesSent registers a Synchronous counter called TotalBytesSent.
 func (rqmc *requestBasedMetricCollector) registerTotalBytesSent() {
 	totalBytesSent, err := rqmc.meter.SyncInt64().Counter(
-		"Total_Bytes_Sent",
+		SERVICE_NAME+"."+API_TOTAL_BYTES_SENT,
 		instrument.WithDescription("Keeps a sum of the total amount of bytes sent while the application is alive"),
-		instrument.WithUnit("mb"),
+		instrument.WithUnit("By"),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -60,7 +60,7 @@ func (rqmc *requestBasedMetricCollector) registerTotalBytesSent() {
 // registerTotalRequests registers an Asynchronous counter called TotalApiRequests.
 func (rqmc *requestBasedMetricCollector) registerTotalRequests() {
 	totalRequests, err := rqmc.meter.AsyncInt64().Counter(
-		"Total_API_Requests",
+		SERVICE_NAME+"."+API_TOTAL_API_REQUESTS,
 		instrument.WithDescription("Increments by one every time a sampleapp endpoint is used"),
 		instrument.WithUnit("1"),
 	)
@@ -73,7 +73,7 @@ func (rqmc *requestBasedMetricCollector) registerTotalRequests() {
 // registerLatencyTime registers a Synchronous histogram called LatencyTime.
 func (rqmc *requestBasedMetricCollector) registerLatencyTime() {
 	latencyTime, err := rqmc.meter.SyncInt64().Histogram(
-		"Latency_Time",
+		SERVICE_NAME+"."+API_LATENCY_TIME,
 		instrument.WithDescription("Measures latency time"),
 		instrument.WithUnit("ms"),
 	)
@@ -91,7 +91,7 @@ func (rqmc *requestBasedMetricCollector) StartTotalRequestCallback() {
 		},
 		// SDK periodically calls this function to collect data.
 		func(ctx context.Context) {
-			rqmc.totalRequests.Observe(ctx, int64(rqmc.GetApiRequest()))
+			rqmc.totalRequests.Observe(ctx, int64(rqmc.GetApiRequest()), requestMetricCommonLabels...)
 		},
 	); err != nil {
 		panic(err)
@@ -102,12 +102,12 @@ func (rqmc *requestBasedMetricCollector) StartTotalRequestCallback() {
 func (rqmc *requestBasedMetricCollector) UpdateTotalBytesSent(ctx context.Context) {
 	min := 0
 	max := 1024
-	rqmc.totalBytesSent.Add(ctx, int64(rand.Intn(max-min)+min))
+	rqmc.totalBytesSent.Add(ctx, int64(rand.Intn(max-min)+min), requestMetricCommonLabels...)
 }
 
 // UpdateLatencyTime updates LatencyTime adds an aditional value between 0 and 512 to the histogram distribution.
 func (rqmc *requestBasedMetricCollector) UpdateLatencyTime(ctx context.Context) {
 	min := 0
 	max := 512
-	rqmc.latencyTime.Record(ctx, int64(rand.Intn(max-min)+min))
+	rqmc.latencyTime.Record(ctx, int64(rand.Intn(max-min)+min), requestMetricCommonLabels...)
 }

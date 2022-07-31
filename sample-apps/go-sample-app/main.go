@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/aws-otel-commnunity/sample-apps/go-sample-app/collection"
 	"github.com/gorilla/mux"
@@ -18,38 +20,48 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// Creates and configures random based metrics based on a configuration file (config.yaml).
-	mp := global.MeterProvider()
-	cfg := collection.GetConfiguration()
-	rmc := collection.NewRandomMetricCollector(mp)
-	rmc.RegisterMetricsClient(ctx, *cfg)
+	// The seed for 'random' values used in this applicaiton
+	rand.Seed(time.Now().UnixNano())
 
-	// Starts request based metric and registers necessary callbacks
-	rqmc := collection.NewRequestBasedMetricCollector(ctx, *cfg, mp)
-	rqmc.StartTotalRequestCallback()
-
+	// Client starts
 	shutdown, err := collection.StartClient(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer shutdown(ctx)
 
+	// Creates and configures random based metrics based on a configuration file (config.yaml).
+	mp := global.MeterProvider()
+	cfg := collection.GetConfiguration()
+
+	// Starts request based metric and registers necessary callbacks
+	rmc := collection.NewRandomMetricCollector(mp)
+	rmc.RegisterMetricsClient(ctx, *cfg)
+	rqmc := collection.NewRequestBasedMetricCollector(ctx, *cfg, mp)
+	rqmc.StartTotalRequestCallback()
+
 	// Creates a router, client and web server with several endpoints
 	r := mux.NewRouter()
 	client := http.Client{
 		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
+
 	r.Use(otelmux.Middleware("Go-Sampleapp-Server"))
 
-	r.HandleFunc("/aws-sdk-call", rqmc.AwsSdkCall)
+	// Three endpoints
+	r.HandleFunc("/aws-sdk-call", func(w http.ResponseWriter, r *http.Request) {
+		collection.AwsSdkCall(w, r, &rqmc)
+	})
 
 	r.HandleFunc("/outgoing-http-call", func(w http.ResponseWriter, r *http.Request) {
-		rqmc.OutgoingHttpCall(w, r, client)
+		collection.OutgoingHttpCall(w, r, client, &rqmc)
 	})
 
 	r.HandleFunc("/outgoing-sampleapp", func(w http.ResponseWriter, r *http.Request) {
-		rqmc.OutgoingSampleApp(w, r, client)
+		collection.OutgoingSampleApp(w, r, client, &rqmc)
 	})
+
+	// Root endpoint
 	http.Handle("/", r)
 
 	srv := &http.Server{

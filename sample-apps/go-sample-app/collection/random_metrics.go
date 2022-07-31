@@ -30,7 +30,7 @@ type randomMetricCollector struct {
 // HeapSize, ThreadsActive, TimeAlive, CpuUsage
 func NewRandomMetricCollector(mp metric.MeterProvider) randomMetricCollector {
 	rmc := randomMetricCollector{}
-	rmc.meter = mp.Meter("GO_SAMPLE_APP_METRICS")
+	rmc.meter = mp.Meter(SERVICE_NAME + ".aws-otel-metrics")
 	rmc.registerHeapSize()
 	rmc.registerThreadsActive()
 	rmc.registerTimeAlive()
@@ -41,9 +41,9 @@ func NewRandomMetricCollector(mp metric.MeterProvider) randomMetricCollector {
 // registerTimeAlive registers a Synchronous Counter called TimeAlive.
 func (rmc *randomMetricCollector) registerTimeAlive() {
 	timeAlive, err := rmc.meter.SyncInt64().Counter(
-		"Time_Alive",
+		SERVICE_NAME+"."+API_TIME_ALIVE,
 		instrument.WithDescription("Total amount of time that the application has been alive"),
-		instrument.WithUnit("1"),
+		instrument.WithUnit("ms"),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -54,9 +54,9 @@ func (rmc *randomMetricCollector) registerTimeAlive() {
 // registerCpuUsage registers an Asynchronous Gauge called CpuUsage.
 func (rmc *randomMetricCollector) registerCpuUsage() {
 	cpuUsage, err := rmc.meter.AsyncInt64().Gauge(
-		"CPU_Usage",
+		SERVICE_NAME+"."+API_CPU_USAGE,
 		instrument.WithDescription("Cpu usage percent"),
-		instrument.WithUnit("%"),
+		instrument.WithUnit("1"),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -68,9 +68,9 @@ func (rmc *randomMetricCollector) registerCpuUsage() {
 // registerHeapSize registers an Asynchronous UpDownCounter called HeapSize.
 func (rmc *randomMetricCollector) registerHeapSize() {
 	totalHeapSize, err := rmc.meter.AsyncInt64().UpDownCounter(
-		"Total_Heap_Size",
+		SERVICE_NAME+"."+API_TOTAL_HEAP_SIZE,
 		instrument.WithDescription("The current total heap size"),
-		instrument.WithUnit("1"),
+		instrument.WithUnit("By"),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -82,7 +82,7 @@ func (rmc *randomMetricCollector) registerHeapSize() {
 // registerThreadsActive registers a Synchronous UpDownCounter called ThreadsActive.
 func (rmc *randomMetricCollector) registerThreadsActive() {
 	threadsActive, err := rmc.meter.SyncInt64().UpDownCounter(
-		"Threads_Active",
+		SERVICE_NAME+"."+API_THREADS_ACTIVE,
 		instrument.WithUnit("1"),
 		instrument.WithDescription("The total amount of threads active"),
 	)
@@ -108,7 +108,7 @@ func (rmc *randomMetricCollector) RegisterMetricsClient(ctx context.Context, cfg
 
 // updateTimeAlive updates TimeAlive by TimeAliveIncrementer increments.
 func (rmc *randomMetricCollector) updateTimeAlive(ctx context.Context, cfg Config) {
-	rmc.timeAlive.Add(ctx, cfg.TimeAliveIncrementer)
+	rmc.timeAlive.Add(ctx, cfg.TimeAliveIncrementer*1000, randomMetricCommonLabels...) // in millisconds
 }
 
 // updateCpuUsage updates CpuUsage by a value between 0 and CpuUsageUpperBound every SDK call.
@@ -123,7 +123,7 @@ func (rmc *randomMetricCollector) updateCpuUsage(ctx context.Context, cfg Config
 			min := 0
 			max := int(cfg.CpuUsageUpperBound)
 			cpuUsage := int64(rand.Intn(max-min) + min)
-			rmc.cpuUsage.Observe(ctx, cpuUsage)
+			rmc.cpuUsage.Observe(ctx, cpuUsage, randomMetricCommonLabels...)
 		},
 	); err != nil {
 		panic(err)
@@ -141,7 +141,7 @@ func (rmc *randomMetricCollector) updateTotalHeapSize(ctx context.Context, cfg C
 			min := 0
 			max := int(cfg.TotalHeapSizeUpperBound)
 			totalHeapSize := int64(rand.Intn(max-min) + min)
-			rmc.heapSize.Observe(ctx, totalHeapSize)
+			rmc.heapSize.Observe(ctx, totalHeapSize, randomMetricCommonLabels...)
 		},
 	); err != nil {
 		panic(err)
@@ -152,7 +152,7 @@ func (rmc *randomMetricCollector) updateTotalHeapSize(ctx context.Context, cfg C
 func (rmc *randomMetricCollector) updateThreadsActive(ctx context.Context, cfg Config) {
 	if threadsBool {
 		if threadsActive < int64(cfg.ThreadsActiveUpperBound) {
-			rmc.threadsActive.Add(ctx, 1)
+			rmc.threadsActive.Add(ctx, 1, randomMetricCommonLabels...)
 			threadsActive++
 		} else {
 			threadsBool = false
@@ -161,7 +161,7 @@ func (rmc *randomMetricCollector) updateThreadsActive(ctx context.Context, cfg C
 
 	} else {
 		if threadsActive > 0 {
-			rmc.threadsActive.Add(ctx, -1)
+			rmc.threadsActive.Add(ctx, -1, randomMetricCommonLabels...)
 			threadsActive--
 		} else {
 			threadsBool = true
