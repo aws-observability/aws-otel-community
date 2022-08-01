@@ -29,7 +29,7 @@ const GRPC_ENDPOINT = "0.0.0.0:4317"
 
 const SERVICE_NAME = "go"
 
-var tracer = otel.Tracer("go-sample-app-tracer")
+var tracer = otel.Tracer("ADOT-Tracer-Sample")
 
 // Names for metric instruments
 const API_TIME_ALIVE = "timeAlive"

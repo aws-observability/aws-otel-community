@@ -74,7 +74,7 @@ func (rqmc *requestBasedMetricCollector) registerTotalRequests() {
 func (rqmc *requestBasedMetricCollector) registerLatencyTime() {
 	latencyTime, err := rqmc.meter.SyncInt64().Histogram(
 		SERVICE_NAME+"."+API_LATENCY_TIME,
-		instrument.WithDescription("Measures latency time"),
+		instrument.WithDescription("Measures latency time in buckets of 100 300 and 500"),
 		instrument.WithUnit("ms"),
 	)
 	if err != nil {

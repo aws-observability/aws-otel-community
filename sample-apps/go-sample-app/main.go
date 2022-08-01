@@ -30,11 +30,11 @@ func main() {
 	}
 	defer shutdown(ctx)
 
-	// Creates and configures random based metrics based on a configuration file (config.yaml).
+	// (Metric related) Creates and configures random based metrics based on a configuration file (config.yaml).
 	mp := global.MeterProvider()
 	cfg := collection.GetConfiguration()
 
-	// Starts request based metric and registers necessary callbacks
+	// (Metric related) Starts request based metric and registers necessary callbacks
 	rmc := collection.NewRandomMetricCollector(mp)
 	rmc.RegisterMetricsClient(ctx, *cfg)
 	rqmc := collection.NewRequestBasedMetricCollector(ctx, *cfg, mp)
