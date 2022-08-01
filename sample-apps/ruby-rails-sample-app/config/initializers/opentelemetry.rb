@@ -20,4 +20,4 @@ OpenTelemetry::SDK.configure do |c|
     c.use_all()
   end
   
-  @@tracer = OpenTelemetry.tracer_provider.tracer('my_app_or_gem', '0.1.0')
+  @@tracer = OpenTelemetry.tracer_provider.tracer('ADOT-Tracer-sample')

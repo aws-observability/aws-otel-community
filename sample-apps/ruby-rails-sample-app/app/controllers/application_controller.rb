@@ -17,8 +17,15 @@ class ApplicationController < ActionController::Base
     def outgoing_http_call
 
         @@tracer.in_span("outgoing-http-call") do |span|
-            uri = URI('https://aws.amazon.com')
-            Net::HTTP.get(uri) 
+            uri = URI.parse("https://aws.amazon.com/")
+            http = Net::HTTP.new(uri.host, uri.port)
+            http.use_ssl = true
+
+            request = Net::HTTP::Get.new(uri.request_uri)
+            res = http.request(request)
+            span.set_attribute("signal", "trace")
+            span.set_attribute("language", "ruby")
+            span.set_attribute("statusCode", res.code)
         end
 
         render json: get_xray_trace_id(OpenTelemetry::Trace.current_span.context.hex_trace_id)
@@ -33,15 +40,28 @@ class ApplicationController < ActionController::Base
                 # Make a leaf request
                 @@tracer.in_span("leaf-request") do |span|
             
-                    uri = URI('https://amazon.com')
-                    Net::HTTP.get(uri) 
+                    uri = URI.parse("https://amazon.com/")
+                    http = Net::HTTP.new(uri.host, uri.port)
+                    http.use_ssl = true
+        
+                    request = Net::HTTP::Get.new(uri.request_uri)
+                    res = http.request(request)
+                    span.set_attribute("signal", "trace")
+                    span.set_attribute("language", "ruby")
+                    span.set_attribute("statusCode", res.code)
                 end
             else
                 # Call sample apps
                 for port in $sample_app_ports do
                     @@tracer.in_span("invoke-sampleapp") do |span|
-                        uri = URI("http://0.0.0.0:"+ port + "/outgoing-sampleapp")
-                        Net::HTTP.get(uri)
+                        uri = URI.parse("http://0.0.0.0:" + port + "/outgoing-sampleapp")
+                        http = Net::HTTP.new(uri.host, uri.port)
+            
+                        request = Net::HTTP::Get.new(uri.request_uri)
+                        res = http.request(request)
+                        span.set_attribute("signal", "trace")
+                        span.set_attribute("language", "ruby")
+                        span.set_attribute("statusCode", res.code)
                     end
                 end     
             end
