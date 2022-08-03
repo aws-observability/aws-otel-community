@@ -2,6 +2,7 @@ package collection
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
@@ -104,7 +105,7 @@ func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 
 	idg := xray.NewIDGenerator()
 	ec2Res, ecsRes, eksRes := getResourceDetectors()
-
+	fmt.Println(ec2Res, ecsRes, eksRes)
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceNameKey.String("go-sampleapp-service"), // Should have a unique name. Service name displayed in backends
@@ -115,9 +116,9 @@ func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 		sdktrace.WithBatcher(traceExporter),
 		sdktrace.WithIDGenerator(idg),
 		sdktrace.WithResource(res),
-		sdktrace.WithResource(ec2Res),
-		sdktrace.WithResource(ecsRes),
-		sdktrace.WithResource(eksRes),
+		// sdktrace.WithResource(ec2Res),
+		// sdktrace.WithResource(ecsRes),
+		// sdktrace.WithResource(eksRes),
 	)
 	return tp, nil
 }
