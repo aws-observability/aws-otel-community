@@ -1,0 +1,31 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+exporters:
+  logging:
+    loglevel: info
+  awsxray:
+    region: us-west-2
+  awsemf:
+    region: us-west-2
+
+service:
+  telemetry:
+    logs:
+      level: debug
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      exporters:
+        - logging
+        - awsxray
+    metrics:
+      receivers:
+        - otlp
+      exporters:
+        - logging
+        - awsemf

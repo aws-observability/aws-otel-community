@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+  otel:
+    image: amazon/aws-otel-collector:latest
+    command: --config /config/collector-config.yml
+    volumes:
+      - .:/config
+      - ~/.aws:/root/.aws
+    ports:
+      - '4317:4317'
+
+  app:
+    image: public.ecr.aws/aws-otel-test/aws-otel-java-spark:test-spark
+    environment:
+      - INSTANCE_ID
+      - LISTEN_ADDRESS=0.0.0.0:4567
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=aws-otel-integ-test
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4317
+      - AWS_REGION=us-west-2
+      - OTEL_JAVAAGENT_DEBUG=true
+      - OTEL_METRICS_EXPORTER=otlp
+    volumes:
+      - ~/.aws:/root/.aws
+    ports:
+      - '4567:4567'
+      - '8080:8080'
