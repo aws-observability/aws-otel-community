@@ -1,1 +1,0 @@
-{"image":"public.ecr.aws/aws-otel-test/aws-otel-java-spark","imageId":"sha256:9bee8dda81bba0423e12ebd2a0cf1c618af0828744c42165c41f77b84a50f464","imageDigest":"sha256:1d9a5b33f9e35a074b4b8d844b3c4baa2964f886c56d5a0eeee9cb89d9d9af70","tags":["latest","test-spark"]}
