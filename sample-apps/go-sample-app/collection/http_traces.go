@@ -7,10 +7,8 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -20,28 +18,32 @@ type response struct {
 	TraceID string `json:"traceID"`
 }
 
+type s3Client struct {
+	client *s3.S3
+}
+
+func NewS3Client() (*s3Client, error) {
+	s, err := session.NewSession()
+	if err != nil {
+		return nil, err
+	}
+	svc := s3.New(s)
+	return &s3Client{client: svc}, nil
+}
+
 // AwsSdkCall mocks a request to s3. ListBuckets are nil so no credentials are needed.
 // Generates an Xray Trace ID.
-func AwsSdkCall(w http.ResponseWriter, r *http.Request, rqmc *requestBasedMetricCollector) {
+func AwsSdkCall(w http.ResponseWriter, r *http.Request, rqmc *requestBasedMetricCollector, s3 *s3Client) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := r.Context()
-	s, err := session.NewSession(&aws.Config{
-		Region: aws.String("us-west-2")},
-	)
 
-	// TODO: Convert this into an interface
-	svc := s3.New(s)
-	svc.ListBuckets(nil) // nil or else would need real aws credentials
-	if err != nil {
-		fmt.Println(err)
-	}
+	s3.client.ListBuckets(nil) // nil or else would need real aws credentials
 
 	ctx, span := tracer.Start(
 		ctx,
 		"get-aws-s3-buckets",
 		trace.WithAttributes(traceCommonLabels...),
 	)
-	span.SetAttributes(attribute.Int("statusCode", 200))
 	defer span.End()
 
 	// Request based metrics provided by rqmc
@@ -75,7 +77,6 @@ func OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Clien
 		if err != nil {
 			fmt.Println(err)
 		}
-		span.SetAttributes(attribute.Int("statusCode", res.StatusCode))
 
 		defer res.Body.Close()
 		// Request based metrics provided by rqmc
@@ -107,13 +108,13 @@ func invoke(ctx context.Context, port string, client http.Client) {
 
 	ctx, span := tracer.Start(
 		ctx,
-		"invoke-sampleapp",
+		"invoke-sample-app",
 	)
+	// Consider making requests on other than localhost
 	addr := "http://" + net.JoinHostPort("0.0.0.0", port) + "/outgoing-sampleapp"
 	fmt.Println(addr)
 	req, _ := http.NewRequestWithContext(ctx, "GET", addr, nil)
 	res, err := client.Do(req)
-	span.SetAttributes(attribute.Int("statusCode", res.StatusCode))
 
 	if err != nil {
 		fmt.Println(err)
@@ -142,7 +143,6 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client
 	if err != nil {
 		fmt.Println(err)
 	}
-	span.SetAttributes(attribute.Int("statusCode", res.StatusCode))
 	defer res.Body.Close()
 
 	// Request based metrics provided by rqmc

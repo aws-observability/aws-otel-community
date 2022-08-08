@@ -2,9 +2,11 @@ package collection
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"go.opentelemetry.io/contrib/detectors/aws/ec2"
+	"go.opentelemetry.io/contrib/detectors/aws/ecs"
+	"go.opentelemetry.io/contrib/detectors/aws/eks"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -12,12 +14,9 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/metric/global"
-	semconv "go.opentelemetry.io/otel/semconv/v1.8.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"google.golang.org/grpc"
 
-	"go.opentelemetry.io/contrib/detectors/aws/ec2"
-	"go.opentelemetry.io/contrib/detectors/aws/ecs"
-	"go.opentelemetry.io/contrib/detectors/aws/eks"
 	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
@@ -26,38 +25,37 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-const GRPC_ENDPOINT = "0.0.0.0:4317"
+const grpcEndpoint = "0.0.0.0:4317"
 
-const SERVICE_NAME = "go"
+const serviceName = "go"
 
-var tracer = otel.Tracer("ADOT-Tracer-Sample")
+var tracer = otel.Tracer("github.com/aws-otel-commnunity/sample-apps/go-sample-app/collection")
 
 // Names for metric instruments
-const API_TIME_ALIVE = "timeAlive"
-const API_CPU_USAGE = "cpuUsage"
-const API_TOTAL_HEAP_SIZE = "totalHeapSize"
-const API_THREADS_ACTIVE = "threadsActive"
-const API_TOTAL_BYTES_SENT = "totalBytesSent"
-const API_TOTAL_API_REQUESTS = "totalApiRequests"
-const API_LATENCY_TIME = "latencyTime"
+const apiTimeAlive = "timeAlive"
+const apiCpuUsage = "cpuUsage"
+const apiTotalHeapSize = "totalHeapSize"
+const apiThreadsActive = "threadsActive"
+const apiTotalBytesSent = "totalBytesSent"
+const apiTotalApiRequests = "totalApiRequests"
+const apiLatencyTime = "latencyTime"
 
 // Common attributes for traces and metrics (random, request)
 var requestMetricCommonLabels = []attribute.KeyValue{
 	attribute.String("signal", "metric"),
-	attribute.String("language", SERVICE_NAME),
+	attribute.String("language", serviceName),
 	attribute.String("metricType", "request"),
 }
 
 var randomMetricCommonLabels = []attribute.KeyValue{
 	attribute.String("signal", "metric"),
-	attribute.String("language", SERVICE_NAME),
+	attribute.String("language", serviceName),
 	attribute.String("metricType", "random"),
 }
 
 var traceCommonLabels = []attribute.KeyValue{
 	attribute.String("signal", "trace"),
-	attribute.String("language", SERVICE_NAME),
-	attribute.Int("statusCode", 0),
+	attribute.String("language", serviceName),
 }
 
 // StartClient starts the OTEL controller which periodically collects signals and exports them.
@@ -84,8 +82,12 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 		cxt, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 
-		defer tp.Shutdown(ctx)
-
+		defer func() {
+			err = tp.Shutdown(ctx)
+		}()
+		if err != nil {
+			return err
+		}
 		// pushes any last exports to the receiver
 		if err := ctrl.Stop(cxt); err != nil {
 			return err
@@ -96,35 +98,42 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 
 // setupTraceProvider configures a trace exporter and an AWS X-Ray ID Generator.
 func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
-	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), // INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
-		otlptracegrpc.WithEndpoint(GRPC_ENDPOINT),
+	// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithEndpoint(grpcEndpoint),
 		otlptracegrpc.WithDialOption(grpc.WithBlock()))
 	if err != nil {
 		return nil, err
 	}
 
 	idg := xray.NewIDGenerator()
-	ec2Res, ecsRes, eksRes := getResourceDetectors()
-	fmt.Println(ec2Res, ecsRes, eksRes)
-	res := resource.NewWithAttributes(
+
+	resA := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("go-sampleapp-service"), // Should have a unique name. Service name displayed in backends
+		semconv.ServiceNameKey.String("go-sample-app"), // Should have a unique name. Service name displayed in backends
 	)
+
+	resB, err := getResourceDetectors(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := resource.Merge(resA, resB)
+	if err != nil {
+		return nil, err
+	}
 
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithBatcher(traceExporter),
 		sdktrace.WithIDGenerator(idg),
 		sdktrace.WithResource(res),
-		// sdktrace.WithResource(ec2Res),
-		// sdktrace.WithResource(ecsRes),
-		// sdktrace.WithResource(eksRes),
 	)
 	return tp, nil
 }
 
 // getResourceDetectors returns resource detectors for ec2, ecs and eks.
-func getResourceDetectors() (*resource.Resource, *resource.Resource, *resource.Resource) {
+func getResourceDetectors(ctx context.Context) (*resource.Resource, error) {
 	ec2ResourceDetector := ec2.NewResourceDetector()
 	ec2Res, _ := ec2ResourceDetector.Detect(context.Background())
 
@@ -134,14 +143,23 @@ func getResourceDetectors() (*resource.Resource, *resource.Resource, *resource.R
 	eksResourceDetector := eks.NewResourceDetector()
 	eksRes, _ := eksResourceDetector.Detect(context.Background())
 
-	return ec2Res, ecsRes, eksRes
+	res, err := resource.Merge(ec2Res, ecsRes)
+	if err != nil {
+		return nil, err
+	}
+	res, err = resource.Merge(res, eksRes)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // setupMetricsController configures a metric exporter and a controller with a histogram tracking latency.
 func setupMetricsController(ctx context.Context) (*controller.Controller, error) {
 	metricClient := otlpmetricgrpc.NewClient(
-		otlpmetricgrpc.WithInsecure(), // INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
-		otlpmetricgrpc.WithEndpoint(GRPC_ENDPOINT))
+		// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
+		otlpmetricgrpc.WithInsecure(),
+		otlpmetricgrpc.WithEndpoint(grpcEndpoint))
 	metricExp, _ := otlpmetric.New(ctx, metricClient)
 
 	controller := controller.New(

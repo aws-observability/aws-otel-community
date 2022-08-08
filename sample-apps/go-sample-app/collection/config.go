@@ -20,7 +20,7 @@ type Config struct {
 func GetConfiguration() *Config {
 	var arr []string
 	viper.SetDefault("Host", "0.0.0.0")
-	viper.SetDefault("Port", "4567")
+	viper.SetDefault("Port", "8080")
 	viper.SetDefault("TimeInterval", 1)
 	viper.SetDefault("RandomTimeAliveIncrementer", 1)
 	viper.SetDefault("RandomTotalHeapSizeUpperBound", 100)

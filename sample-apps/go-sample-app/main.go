@@ -26,7 +26,7 @@ func main() {
 	// Client starts
 	shutdown, err := collection.StartClient(ctx)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer shutdown(ctx)
 
@@ -40,6 +40,10 @@ func main() {
 	rqmc := collection.NewRequestBasedMetricCollector(ctx, *cfg, mp)
 	rqmc.StartTotalRequestCallback()
 
+	s3Client, err := collection.NewS3Client()
+	if err != nil {
+		fmt.Println(err)
+	}
 	// Creates a router, client and web server with several endpoints
 	r := mux.NewRouter()
 	client := http.Client{
@@ -50,7 +54,7 @@ func main() {
 
 	// Three endpoints
 	r.HandleFunc("/aws-sdk-call", func(w http.ResponseWriter, r *http.Request) {
-		collection.AwsSdkCall(w, r, &rqmc)
+		collection.AwsSdkCall(w, r, &rqmc, s3Client)
 	})
 
 	r.HandleFunc("/outgoing-http-call", func(w http.ResponseWriter, r *http.Request) {
