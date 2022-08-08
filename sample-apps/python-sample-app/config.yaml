@@ -1,0 +1,9 @@
+---
+host: "0.0.0.0"                       # Host - String Address
+port: "8080"                          # Port - String Port
+time_interval: 1                       # Interval - Time in seconds to generate new metrics
+random_time_alive_incrementer: 1         # Metric - Amount to incremement metric by every TimeInterval
+random_total_heap_size_upper_bound: 100    # Metric - UpperBound for TotalHeapSize for random metric value every TimeInterval
+random_threads_active_upper_bound: 10     # Metric - UpperBound for ThreadsActive for random metric value every TimeInterval
+random_cpu_usage_upper_bound: 100         # Metric - UppperBound for CpuUsage for random metric value every TimeInterval                                      
+sample_app_ports: ["4567"]              # Sampleapp ports to make calls to
