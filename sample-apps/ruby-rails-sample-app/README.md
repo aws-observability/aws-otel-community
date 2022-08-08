@@ -3,13 +3,13 @@
 This Ruby sample app will generate Traces based on defined events. Metrics do not yet have a finished implementation upstream so they will be left as  coming soon. To generate traces, one of the following endpoints need to be hit. 
 
 1. /
-    1. Ensures the application is running
+    - Ensures the application is running
 2. /outgoing-http-call
-    1. Makes a HTTP request to aws.amazon.com (http://aws.amazon.com/)
+    - Makes a HTTP request to aws.amazon.com (http://aws.amazon.com/)
 3. /aws-sdk-call
-    1. Makes a call to AWS S3 to list buckets for the account corresponding to the provided AWS credentials
+    - Makes a call to AWS S3 to list buckets for the account corresponding to the provided AWS credentials
 4. /outgoing-sampleapp
-    1. Makes a call to all other sample app ports configured at <host>:<port>/outgoing-sampleapp. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/) 
+    - Makes a call to all other sample app ports configured at <host>:<port>/outgoing-sampleapp. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/) 
 
 ### Requirements
 
