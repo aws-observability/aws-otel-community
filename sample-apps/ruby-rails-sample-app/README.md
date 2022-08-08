@@ -9,7 +9,7 @@ This Ruby sample app will generate Traces based on defined events. Metrics do no
 3. /aws-sdk-call
     - Makes a call to AWS S3 to list buckets for the account corresponding to the provided AWS credentials
 4. /outgoing-sampleapp
-    - Makes a call to all other sample app ports configured at <host>:<port>/outgoing-sampleapp. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/) 
+    - Makes a call to all other sample app ports configured at `<host>:<port>/outgoing-sampleapp`. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/) 
 
 ### Requirements
 
@@ -34,7 +34,7 @@ In order to run the application
 `bundle`
 - Run the rails server
 `rails server`
-Now the application is ran and the endpoints can be called at 0.0.0.0:8080/<one-of-4-endpoints>.
+Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
 
 ### Non conformance
 
