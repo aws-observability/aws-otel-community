@@ -23,12 +23,11 @@ group :development do
 end
 
 gem 'aws-sdk-s3', '~> 1'
-gem 'faraday'
-
-gem 'opentelemetry-sdk'
 
 gem 'opentelemetry-propagator-xray'
-
 gem 'opentelemetry-sdk'
 gem 'opentelemetry-exporter-otlp'
-gem 'opentelemetry-instrumentation-all'
+gem 'opentelemetry-instrumentation-rails'
+gem 'opentelemetry-instrumentation-net_http'
+gem 'opentelemetry-instrumentation-concurrent_ruby'
+gem 'opentelemetry-instrumentation-aws_sdk', '>= 0.2.1'
