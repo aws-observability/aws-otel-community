@@ -8,4 +8,4 @@ source bin/activate
 
 pip install --no-cache-dir -r requirements.txt
 
-opentelemetry-instrument python app.py
+OTEL_PROPAGATORS=xray OTEL_PYTHON_ID_GENERATOR=xray opentelemetry-instrument python app.py
