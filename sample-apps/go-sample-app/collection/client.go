@@ -22,7 +22,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-const grpcEndpoint = "otel:4317"
+const grpcEndpoint = "0.0.0.0:4317"
 
 const serviceName = "go"
 
