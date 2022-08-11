@@ -12,7 +12,6 @@ import (
 	"github.com/aws-otel-commnunity/sample-apps/go-sample-app/collection"
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/metric/global"
 )
 
@@ -47,7 +46,7 @@ func main() {
 	// Creates a router, client and web server with several endpoints
 	r := mux.NewRouter()
 	client := http.Client{
-		Transport: otelhttp.NewTransport(http.DefaultTransport),
+		// Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 
 	r.Use(otelmux.Middleware("Go-Sampleapp-Server"))

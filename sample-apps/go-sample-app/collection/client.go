@@ -4,9 +4,6 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/contrib/detectors/aws/ec2"
-	"go.opentelemetry.io/contrib/detectors/aws/ecs"
-	"go.opentelemetry.io/contrib/detectors/aws/eks"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -25,7 +22,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-const grpcEndpoint = "0.0.0.0:4317"
+const grpcEndpoint = "otel:4317"
 
 const serviceName = "go"
 
@@ -108,20 +105,10 @@ func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 
 	idg := xray.NewIDGenerator()
 
-	resA := resource.NewWithAttributes(
+	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceNameKey.String("go-sample-app"), // Should have a unique name. Service name displayed in backends
 	)
-
-	resB, err := getResourceDetectors(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := resource.Merge(resA, resB)
-	if err != nil {
-		return nil, err
-	}
 
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
@@ -130,28 +117,6 @@ func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 		sdktrace.WithResource(res),
 	)
 	return tp, nil
-}
-
-// getResourceDetectors returns resource detectors for ec2, ecs and eks.
-func getResourceDetectors(ctx context.Context) (*resource.Resource, error) {
-	ec2ResourceDetector := ec2.NewResourceDetector()
-	ec2Res, _ := ec2ResourceDetector.Detect(context.Background())
-
-	ecsResourceDetector := ecs.NewResourceDetector()
-	ecsRes, _ := ecsResourceDetector.Detect(context.Background())
-
-	eksResourceDetector := eks.NewResourceDetector()
-	eksRes, _ := eksResourceDetector.Detect(context.Background())
-
-	res, err := resource.Merge(ec2Res, ecsRes)
-	if err != nil {
-		return nil, err
-	}
-	res, err = resource.Merge(res, eksRes)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
 }
 
 // setupMetricsController configures a metric exporter and a controller with a histogram tracking latency.
