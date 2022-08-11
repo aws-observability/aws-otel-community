@@ -3,6 +3,15 @@ require "net/http"
 def send_http_request(uri)
   uri = URI.parse(uri)
   http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = false
+  request = Net::HTTP::Get.new(uri.request_uri)
+  res = http.request(request)
+  return res
+end
+
+def send_https_request(uri)
+  uri = URI.parse(uri)
+  http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
   request = Net::HTTP::Get.new(uri.request_uri)
   res = http.request(request)
@@ -42,11 +51,10 @@ class ApplicationController < ActionController::Base
 
   def outgoing_http_call
     @@tracer.in_span("outgoing-http-call") do |span|
-      res = send_http_request("https://aws.amazon.com/")
+      res = send_https_request("https://aws.amazon.com/")
 
       span.set_attribute("signal", "trace")
       span.set_attribute("language", "ruby")
-      span.set_attribute("statusCode", res.code)
     end
 
     render json: get_xray_trace_id(OpenTelemetry::Trace.current_span.context.hex_trace_id)
@@ -63,22 +71,21 @@ class ApplicationController < ActionController::Base
       if count == 0
         # Make a leaf request
         @@tracer.in_span("leaf-request") do |span|
-          res = send_http_request("https://amazon.com/")
+          res = send_https_request("https://aws.amazon.com/")
 
           span.set_attribute("signal", "trace")
           span.set_attribute("language", "ruby")
-          span.set_attribute("statusCode", res.code)
         end
       else
         # Call sample apps
         for port in $sample_app_ports
           @@tracer.in_span("invoke-sampleapp") do |span|
-            uri = "http://0.0.0.0:" + port + "/outgoing-sampleapp"
-            res = send_http_request(uri)
+            uri = "http://" + port + "/outgoing-sampleapp"
+            puts uri
+            res = send_http_request("http://" + port + "/outgoing-sampleapp")
 
             span.set_attribute("signal", "trace")
             span.set_attribute("language", "ruby")
-            span.set_attribute("statusCode", res.code)
           end
         end
       end

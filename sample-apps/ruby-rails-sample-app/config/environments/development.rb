@@ -59,7 +59,7 @@ Rails.application.configure do
 
   config.log_level = ENV.fetch('SAMPLE_APP_LOG_LEVEL', nil) == 'ERROR' ? :error : :debug
 
-  config.hosts << /(app|localhost|127.0.0.1|0.0.0.0)/
+  config.hosts.clear
 
   ENV['OTEL_EXPORTER_OTLP_ENDPOINT'] = 'http://0.0.0.0:4318'
 
