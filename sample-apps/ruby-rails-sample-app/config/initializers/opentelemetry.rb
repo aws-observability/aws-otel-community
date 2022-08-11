@@ -3,7 +3,7 @@ require 'opentelemetry-exporter-otlp'
 require 'opentelemetry-sdk'
 require 'opentelemetry-propagator-xray'
 
-@@tracer = OpenTelemetry.tracer_provider.tracer("ADOT-Tracer-sample")
+@@tracer = OpenTelemetry.tracer_provider.tracer("app/initializers/opentelemtry/ruby")
 
 OpenTelemetry::SDK.configure do |c|
   c.service_name = "ruby-sample-app"+$port

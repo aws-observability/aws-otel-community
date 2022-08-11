@@ -80,9 +80,8 @@ class ApplicationController < ActionController::Base
         # Call sample apps
         for port in $sample_app_ports
           @@tracer.in_span("invoke-sampleapp") do |span|
-            uri = "http://" + port + "/outgoing-sampleapp"
-            puts uri
-            res = send_http_request("http://" + port + "/outgoing-sampleapp")
+            uri = "http://0.0.0.0" + port + "/outgoing-sampleapp"
+            res = send_http_request(uri)
 
             span.set_attribute("signal", "trace")
             span.set_attribute("language", "ruby")
