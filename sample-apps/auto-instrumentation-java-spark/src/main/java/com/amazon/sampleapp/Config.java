@@ -67,3 +67,16 @@ public class Config {
         return configSamplePorts;
     }
 }
+
+public class Config {
+    private static Config INSTANCE = new Config();
+    public static Config getConfig() {
+        return INSTANCE;
+    }
+
+    private Config() {
+        Yaml yaml = new Yaml();
+        InputStream inputStream = getClass().getResourceAsStream("/config.yaml");
+        Map<String, Object>  = yaml.load(inputStream);
+    }
+}
