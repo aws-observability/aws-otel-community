@@ -68,23 +68,23 @@ def convert_otel_trace_id_to_xray(otel_trace_id_decimal):
 
 # register total bytes sent counter
 total_bytes_sent=meter.create_counter(
-    name="total_bytes_sent",
+    name="totalBytesSent",
     description="Keeps a sum of the total amount of bytes sent while application is alive",
-    unit='mb'
+    unit='By'
 )
 
 # register api requests observable counter
 total_api_requests=meter.create_observable_counter(
-    name="api_requests",
+    name="apiRequests",
     callbacks=[api_requests_callback],
-    description="increments by one every time a sampleapp endpoint is used",
+    description="Increments by one every time a sampleapp endpoint is used",
     unit='1'
 )
 
 # registers latency time histogram
 latency_time=meter.create_histogram(
-    name="latency_time",
-    description="measures latency time",
+    name="latencyTime",
+    description="Measures latency time in buckets of 100, 300 and 500",
     unit='ms'
         )
 
@@ -108,7 +108,7 @@ def call_http():
 # Test AWS SDK instrumentation
 @app.route("/aws-sdk-call")
 def call_aws_sdk():
-    
+
     update_total_bytes_sent()
     update_latency_time()
 
@@ -122,22 +122,24 @@ def call_aws_sdk():
     )
 
 # when this sample-app is invoked either by itself or a different sample app
-@app.route("/outgoing-sample-app")
+@app.route("/outgoing-sampleapp")
 def invoke():
     # Call sample apps
-    ports = cfg.get("sample_app_ports")
+    ports = cfg.get("SampleAppPorts")
     if ports:
         for port in ports:
-            uri = "http://127.0.0.1:" + str(port) + "/outgoing-sample-app"
+            uri = f"http://127.0.0.1:{port}/outgoing-sample-app"
             print("making a request to: " + uri)
             r = requests.get(uri)
-            print(r.text)
+
     # If no sample apps are defined in the config file the app makes a request to amazon.
     else:
         print("no ports configured. making a request to https://aws.amazon.com instead.")
         requests.get("https://aws.amazon.com/")
     
-
+    update_total_bytes_sent()
+    update_latency_time()
+    
     return app.make_response(
         convert_otel_trace_id_to_xray(
             trace.get_current_span().get_span_context().trace_id
@@ -152,6 +154,6 @@ def root_endpoint():
 
 if __name__ == '__main__':
     # starting the random metric collector
-    rmc = random_metrics.random_metric_collector()
+    rmc = random_metrics.RandomMetricCollector()
     rmc.register_metrics_client(cfg)
-    app.run(host=cfg['host'], port=cfg['port'])
+    app.run(host=cfg['Host'], port=cfg['Port'])
