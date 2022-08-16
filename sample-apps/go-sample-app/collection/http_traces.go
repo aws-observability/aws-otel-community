@@ -72,7 +72,7 @@ func OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Clien
 			"leaf-request",
 		)
 
-		req, _ := http.NewRequestWithContext(ctx, "GET", "https://www.amazon.com", nil)
+		req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
 		res, err := client.Do(req)
 		if err != nil {
 			fmt.Println(err)
