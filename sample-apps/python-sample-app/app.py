@@ -11,8 +11,8 @@ from opentelemetry.propagators.aws.aws_xray_propagator import (
     TRACE_ID_FIRST_PART_LENGTH,
     TRACE_ID_VERSION,
 )
-from opentelemetry import trace
-from opentelemetry import metrics
+
+from opentelemetry import trace, metrics
 
 from typing import Iterable
 from flask import Flask, request
@@ -157,3 +157,4 @@ if __name__ == '__main__':
     rmc = random_metrics.RandomMetricCollector()
     rmc.register_metrics_client(cfg)
     app.run(host=cfg['Host'], port=cfg['Port'])
+

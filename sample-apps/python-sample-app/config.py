@@ -15,4 +15,3 @@ def create_config(cfg):
     config.setdefault('SampleAppPorts',['8080'])
     return config
 
-create_config('config.yaml')
