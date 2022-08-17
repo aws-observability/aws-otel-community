@@ -61,6 +61,7 @@ func OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Clien
 	ctx, span := tracer.Start(
 		ctx,
 		"invoke-sample-apps",
+		trace.WithAttributes(traceCommonLabels...),
 	)
 	defer span.End()
 	count := len(rqmc.config.SampleAppPorts)
@@ -109,6 +110,7 @@ func invoke(ctx context.Context, port string, client http.Client) {
 	ctx, span := tracer.Start(
 		ctx,
 		"invoke-sample-app",
+		trace.WithAttributes(traceCommonLabels...),
 	)
 	// Consider making requests on other than localhost
 	addr := "http://" + net.JoinHostPort("0.0.0.0", port) + "/outgoing-sampleapp"
@@ -134,6 +136,7 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client
 	ctx, span := tracer.Start(
 		ctx,
 		"outgoing-http-call",
+		trace.WithAttributes(traceCommonLabels...),
 	)
 
 	defer span.End()
