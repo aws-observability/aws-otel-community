@@ -136,16 +136,17 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client
 	ctx, span := tracer.Start(
 		ctx,
 		"outgoing-http-call",
-		trace.WithAttributes(traceCommonLabels...),
 	)
 
 	defer span.End()
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
 	res, err := client.Do(req)
+	fmt.Println(req.Body)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	defer res.Body.Close()
 
 	// Request based metrics provided by rqmc

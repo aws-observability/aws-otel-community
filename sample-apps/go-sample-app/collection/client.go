@@ -113,8 +113,8 @@ func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithBatcher(traceExporter),
-		sdktrace.WithIDGenerator(idg),
 		sdktrace.WithResource(res),
+		sdktrace.WithIDGenerator(idg),
 	)
 	return tp, nil
 }
