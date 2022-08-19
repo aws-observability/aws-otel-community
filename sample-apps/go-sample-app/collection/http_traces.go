@@ -142,7 +142,6 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
 	res, err := client.Do(req)
-	fmt.Println(req.Body)
 	if err != nil {
 		fmt.Println(err)
 	}
