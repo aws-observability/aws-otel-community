@@ -35,12 +35,11 @@ func NewS3Client() (*s3Client, error) {
 // Generates an Xray Trace ID.
 func AwsSdkCall(w http.ResponseWriter, r *http.Request, rqmc *requestBasedMetricCollector, s3 *s3Client) {
 	w.Header().Set("Content-Type", "application/json")
-	ctx := r.Context()
 
 	s3.client.ListBuckets(nil) // nil or else would need real aws credentials
 
 	ctx, span := tracer.Start(
-		ctx,
+		r.Context(),
 		"get-aws-s3-buckets",
 		trace.WithAttributes(traceCommonLabels...),
 	)
@@ -57,9 +56,8 @@ func AwsSdkCall(w http.ResponseWriter, r *http.Request, rqmc *requestBasedMetric
 // OutgoingSampleApp makes a request to another Sampleapp and generates an Xray Trace ID. It will also make a request to amazon.com.
 func OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Client, rqmc *requestBasedMetricCollector) {
 
-	ctx := r.Context()
 	ctx, span := tracer.Start(
-		ctx,
+		r.Context(),
 		"invoke-sample-apps",
 		trace.WithAttributes(traceCommonLabels...),
 	)
@@ -71,6 +69,7 @@ func OutgoingSampleApp(w http.ResponseWriter, r *http.Request, client http.Clien
 		ctx, span := tracer.Start(
 			ctx,
 			"leaf-request",
+			trace.WithAttributes(traceCommonLabels...),
 		)
 
 		req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
@@ -131,10 +130,9 @@ func invoke(ctx context.Context, port string, client http.Client) {
 func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client, rqmc *requestBasedMetricCollector) {
 
 	w.Header().Set("Content-Type", "application/json")
-	ctx := r.Context()
 
 	ctx, span := tracer.Start(
-		ctx,
+		r.Context(),
 		"outgoing-http-call",
 	)
 

@@ -6,9 +6,6 @@ COPY go.sum .
 RUN GO111MODULE=on go mod download
 
 FROM golang:1.17-alpine as build
-COPY --from=mod $GOCACHE $GOCACHE
-COPY --from=mod $GOPATH/pkg/mod $GOPATH/pkg/mod
-WORKDIR /app
 COPY . .
 RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -o=/bin/main .
 

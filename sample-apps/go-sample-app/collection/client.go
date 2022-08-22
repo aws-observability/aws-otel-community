@@ -22,6 +22,8 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
+var cfg = GetConfiguration()
+
 const grpcEndpoint = "0.0.0.0:4317"
 
 const serviceName = "go"
@@ -53,6 +55,8 @@ var randomMetricCommonLabels = []attribute.KeyValue{
 var traceCommonLabels = []attribute.KeyValue{
 	attribute.String("signal", "trace"),
 	attribute.String("language", serviceName),
+	attribute.String("host", cfg.Host),
+	attribute.String("port", cfg.Port),
 }
 
 // StartClient starts the OTEL controller which periodically collects signals and exports them.
@@ -76,20 +80,18 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 	global.SetMeterProvider(ctrl)
 
 	return func(context.Context) error {
-		cxt, cancel := context.WithTimeout(ctx, time.Second)
+		ctx, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 
-		defer func() {
-			err = tp.Shutdown(ctx)
+		defer func() error {
+			tpErr := tp.Shutdown(ctx)
+			if tpErr != nil {
+				return tpErr
+			}
+			return nil
 		}()
-		if err != nil {
-			return err
-		}
 		// pushes any last exports to the receiver
-		if err := ctrl.Stop(cxt); err != nil {
-			return err
-		}
-		return nil
+		return ctrl.Stop(ctx)
 	}, nil
 }
 
