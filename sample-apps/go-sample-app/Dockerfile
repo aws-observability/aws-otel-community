@@ -4,6 +4,8 @@ WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 RUN GO111MODULE=on go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o=/bin/main .
 
 FROM scratch
 COPY --from=build /bin/main /bin/main
