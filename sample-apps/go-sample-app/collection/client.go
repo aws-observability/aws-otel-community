@@ -79,19 +79,19 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 	}
 	global.SetMeterProvider(ctrl)
 
-	return func(context.Context) error {
+	return func(context.Context) (err error) {
 		ctx, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 
-		defer func() error {
+		defer func() {
 			tpErr := tp.Shutdown(ctx)
 			if tpErr != nil {
-				return tpErr
+				err = tpErr
 			}
-			return nil
 		}()
 		// pushes any last exports to the receiver
-		return ctrl.Stop(ctx)
+		err = ctrl.Stop(ctx)
+		return
 	}, nil
 }
 
