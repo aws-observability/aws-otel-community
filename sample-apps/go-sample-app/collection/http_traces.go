@@ -134,6 +134,7 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client
 	ctx, span := tracer.Start(
 		r.Context(),
 		"outgoing-http-call",
+		trace.WithAttributes(traceCommonLabels...),
 	)
 
 	defer span.End()
