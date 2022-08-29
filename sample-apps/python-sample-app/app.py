@@ -1,4 +1,3 @@
-from tkinter import N
 from config import *
 
 import random_metrics
@@ -14,7 +13,6 @@ from opentelemetry.propagators.aws.aws_xray_propagator import (
 
 from opentelemetry import trace, metrics
 
-from typing import Iterable
 from flask import Flask, request
 
 
@@ -128,7 +126,7 @@ def invoke():
     ports = cfg.get("SampleAppPorts")
     if ports:
         for port in ports:
-            uri = f"http://127.0.0.1:{port}/outgoing-sample-app"
+            uri = f"http://127.0.0.1:{port}/outgoing-sampleapp"
             print("making a request to: " + uri)
             r = requests.get(uri)
 
