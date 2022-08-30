@@ -90,3 +90,4 @@ class RandomMetricCollector():
 
         update_thread = threading.Thread(target=update, args=(self, cfg,), daemon=True)
         update_thread.start()
+
