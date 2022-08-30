@@ -128,7 +128,7 @@ def invoke():
     ports = cfg.get("SampleAppPorts")
     if ports:
         for port in ports:
-            uri = f"http://127.0.0.1:{port}/outgoing-sample-app"
+            uri = f"http://127.0.0.1:{port}/outgoing-sampleapp"
             print("making a request to: " + uri)
             r = requests.get(uri)
 
