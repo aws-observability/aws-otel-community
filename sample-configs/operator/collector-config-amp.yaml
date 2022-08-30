@@ -1,6 +1,6 @@
 #
 # OpenTelemetry Collector configuration
-# Metrics pipeline with Prometheus Receiver and AWS Remote Write Exporter sending metrics to Amazon Managed Prometheus
+# Metrics pipeline with Prometheus Receiver and Prometheus Remote Write Exporter sending metrics to Amazon Managed Prometheus
 #
 ---
 apiVersion: opentelemetry.io/v1alpha1
@@ -14,6 +14,11 @@ spec:
     prometheus.io/scrape: 'true'
     prometheus.io/port: '8888'
   config: |
+    extensions:
+      sigv4auth:
+        region: "<YOUR_AWS_REGION>"
+        service: "aps"
+
     receivers:
       #
       # Scrape configuration for the Prometheus Receiver
@@ -299,18 +304,18 @@ spec:
         timeout: 60s         
 
     exporters:
-      awsprometheusremotewrite:
-        endpoint: "<YOUR_REMOTE_WRITE_ENDPOINT>"
-        aws_auth:
-          region: "<YOUR_AWS_REGION>"
-          service: "aps"
+      prometheusremotewrite:
+        endpoint: <YOUR_REMOTE_WRITE_ENDPOINT>
+        auth:
+          authenticator: sigv4auth
 
     service:
+      extensions: [sigv4auth]
       pipelines:   
         metrics:
           receivers: [prometheus]
           processors: [batch/metrics]
-          exporters: [awsprometheusremotewrite]
+          exporters: [prometheusremotewrite]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
