@@ -37,40 +37,8 @@ from opentelemetry.instrumentation.botocore import BotocoreInstrumentor
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
-
-# Set up AWS X-Ray Propagator
-propagate.set_global_textmap(AwsXRayPropagator())
-
-# Service name is required for most backends
-resource = Resource(attributes={
-    SERVICE_NAME: 'python-manual-instrumentation-sampleapp'
-})
-
-# Setting up Traces
-processor = BatchSpanProcessor(OTLPSpanExporter())
-tracer_provider = TracerProvider(
-    resource=resource, 
-    active_span_processor=processor,
-    id_generator=AwsXRayIdGenerator())
-
-trace.set_tracer_provider(tracer_provider)
-tracer = trace.get_tracer(__name__)
-
-# Setting up Metrics
-metric_reader = PeriodicExportingMetricReader(OTLPMetricExporter())
-metric_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
-
-metrics.set_meter_provider(metric_provider)
-meter = metrics.get_meter(__name__)
-
 # Starting Flask app
 app = Flask(__name__)
-
-# Instrument Packages
-
-BotocoreInstrumentor().instrument()
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
 
 # Generate config from config file
 cfg = create_config('config.yaml')
@@ -80,6 +48,42 @@ TRACES & REQUEST BASED METRICS
 """
 # Global variable to keep track of the total number of API requests
 n = 0
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+
+# Setting up Instrumentation
+def setup_instrumentation():
+    BotocoreInstrumentor().instrument()
+    FlaskInstrumentor().instrument_app(app)
+    RequestsInstrumentor().instrument()
+
+# Setting up opentelemetry
+def setup_opentelemetry(tracer, meter):
+    # Set up AWS X-Ray Propagator
+    propagate.set_global_textmap(AwsXRayPropagator())
+    # Service name is required for most backends
+    resource = Resource(attributes={
+        SERVICE_NAME: 'python-manual-instrumentation-sampleapp'
+    })
+
+    # Setting up Traces
+    processor = BatchSpanProcessor(OTLPSpanExporter())
+    tracer_provider = TracerProvider(
+        resource=resource, 
+        active_span_processor=processor,
+        id_generator=AwsXRayIdGenerator())
+
+    trace.set_tracer_provider(tracer_provider)
+    tracer = trace.get_tracer(__name__)
+
+    # Setting up Metrics
+    metric_reader = PeriodicExportingMetricReader(OTLPMetricExporter())
+    metric_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
+
+    metrics.set_meter_provider(metric_provider)
+    meter = metrics.get_meter(__name__)
+
 
 # update_total_bytes_sent updates the metric with a value between 0 and 1024
 def update_total_bytes_sent():
@@ -213,7 +217,9 @@ def root_endpoint():
     return "<h1>App running!</h1>"
 
 if __name__ == '__main__':
-    # starting the random metric collector
+    # setting up instrumentation & opentelemetry
+    setup_instrumentation()
+    setup_opentelemetry(tracer, meter)
     rmc = random_metrics.RandomMetricCollector()
     rmc.register_metrics_client(cfg)
     app.run(host=cfg['Host'], port=cfg['Port'])
