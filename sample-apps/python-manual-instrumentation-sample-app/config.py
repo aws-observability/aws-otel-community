@@ -12,6 +12,6 @@ def create_config(cfg):
     config.setdefault('RandomTotalHeapSizeUpperBound',100)
     config.setdefault('RandomThreadsActiveUpperBound',10)
     config.setdefault('RandomCpuUsageUpperBound',100)
-    config.setdefault('SampleAppPorts',['8080'])
+    config.setdefault('SampleAppPorts',[])
     return config
 
