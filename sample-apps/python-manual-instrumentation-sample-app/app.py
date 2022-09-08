@@ -214,7 +214,7 @@ def invoke():
 # Test Root Endpoint
 @app.route("/")
 def root_endpoint():
-    return "<h1>App running!</h1>"
+    return "OK"
 
 if __name__ == '__main__':
     # setting up instrumentation & opentelemetry
