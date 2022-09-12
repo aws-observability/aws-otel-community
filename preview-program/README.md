@@ -6,27 +6,23 @@ This program covers all preview features and AWS services integrations available
 ## Scope
 
 What’s *not in scope* for this program:
-
-* The [default tracing pipelines](https://github.com/aws-observability/aws-otel-collector/blob/main/config.yaml), which includes trace collection for X-Ray.
+* Tracing support, including collection pipelines that send traces to [AWS X-Ray](https://aws-otel.github.io/docs/getting-started/x-ray)
+* Metrics support, including collection pipelines using [Prometheus](https://aws-otel.github.io/docs/getting-started/advanced-prometheus-remote-write-configurations) components 
+  to send metrics to [Amazon Managed Service for Prometheus](https://aws-otel.github.io/docs/getting-started/prometheus-remote-write-exporter) 
+  and [CloudWatch Metrics](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
+    * Java, .NET, and Python ADOT SDKs are GA, and are not in scope.
+* The [default pipelines](https://github.com/aws-observability/aws-otel-collector/blob/main/config.yaml), which includes trace collection for X-Ray and metric collection for CloudWatch.
 * Any partner components and integrations.
 * The following [components](https://aws-otel.github.io/docs/releases) of ADOT:
     * AWS X-Ray Playground for OpenTelemetry
     * AWS Distro for OpenTelemetry Integration Test Framework
-* The following ADOT collector pipeline components are not in scope for this program (since they are already GA): `awsxrayreceiver` and `awsxrayexporter`.
-
-What *is included* in this program:
-
-* Metrics support, including collection pipelines using [Prometheus](https://aws-otel.github.io/docs/getting-started/advanced-prometheus-remote-write-configurations) components 
-  to send metrics to [Amazon Managed Service for Prometheus](https://aws-otel.github.io/docs/getting-started/prometheus-remote-write-exporter) 
-  and [CloudWatch Metrics](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
-* Logs support, which includes collection pipelines using component to send logs to [CloudWatch Logs](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
-* The following [components](https://aws-otel.github.io/docs/releases):
     * AWS Distro for OpenTelemetry [Collector](https://aws-otel.github.io/docs/getting-started/collector)
     * AWS Distro for OpenTelemetry [Operator](https://aws-otel.github.io/docs/getting-started/operator)
-* The following ADOT collector pipeline components are in scope:
-    * receivers: `awsecscontainermetricsreceiver`, `statsdreceiver`, and `awscontainerinsightreceiver`
-    * exporters: `awsemfexporter` and `awsprometheusremotewriteexporter`
-    * extension: `ecsobserver` and `awsproxy`
+
+What *is included* in this program:
+* Metrics support, for SDKs not mentioned above
+    * Javascript, Ruby, Go ADOT SDKs are not GA, and are in scope.
+* Logs support, which includes collection pipelines using component to send logs to [CloudWatch Logs](https://aws-otel.github.io/docs/getting-started/cloudwatch-metrics#cloudwatch-emf-exporter-awsemf).
 
 ## Expectations
 
