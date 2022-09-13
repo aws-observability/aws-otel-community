@@ -1,0 +1,24 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: debug
+  awsxray:
+    region: us-west-2
+
+  awsemf:
+    region: 'us-west-2'
+    dimension_rollup_option: "NoDimensionRollup"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [awsxray,logging]
+    metrics:
+      receivers: [otlp]
+      exporters: [awsemf, logging]
