@@ -35,6 +35,7 @@ const { updateTotalBytesSent, updateLatencyTime } = require('./request-metrics')
 
 const api = require('@opentelemetry/api');
 const create_cfg = require('./config');
+const { DiagConsoleLogger } = require('@opentelemetry/api');
 
 function startServer(file='./config.yaml') {
     const worker = new Worker.Worker('./random-metrics.js');
@@ -51,32 +52,30 @@ function startServer(file='./config.yaml') {
 function handleRequest(req, res) {
     const cfg = create_cfg.create_config('./config.yaml');
     const requestStartTime = new Date().getMilliseconds();
-    try {
-        if (req.url === '/') {
+    const routeMapper = {
+        '/': (req, res) => {
             res.end('OK.');
-        }
-
-        else if (req.url === '/aws-sdk-call') {
+        },
+        '/aws-sdk-call': (req, res) => {
             const s3 = new AWS.S3();
             s3.listBuckets(() => {
-              console.log("Responding to /aws-sdk-call");
-      
-              res.end(getTraceIdJson());
-              updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/aws-sdk-call', res.statusCode);
-              updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/aws-sdk-call', res.statusCode);
+                console.log("Responding to /aws-sdk-call");
+        
+                res.end(getTraceIdJson());
+                updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/aws-sdk-call', res.statusCode);
+                updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/aws-sdk-call', res.statusCode);
             });
-          }
-    
-        else if (req.url === '/outgoing-http-call') {
+        },
+        '/outgoing-http-call': (req, res) => {
             http.get('http://aws.amazon.com', () => {
-                console.log("Responding to /outgoing-http-call");
+            console.log("Responding to /outgoing-http-call");
     
             res.end(getTraceIdJson());
             updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-http-call', res.statusCode);
             updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-http-call', res.statusCode);
             });
-      }
-        else if (req.url === '/outgoing-sampleapp') {
+        },
+        '/outgoing-sampleapp': (req, res) => {
             if (cfg.SampleAppPorts.length > 0) {
                 for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
                     let uri = `http://127.0.0.1:${cfg.SampleAppPorts[i]}/outgoing-sampleapp`;
@@ -96,7 +95,14 @@ function handleRequest(req, res) {
             }
             res.end(getTraceIdJson());
         }
-    } catch (err) {
+    }
+    try {
+        const handler = routeMapper[req.url]
+        if (handler) {
+            routeMapper[req.url] (req, res);
+        };
+    } 
+    catch (err) {
         console.log(err);
     }
 }
