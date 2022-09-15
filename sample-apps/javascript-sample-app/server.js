@@ -16,13 +16,6 @@
 
 'use strict';
 
-// setting up metrics
-// const my_meter = require('./create-a-meter');
-// const { emitsPayloadMetric, emitReturnTimeMetric } = require('./get-meter-emit-functions')(my_meter)
-
-// TracerProvider must be initialized before instrumented packages
-// (i.e. before 'aws-sdk' and 'http') are imported.
-
 // setting up the traces and metrics
 const tracer = require('./tracer');
 const meter = require('./meter');
@@ -31,7 +24,7 @@ const http = require('http');
 const AWS = require('aws-sdk');
 const Worker = require('worker_threads');
 
-const { updateTotalBytesSent, updateLatencyTime } = require('./request-metrics')(meter);
+const { updateTotalBytesSent, updateLatencyTime } = require('./request-metrics');
 
 const api = require('@opentelemetry/api');
 const create_cfg = require('./config');
