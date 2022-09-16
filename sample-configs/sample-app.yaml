@@ -42,7 +42,7 @@ spec:
               value: http://my-collector-collector:4317
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: service.namespace=GettingStarted,service.name=GettingStartedService
-          image: public.ecr.aws/aws-otel-test/aws-otel-java-test-spark:v0.11.0
+          image: public.ecr.aws/aws-otel-test/aws-otel-java-spark:1.17.0
           name: sample-app
           ports:
             - containerPort: 4567
