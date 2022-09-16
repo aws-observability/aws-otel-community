@@ -57,7 +57,7 @@ public class RandomMetricsProducer {
     public RandomMetricsProducer(Config cfg) {
         this.config = cfg;
         Meter meter =
-                GlobalOpenTelemetry.meterBuilder("aws-otel")
+                GlobalOpenTelemetry.meterBuilder("adot-java-sample-app")
                         .setInstrumentationVersion("1.0")
                         .build();
 

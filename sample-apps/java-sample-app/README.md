@@ -40,6 +40,8 @@ In order to run the application, please follow the steps:
 
 - Now the application is running and the endpoints can be called at `127.0.0.1:4567/<one-of-4-endpoints>`. Example: http://127.0.0.1:4567/outgoing-sampleapp
 
-Obs: This directory also contains `config.yaml` file that can be used with the AWS Distro for OpenTelemetry collector.
+To use a different configuration file to run the sample application you can use the `ADOT_JAVA_SAMPLE_APP_CONFIG` environment variable. Set this environment variable to the path of your custom configuration file.
+
+Obs: This directory also contains `collector-config.yaml` file that can be used with the AWS Distro for OpenTelemetry collector.
 
 https://github.com/aws-observability/aws-otel-collector

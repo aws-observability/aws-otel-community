@@ -138,6 +138,7 @@ public class ManualApp extends BaseApp {
         request.attribute(REQUEST_OTEL_SPAN, span);
     }
 
+    @Override
     protected void afterRequest(spark.Request request, Response response) {
         super.afterRequest(request, response);
         Span span = request.attribute(REQUEST_OTEL_SPAN);
