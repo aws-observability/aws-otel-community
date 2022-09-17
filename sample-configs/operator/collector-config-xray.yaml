@@ -1,5 +1,5 @@
 apiVersion: opentelemetry.io/v1alpha1
-kind: OpenTelemetryCollector
+kind: ADOTCollector
 metadata:
   name: my-collector-xray
 spec:
@@ -14,6 +14,9 @@ spec:
           http:
             endpoint: 0.0.0.0:4318
     processors:
+      batch/traces:
+        timeout: 1s
+        send_batch_size: 50
 
     exporters:
       awsxray:
@@ -23,5 +26,5 @@ spec:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: []
+          processors: [batch/traces]
           exporters: [awsxray]
