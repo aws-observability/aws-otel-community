@@ -1,5 +1,5 @@
 apiVersion: opentelemetry.io/v1alpha1
-kind: ADOTCollector
+kind: OpenTelemetryCollector
 metadata:
   name: my-collector-xray
 spec:
