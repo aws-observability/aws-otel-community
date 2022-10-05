@@ -2,7 +2,8 @@
 <Configuration status="WARN">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} %X{AWS-XRAY-TRACE-ID} - %msg%n"/>
+            <!-- Logs are in the format of Service Lens: https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java-configuration.html#xray-sdk-java-configuration-logging -->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] AWS-XRAY-TRACE-ID: %X{AWS-XRAY-TRACE-ID} %-5p %m%n"/>
         </Console>
     </Appenders>
     <Loggers>
