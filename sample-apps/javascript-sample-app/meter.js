@@ -15,17 +15,26 @@
  */
 'use strict';
 
-const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-grpc');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
+const { metrics } = require('@opentelemetry/api-metrics');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions')
 
 /** The OTLP Metrics Provider with OTLP gRPC Metric Exporter and Metrics collection Interval  */
-module.exports = new MeterProvider({
+
+const meterProvider = new MeterProvider({
     resource: Resource.default().merge(new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: "js-sampleapp"
+        [SemanticResourceAttributes.SERVICE_NAME]: "js-sample-app",
+        [SemanticResourceAttributes.PROCESS_PID]: process.pid,
+        [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: 'beta'
     })),
-    // Expects Collector at env variable `OTEL_EXPORTER_OTLP_ENDPOINT`, otherwise, http://localhost:4317
-    exporter: new CollectorMetricExporter(),
-    interval: 1000,
-}).getMeter('js-sampleapp');
+});
+
+meterProvider.addMetricReader(new PeriodicExportingMetricReader({
+    exporter: new OTLPMetricExporter(),
+    exportIntervalMillis: 1000
+}));
+
+metrics.setGlobalMeterProvider(meterProvider);
+module.exports = meterProvider.getMeter('js-sample-app-meter');

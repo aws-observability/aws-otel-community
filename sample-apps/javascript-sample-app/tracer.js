@@ -24,7 +24,7 @@ const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 
 // OTel JS - Core - Exporters
-const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
 
 // OTel JS - Core - Instrumentations
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
@@ -38,7 +38,9 @@ const { AWSXRayPropagator } = require('@opentelemetry/propagator-aws-xray');
 
 const tracerProvider = new NodeTracerProvider({
   resource: Resource.default().merge(new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: "js-sampleapp"
+    [SemanticResourceAttributes.SERVICE_NAME]: "js-sample-app",
+    [SemanticResourceAttributes.PROCESS_PID]: process.pid,
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: 'beta'
   })),
   idGenerator: new AWSXRayIdGenerator(),
   instrumentations: [
@@ -49,11 +51,10 @@ const tracerProvider = new NodeTracerProvider({
   ]
 });
 
-// Expects Collector at env variable `OTEL_EXPORTER_OTLP_ENDPOINT`, otherwise, http://localhost:4317
-tracerProvider.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
+tracerProvider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 
 tracerProvider.register({
   propagator: new AWSXRayPropagator()
 });
 
-module.exports = trace.getTracer("js-sampleapp");
+module.exports = trace.getTracer("js-sample-app-trace");

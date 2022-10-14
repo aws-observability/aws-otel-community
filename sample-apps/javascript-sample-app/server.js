@@ -22,17 +22,14 @@ const meter = require('./meter');
 
 const http = require('http');
 const AWS = require('aws-sdk');
-const Worker = require('worker_threads');
 
-const { updateTotalBytesSent, updateLatencyTime } = require('./request-metrics');
-
+const { updateTotalBytesSent, updateLatencyTime, updateApiRequestsMetric } = require('./request-metrics');
 const api = require('@opentelemetry/api');
-const create_cfg = require('./config');
-const { DiagConsoleLogger } = require('@opentelemetry/api');
 
-function startServer(file='./config.yaml') {
-    const worker = new Worker.Worker('./random-metrics.js');
-    const cfg = create_cfg.create_config(file);
+const create_cfg = require('./config');
+const cfg = create_cfg.create_config('./config.yaml');
+
+function startServer() {
     const server = http.createServer(handleRequest);
     server.listen(cfg.Port, cfg.Host, (err) => {
       if (err) {
@@ -43,7 +40,6 @@ function startServer(file='./config.yaml') {
 }
 
 function handleRequest(req, res) {
-    const cfg = create_cfg.create_config('./config.yaml');
     const requestStartTime = new Date().getMilliseconds();
     const routeMapper = {
         '/': (req, res) => {
@@ -57,6 +53,7 @@ function handleRequest(req, res) {
                 res.end(getTraceIdJson());
                 updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/aws-sdk-call', res.statusCode);
                 updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/aws-sdk-call', res.statusCode);
+                updateApiRequestsMetric();
             });
         },
         '/outgoing-http-call': (req, res) => {
@@ -66,6 +63,7 @@ function handleRequest(req, res) {
             res.end(getTraceIdJson());
             updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-http-call', res.statusCode);
             updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-http-call', res.statusCode);
+            updateApiRequestsMetric();
             });
         },
         '/outgoing-sampleapp': (req, res) => {
@@ -76,6 +74,7 @@ function handleRequest(req, res) {
                         console.log(`made a request to ${uri}`);
                         updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-sampleapp', res.statusCode);
                         updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-sampleapp', res.statusCode);
+                        updateApiRequestsMetric();
                     });
                 }
             }
@@ -84,6 +83,7 @@ function handleRequest(req, res) {
                     console.log('no ports configured. made a request to https://aws.amazon.com instead.');
                     updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-sampleapp', res.statusCode);
                     updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-sampleapp', res.statusCode);
+                    updateApiRequestsMetric();
                 });
             }
             res.end(getTraceIdJson());
@@ -100,7 +100,6 @@ function handleRequest(req, res) {
     }
 }
 
-
 function getTraceIdJson() {
     const otelTraceId = api.trace.getSpan(api.context.active()).spanContext().traceId;
     const timestamp = otelTraceId.substring(0, 8);
@@ -110,7 +109,7 @@ function getTraceIdJson() {
   }
 
 function mimicPayLoadSize() {
-return Math.random() * 1000;
+    return Math.random() * 1000;
 }
   
-startServer('./config.yaml')
+startServer();

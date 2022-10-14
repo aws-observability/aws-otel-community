@@ -13,53 +13,44 @@
  * permissions and limitations under the License.
  *
  */
-
+const meter = require('./meter');
 const TOTAL_BYTES_SENT_METRIC = 'totalBytesSent';
 const TOTAL_API_REQUESTS = 'apiRequests';
 const LATENCY_TIME = 'latencyTime';
-const meter = require('./meter');
+const attributes = { statusCode: '200',  metricType: 'random' };
 
-// variable to track number of api requests.
-let n = 0;
-
+let totalApiRequests = 0;
 const totalBytesSentMetric = meter.createCounter(TOTAL_BYTES_SENT_METRIC, {
     description: "Keeps a sum of the total amount of bytes sent while the application is alive.",
-    unit: 'By'
+    unit: 'mb'
 });
 
-// SumObserver is the same as ObservableCounter.
-const totalApiRequestsMetric = meter.createSumObserver(TOTAL_API_REQUESTS, {
-    description: "Increments by 1 every time a sampleapp endpoint is used.",
+const totalApiRequestsMetric = meter.createObservableCounter(TOTAL_API_REQUESTS, {
+    description: "Increments by 1 every time a sample-app endpoint is used.",
     unit: '1'
-}, async (observerResult) => {
-    const value = await getTotalApiRequests();
-    observerResult.observe(value, { label: '1'}); 
 });
+totalApiRequestsMetric.addCallback((measurement) => {measurement.observe(totalApiRequests, attributes)});
 
-// ValueRecorder is the same as histogram.
-const latencyTimeMetric = meter.createValueRecorder(LATENCY_TIME, {
-    description: "Measures latency time in buckets of 100, 300 and 500.",
+const latencyTimeMetric = meter.createHistogram(LATENCY_TIME, {
+    description: "Measures latency time.",
     unit: 'ms'
 });
 
 function updateTotalBytesSent(bytes, apiName, statusCode) {
     console.log("updating total bytes sent");
-    const labels = { 'apiName': apiName, 'statusCode': statusCode };
-    totalBytesSentMetric.bind(labels).add(bytes);
+    const attributes = { 'apiName': apiName, 'statusCode': statusCode };
+    totalBytesSentMetric.add(bytes, attributes);
 };
 
 function updateLatencyTime(returnTime, apiName, statusCode) {
     console.log("updating latency time");
-    const labels = { 'apiName': apiName, 'statusCode': statusCode };
-    latencyTimeMetric.bind(labels).record(returnTime);
+    const attributes = { 'apiName': apiName, 'statusCode': statusCode };
+    latencyTimeMetric.record(returnTime, attributes);
 };
 
-function getTotalApiRequests() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(n++);
-        }, 100)
-    })
+function updateApiRequestsMetric() {
+    totalApiRequests += 1;
+    console.log("API Requests:" + totalApiRequests);
 }
 
-module.exports = {updateLatencyTime, updateTotalBytesSent}
+module.exports = {updateLatencyTime, updateTotalBytesSent, updateApiRequestsMetric}

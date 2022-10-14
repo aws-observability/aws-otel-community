@@ -14,15 +14,8 @@
  *
  */
 
+const meter = require('./meter');
 create_cfg = require('./config');
-
-const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-grpc');
-const { MeterProvider } = require('@opentelemetry/metrics');
-const { Resource } = require('@opentelemetry/resources');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-
-/** The OTLP Metrics Provider with OTLP gRPC Metric Exporter and Metrics collection Interval  */
-const meter = require('./meter')
 
 const cfg = create_cfg.create_config('./config.yaml');
 const TIME_ALIVE_METRIC = 'timeAlive';
@@ -30,21 +23,17 @@ const CPU_USAGE_METRIC = 'cpuUsage';
 const THREADS_ACTIVE_METRIC = 'threadsActive';
 const HEAP_SIZE_METRIC = 'totalHeapSize';
 
+const attributes = { statusCode: '200',  metricType: 'random' };
+
 let threadBool = true;
 let threadCount = 0;
+let cpuUsage = 0;
+let totalHeapSize = 0;
+
 
 const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC, {
     description: 'Total amount of time that the application has been alive',
     unit: 's'
-});
-
-// Value observer is the same as an observable gauge
-const cpuUsageMetric = meter.createValueObserver(CPU_USAGE_METRIC, {
-    description: 'Cpu usage percent',
-    unit: '1'
-},  async (observerResult) => {
-    const value = await getCpuUsage();
-    observerResult.observe(value, { label: '1' });
 });
 
 const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
@@ -52,44 +41,34 @@ const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
     unit:'1'
 });
 
-// UpDown Sum Observer is the same as ObservableUpDownCounter
-const totalHeapSizeMetric = meter.createUpDownSumObserver(HEAP_SIZE_METRIC, {
-    description: 'The current total heap size',
-    unit:'By'
-}, async (observerResult) => {
-    const value = await getTotalHeapSize();
-    observerResult.observe(value, { label: 'By' });
+const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC, {
+    description: 'Cpu usage percent',
+    unit: '1'
 });
+cpuUsageMetric.addCallback((measurement) => {measurement.observe(cpuUsage, attributes)});
 
-/** Define Metrics Dimensions */
-const labels = { pid: process.pid, env: 'beta' };
+const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC, {
+    description: 'The current total heap size',
+    unit:'1'
+});
+totalHeapSizeMetric.addCallback((measurement) => {measurement.observe(totalHeapSize, attributes)});
 
-function getCpuUsage() {
-    console.log("getting cpu usage...")
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(Math.random() * (cfg.RandomCpuUsageUpperBound - 0) + 0);
-        }, 100);
-    });
+function updateCpuUsageMetric() {
+    cpuUsage = Math.random() * cfg.RandomCpuUsageUpperBound;
 }
 
-function getTotalHeapSize() {
-    console.log("getting total heap size...")
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(Math.random() * (cfg.RandomTotalHeapSizeUpperBound - 0 ) + 0);
-        }, 100);
-    });
+function updateSizeMetric() {
+    totalHeapSize += Math.random() * cfg.RandomTotalHeapSizeUpperBound;
 }
 
 function updateTimeAlive() {
-    timeAliveMetric.bind(labels).add(cfg.RandomTimeAliveIncrementer);
+    timeAliveMetric.add(cfg.RandomTimeAliveIncrementer, attributes);
 }
 
 function updateThreadsActive() {
     if (threadBool) {
         if (threadCount < cfg.RandomThreadsActiveUpperBound) {
-            threadsActiveMetric.bind(labels).add(1);
+            threadsActiveMetric.add(1, attributes);
             threadCount++;
         }
         else {
@@ -99,7 +78,7 @@ function updateThreadsActive() {
     }
     else {
         if (threadCount > 0) {
-            threadsActiveMetric.bind(labels).add(-1);
+            threadsActiveMetric.add(-1, attributes);
             threadCount--;
         }
         else {
@@ -109,7 +88,10 @@ function updateThreadsActive() {
     }
 
 }
-setInterval(() =>{
+
+setInterval(() => {
     updateTimeAlive();
     updateThreadsActive();
+    updateCpuUsageMetric();
+    updateSizeMetric();
 }, cfg.TimeInterval * 1000);
