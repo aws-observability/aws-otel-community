@@ -92,7 +92,7 @@ function handleRequest(req, res) {
     try {
         const handler = routeMapper[req.url]
         if (handler) {
-            routeMapper[req.url] (req, res);
+            handler (req, res);
         };
     } 
     catch (err) {
