@@ -21,7 +21,7 @@ const { trace } = require('@opentelemetry/api');
 
 // OTel JS - Core
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
-const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { SimpleSpanProcessor, BatchSpanProcessor} = require('@opentelemetry/sdk-trace-base');
 
 // OTel JS - Core - Exporters
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
@@ -51,7 +51,7 @@ const tracerProvider = new NodeTracerProvider({
   ]
 });
 
-tracerProvider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
+tracerProvider.addSpanProcessor(new BatchSpanProcessor(new OTLPTraceExporter()));
 
 tracerProvider.register({
   propagator: new AWSXRayPropagator()

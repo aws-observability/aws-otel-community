@@ -69,13 +69,18 @@ function handleRequest(req, res) {
         '/outgoing-sampleapp': (req, res) => {
             if (cfg.SampleAppPorts.length > 0) {
                 for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
-                    let uri = `http://127.0.0.1:${cfg.SampleAppPorts[i]}/outgoing-sampleapp`;
-                    http.get(uri, () => {
-                        console.log(`made a request to ${uri}`);
-                        updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-sampleapp', res.statusCode);
-                        updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-sampleapp', res.statusCode);
-                        updateApiRequestsMetric();
-                    });
+                    let port = cfg.SampleAppPorts[i];
+                    if(!isNaN(port) && port > 0 && port <= 65535) {
+                        let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
+                        http.get(uri, () => {
+                            console.log(`made a request to ${uri}`);
+                            updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-sampleapp', res.statusCode);
+                            updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-sampleapp', res.statusCode);
+                            updateApiRequestsMetric();
+                        });
+                    } else {
+                        console.log("SampleAppPorts is not a valid configuration!");
+                    }
                 }
             }
             else {
