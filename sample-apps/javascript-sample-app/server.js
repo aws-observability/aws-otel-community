@@ -14,32 +14,38 @@
  *
  */
 
-'use strict';
+'use strict'
 
-// setting up the traces and metrics
-const tracer = require('./tracer');
-const meter = require('./meter');
-
-const http = require('http');
+const sdk = require("./common");
+const Worker = require("worker_threads");
+const http = require("http");
 const AWS = require('aws-sdk');
+const api = require('@opentelemetry/api'); // get tracer
 
-const { updateTotalBytesSent, updateLatencyTime, updateApiRequestsMetric } = require('./request-metrics');
-const api = require('@opentelemetry/api');
-
+// config
 const create_cfg = require('./config');
 const cfg = create_cfg.create_config('./config.yaml');
+
+
+// initialise sdk (metric and trace provider) and start server and a separate thread for random-metrics generation.
+sdk.nodeSDKBuilder()
+    .then(() => {
+    startServer();
+    const worker = new Worker.Worker('./random-metrics.js'); 
+});
 
 function startServer() {
     const server = http.createServer(handleRequest);
     server.listen(cfg.Port, cfg.Host, (err) => {
-      if (err) {
-        throw err;
-      }
-      console.log(`Node HTTP listening on ${cfg.Host}:${cfg.Port}`);
+        if (err) {
+            throw err;
+        }
+        console.log(`Node HTTP listening on ${cfg.Host}:${cfg.Port}`);
     });
 }
 
 function handleRequest(req, res) {
+    const { updateTotalBytesSent, updateLatencyTime, updateApiRequestsMetric } = require('./request-metrics');
     const requestStartTime = new Date().getMilliseconds();
     const routeMapper = {
         '/': (req, res) => {
@@ -51,9 +57,7 @@ function handleRequest(req, res) {
                 console.log("Responding to /aws-sdk-call");
         
                 res.end(getTraceIdJson());
-                updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/aws-sdk-call', res.statusCode);
-                updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/aws-sdk-call', res.statusCode);
-                updateApiRequestsMetric();
+                updateMetrics(res, '/aws-sdk-call', requestStartTime);
             });
         },
         '/outgoing-http-call': (req, res) => {
@@ -61,9 +65,7 @@ function handleRequest(req, res) {
             console.log("Responding to /outgoing-http-call");
     
             res.end(getTraceIdJson());
-            updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-http-call', res.statusCode);
-            updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-http-call', res.statusCode);
-            updateApiRequestsMetric();
+            updateMetrics(res, '/aws-sdk-call', requestStartTime);
             });
         },
         '/outgoing-sampleapp': (req, res) => {
@@ -74,9 +76,7 @@ function handleRequest(req, res) {
                         let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
                         http.get(uri, () => {
                             console.log(`made a request to ${uri}`);
-                            updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-sampleapp', res.statusCode);
-                            updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-sampleapp', res.statusCode);
-                            updateApiRequestsMetric();
+                            updateMetrics(res, '/aws-sdk-call', requestStartTime);
                         });
                     } else {
                         console.log("SampleAppPorts is not a valid configuration!");
@@ -85,10 +85,8 @@ function handleRequest(req, res) {
             }
             else {
                 http.get('http://aws.amazon.com', () => {
-                    console.log('no ports configured. made a request to https://aws.amazon.com instead.');
-                    updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), '/outgoing-sampleapp', res.statusCode);
-                    updateLatencyTime(new Date().getMilliseconds() - requestStartTime, '/outgoing-sampleapp', res.statusCode);
-                    updateApiRequestsMetric();
+                    console.log('no ports configured. made a request to http://aws.amazon.com instead.');
+                    updateMetrics(res, '/aws-sdk-call', requestStartTime);
                 });
             }
             res.end(getTraceIdJson());
@@ -103,6 +101,13 @@ function handleRequest(req, res) {
     catch (err) {
         console.log(err);
     }
+
+    function updateMetrics(res, apiName, requestStartTime) {
+        updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), apiName, res.statusCode);
+        updateLatencyTime(new Date().getMilliseconds() - requestStartTime, apiName, res.statusCode);
+        updateApiRequestsMetric();
+    }
+    
 }
 
 function getTraceIdJson() {
@@ -116,5 +121,4 @@ function getTraceIdJson() {
 function mimicPayLoadSize() {
     return Math.random() * 1000;
 }
-  
-startServer();
+

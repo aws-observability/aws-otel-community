@@ -14,84 +14,95 @@
  *
  */
 
-const meter = require('./meter');
-create_cfg = require('./config');
+'use strict'
 
+const sdk = require("./common");
+const metricsApi = require('@opentelemetry/api-metrics');
+
+// config
+const create_cfg = require('./config');
 const cfg = create_cfg.create_config('./config.yaml');
+
 const TIME_ALIVE_METRIC = 'timeAlive';
 const CPU_USAGE_METRIC = 'cpuUsage';
 const THREADS_ACTIVE_METRIC = 'threadsActive';
 const HEAP_SIZE_METRIC = 'totalHeapSize';
 
-const attributes = { statusCode: '200',  metricType: 'random' };
+const common_attributes = { signal: 'metric',  language: 'java', metricType: 'random' };
 
-let threadBool = true;
 let threadCount = 0;
 let cpuUsage = 0;
 let totalHeapSize = 0;
 
+async function randomMetric() {
 
-const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC, {
-    description: 'Total amount of time that the application has been alive',
-    unit: 's'
-});
+    // initialise sdk (metric and trace provider)
+    await sdk.nodeSDKBuilder();
+    // get meter from global meter provider
+    const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
 
-const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
-    description: 'The total number of threads active',
-    unit:'1'
-});
+    // counter metric
+    const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC, {
+        description: 'Total amount of time that the application has been alive',
+        unit: 's'
+    });
 
-const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC, {
-    description: 'Cpu usage percent',
-    unit: '1'
-});
-cpuUsageMetric.addCallback((measurement) => {measurement.observe(cpuUsage, attributes)});
+    // updown counter metric
+    const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
+        description: 'The total number of threads active',
+        unit:'1'
+    });
 
-const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC, {
-    description: 'The current total heap size',
-    unit:'1'
-});
-totalHeapSizeMetric.addCallback((measurement) => {measurement.observe(totalHeapSize, attributes)});
+    // observable gauge metric
+    const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC, {
+        description: 'Cpu usage percent',
+        unit: '1'
+    });
+    cpuUsageMetric.addCallback((measurement) => {measurement.observe(cpuUsage, common_attributes)});
 
-function updateCpuUsageMetric() {
-    cpuUsage = Math.random() * cfg.RandomCpuUsageUpperBound;
-}
+    // observable updown counter metric
+    const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC, {
+        description: 'The current total heap size',
+        unit:'1'
+    });
+    totalHeapSizeMetric.addCallback((measurement) => {measurement.observe(totalHeapSize, common_attributes)});
 
-function updateSizeMetric() {
-    totalHeapSize += Math.random() * cfg.RandomTotalHeapSizeUpperBound;
-}
+    // updates observable gauge
+    function updateCpuUsageMetric() {
+        cpuUsage = Math.random() * cfg.RandomCpuUsageUpperBound;
+    }
 
-function updateTimeAlive() {
-    timeAliveMetric.add(cfg.RandomTimeAliveIncrementer, attributes);
-}
+    // updates updown counter
+    function updateSizeMetric() {
+        totalHeapSize += Math.random() * cfg.RandomTotalHeapSizeUpperBound;
+    }
 
-function updateThreadsActive() {
-    if (threadBool) {
-        if (threadCount < cfg.RandomThreadsActiveUpperBound) {
-            threadsActiveMetric.add(1, attributes);
+    // updates counter
+    function updateTimeAlive() {
+        timeAliveMetric.add(cfg.RandomTimeAliveIncrementer, common_attributes);
+    }
+
+    // updates updown counter metric
+    function updateThreadsActive() {
+        let min = -1;
+        let activeThreads = Math.floor(Math.random() * (cfg.RandomThreadsActiveUpperBound - min + 1) + min);
+
+        if (threadCount < activeThreads) {
+            threadsActiveMetric.add(1, common_attributes);
             threadCount++;
         }
         else {
-            threadBool = false;
+            threadsActiveMetric.add(-1, common_attributes);
             threadCount--;
-        }
-    }
-    else {
-        if (threadCount > 0) {
-            threadsActiveMetric.add(-1, attributes);
-            threadCount--;
-        }
-        else {
-            threadBool = true;
-            threadCount++;
         }
     }
 
+    setInterval(() => {
+        updateTimeAlive();
+        updateThreadsActive();
+        updateCpuUsageMetric();
+        updateSizeMetric();
+    }, cfg.TimeInterval * 1000);
 }
 
-setInterval(() => {
-    updateTimeAlive();
-    updateThreadsActive();
-    updateCpuUsageMetric();
-    updateSizeMetric();
-}, cfg.TimeInterval * 1000);
+randomMetric();

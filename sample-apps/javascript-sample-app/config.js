@@ -14,6 +14,8 @@
  *
  */
 
+'use strict'
+
 // reads in config file
 const yaml = require('js-yaml');
 const fs = require('fs');
