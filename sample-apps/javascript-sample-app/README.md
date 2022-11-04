@@ -11,11 +11,11 @@ Additionally, you can generate Traces and request based Metrics by making reques
 1. /
     1. Ensures the application is running
 2. /outgoing-http-call
-    1. Makes a HTTP request to aws.amazon.com (https://aws.amazon.com/)
+    1. Makes a HTTP request to aws.amazon.com (http://aws.amazon.com/)
 3. /aws-sdk-call
     1. Makes a call to AWS S3 to list buckets for the account corresponding to the provided AWS credentials
 4. /outgoing-sampleapp
-    1. Makes a call to all other sample app ports configured at `<host>:<port>/outgoing-sampleapp`. If none available, makes a HTTP request to www.amazon.com (https://www.amazon.com/)
+    1. Makes a call to all other sample app ports configured at `<host>:<port>/outgoing-sampleapp`. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/)
 
 There are two type of Java sample application that expose the exact same metrics and endpoints:
 
