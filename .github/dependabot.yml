@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gomod"
+    directory: "/sample-apps/go-sample-app"
+    schedule:
+      interval: "weekly"
+      day: sunday
+  - package-ecosystem: "gradle"
+    directory: "/sample-apps/java-sample-app"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "gomod"
+    directory: "/sample-apps/prometheus-sample-app"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "pip"
+    directory: "/sample-apps/python-auto-instrumentation-sample-app"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "pip"
+    directory: "/sample-apps/python-manual-instrumentation-sample-app"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "bundler"
+    directory: "/sample-apps/ruby-rails-sample-app"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
