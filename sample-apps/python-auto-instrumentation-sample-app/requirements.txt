@@ -4,7 +4,7 @@ opentelemetry-distro==0.33b0
 opentelemetry-exporter-otlp==1.12.0
 opentelemetry-api==1.12.0
 opentelemetry-instrumentation-flask==0.33b0
-opentelemetry-instrumentation-requests==0.33b0
+opentelemetry-instrumentation-requests==0.35b0
 opentelemetry-instrumentation-botocore==0.33b0
 opentelemetry-sdk-extension-aws==2.0.1
 opentelemetry-propagator-aws-xray==1.0.1
