@@ -28,7 +28,7 @@ const CPU_USAGE_METRIC = 'cpuUsage';
 const THREADS_ACTIVE_METRIC = 'threadsActive';
 const HEAP_SIZE_METRIC = 'totalHeapSize';
 
-const common_attributes = { signal: 'metric',  language: 'java', metricType: 'random' };
+const common_attributes = { signal: 'metric',  language: 'javascript', metricType: 'random' };
 
 let threadCount = 0;
 let cpuUsage = 0;
@@ -38,7 +38,7 @@ async function randomMetric() {
 
     // initialise sdk (metric and trace provider)
     await sdk.nodeSDKBuilder();
-    // get meter from global meter provider
+    
     const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
 
     // counter metric

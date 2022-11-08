@@ -25,11 +25,9 @@ const LATENCY_TIME = 'latencyTime';
 
 let totalApiRequests = 0;
 
-const commmon_attributes = { signal: 'metric',  language: 'java', metricType: 'request' };
+const commmon_attributes = { signal: 'metric',  language: 'javascript', metricType: 'request' };
 
-// get meter from global meter provider
 const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
-
 
 const totalBytesSentMetric = meter.createCounter(TOTAL_BYTES_SENT_METRIC, {
     description: "Keeps a sum of the total amount of bytes sent while the application is alive.",
@@ -48,13 +46,13 @@ const latencyTimeMetric = meter.createHistogram(LATENCY_TIME, {
 });
 
 function updateTotalBytesSent(bytes, apiName, statusCode) {
-    console.log("updating total bytes sent");
+    console.log("Updating total bytes sent");
     const attributes = commmon_attributes + { 'apiName': apiName, [SemanticAttributes.HTTP_STATUS_CODE]: statusCode };
     totalBytesSentMetric.add(bytes, attributes);
 };
 
 function updateLatencyTime(returnTime, apiName, statusCode) {
-    console.log("updating latency time");
+    console.log("Updating latency time");
     const attributes = commmon_attributes + { 'apiName': apiName, [SemanticAttributes.HTTP_STATUS_CODE]: statusCode };
     latencyTimeMetric.record(returnTime, attributes);
 };

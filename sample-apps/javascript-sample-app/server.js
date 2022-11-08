@@ -18,9 +18,14 @@
 
 const sdk = require("./common");
 const Worker = require("worker_threads");
-const http = require("http");
+const http = require('http');
+const https = require('https');
 const AWS = require('aws-sdk');
-const api = require('@opentelemetry/api'); // get tracer
+const fetch = require ("node-fetch");
+
+// tracer
+const api = require('@opentelemetry/api'); 
+const common_span_attributes = { signal: 'trace', language: 'javascript' };
 
 // config
 const create_cfg = require('./config');
@@ -55,41 +60,34 @@ function handleRequest(req, res) {
             const s3 = new AWS.S3();
             s3.listBuckets(() => {
                 console.log("Responding to /aws-sdk-call");
-        
                 res.end(getTraceIdJson());
                 updateMetrics(res, '/aws-sdk-call', requestStartTime);
             });
         },
-        '/outgoing-http-call': (req, res) => {
-            http.get('http://aws.amazon.com', () => {
-            console.log("Responding to /outgoing-http-call");
-    
-            res.end(getTraceIdJson());
-            updateMetrics(res, '/aws-sdk-call', requestStartTime);
-            });
+        '/outgoing-http-call': async (req, res) => {
+            const traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
+            res.end(traceid);
+            updateMetrics(res, '/outgoing-http-call', requestStartTime);
         },
-        '/outgoing-sampleapp': (req, res) => {
+        '/outgoing-sampleapp': async (req, res) => {
+            let traceid;
             if (cfg.SampleAppPorts.length > 0) {
                 for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
                     let port = cfg.SampleAppPorts[i];
                     if(!isNaN(port) && port > 0 && port <= 65535) {
                         let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
-                        http.get(uri, () => {
-                            console.log(`made a request to ${uri}`);
-                            updateMetrics(res, '/aws-sdk-call', requestStartTime);
-                        });
+                        traceid = await instrument('/outgoing-sampleapp', uri);
+                        updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
                     } else {
                         console.log("SampleAppPorts is not a valid configuration!");
                     }
                 }
             }
             else {
-                http.get('http://aws.amazon.com', () => {
-                    console.log('no ports configured. made a request to http://aws.amazon.com instead.');
-                    updateMetrics(res, '/aws-sdk-call', requestStartTime);
-                });
+                traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
+                updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
             }
-            res.end(getTraceIdJson());
+            res.end(traceid);
         }
     }
     try {
@@ -122,3 +120,31 @@ function mimicPayLoadSize() {
     return Math.random() * 1000;
 }
 
+
+async function httpCall(url) {
+    try {
+        const response = await fetch(url); 
+        console.log(`made a request to ${url}`);
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+    } catch (err) {
+        throw new Error(`Error while fetching the ${url}`, err);
+    }
+}
+
+async function instrumentHTTPRequest(spanName, url) {
+    const tracer = api.trace.getTracer('js-sample-app-tracer');  
+    const span = tracer.startSpan('/outgoing-http-call', {
+        attributes: common_span_attributes
+    });
+    const ctx = api.trace.setSpan(api.context.active(), span);
+    let traceid;
+    await api.context.with(ctx, async () => {
+        console.log(`Responding to ${spanName}`);
+        await httpCall(url); 
+        traceid = getTraceIdJson();
+        span.end();
+    });
+    return traceid;
+}
