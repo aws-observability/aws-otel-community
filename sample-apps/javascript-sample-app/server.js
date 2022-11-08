@@ -64,7 +64,7 @@ function handleRequest(req, res) {
             });
         },
         '/outgoing-http-call': async (req, res) => {
-            const traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
+            const traceid = await instrumentHTTPRequest('outgoing-http-call', 'https://aws.amazon.com');
             res.end(traceid);
             updateMetrics(res, '/outgoing-http-call', requestStartTime);
         },
@@ -134,7 +134,7 @@ async function httpCall(url) {
 
 async function instrumentHTTPRequest(spanName, url) {
     const tracer = api.trace.getTracer('js-sample-app-tracer');  
-    const span = tracer.startSpan('/outgoing-http-call', {
+    const span = tracer.startSpan(spanName, {
         attributes: common_span_attributes
     });
     const ctx = api.trace.setSpan(api.context.active(), span);
