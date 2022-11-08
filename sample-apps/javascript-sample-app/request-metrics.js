@@ -47,13 +47,13 @@ const latencyTimeMetric = meter.createHistogram(LATENCY_TIME, {
 
 function updateTotalBytesSent(bytes, apiName, statusCode) {
     console.log("Updating total bytes sent");
-    const attributes = commmon_attributes + { 'apiName': apiName, [SemanticAttributes.HTTP_STATUS_CODE]: statusCode };
+    const attributes = { signal: 'metric',  language: 'javascript', metricType: 'request', 'apiName': apiName, [SemanticAttributes.HTTP_STATUS_CODE]: statusCode };
     totalBytesSentMetric.add(bytes, attributes);
 };
 
 function updateLatencyTime(returnTime, apiName, statusCode) {
     console.log("Updating latency time");
-    const attributes = commmon_attributes + { 'apiName': apiName, [SemanticAttributes.HTTP_STATUS_CODE]: statusCode };
+    const attributes = { signal: 'metric',  language: 'javascript', metricType: 'request', 'apiName': apiName, [SemanticAttributes.HTTP_STATUS_CODE]: statusCode };
     latencyTimeMetric.record(returnTime, attributes);
 };
 

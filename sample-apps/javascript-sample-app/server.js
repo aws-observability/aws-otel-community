@@ -19,7 +19,6 @@
 const sdk = require("./common");
 const Worker = require("worker_threads");
 const http = require('http');
-const https = require('https');
 const AWS = require('aws-sdk');
 const fetch = require ("node-fetch");
 
