@@ -48,45 +48,49 @@ function handleRequest(req, res) {
         '/': (req, res) => {
             res.end('OK.');
         },
-        '/aws-sdk-call': (req, res) => {
-            const s3 = new AWS.S3();
-            s3.listBuckets(() => {
-                console.log("Responding to /aws-sdk-call");
-                res.end(getTraceIdJson());
-                updateMetrics(res, '/aws-sdk-call', requestStartTime);
-            });
-        },
-        '/outgoing-http-call': async (req, res) => {
-            const traceid = await instrumentHTTPRequest('outgoing-http-call', 'https://aws.amazon.com');
-            res.end(traceid);
-            updateMetrics(res, '/outgoing-http-call', requestStartTime);
-        },
-        '/outgoing-sampleapp': async (req, res) => {
-            let traceid;
-            if (cfg.SampleAppPorts.length > 0) {
-            for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
-                let port = cfg.SampleAppPorts[i];
-                    let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
-                    traceid = await instrument('/outgoing-sampleapp', uri);
-                    updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
-            }
-        }
-        else {
-            traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
-            updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
-        }
-        res.end(traceid);
-        }
+        '/aws-sdk-call': sdkCall,
+        '/outgoing-http-call': outgoingHTTPCall,
+        '/outgoing-sampleapp': outgoingSampleApp
     }
     try {
         const handler = routeMapper[req.url]
         if (handler) {
             handler (req, res);
+            console.log("Content Length", res._contentLength);
+            updateMetrics(res, req.url, requestStartTime);
         };
     } 
     catch (err) {
         console.log(err);
     }   
+}
+
+function sdkCall (req, res) {
+    const s3 = new AWS.S3();
+    s3.listBuckets(() => {
+        console.log("Responding to /aws-sdk-call");
+        res.end(getTraceIdJson());
+    });
+}
+
+async function outgoingHTTPCall (req, res) {
+    const traceid = await instrumentHTTPRequest('outgoing-http-call', 'https://aws.amazon.com');
+    res.end(traceid);
+}
+
+async function outgoingSampleApp (req, res) {
+    let traceid;
+    if (cfg.SampleAppPorts.length > 0) {
+    for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
+        let port = cfg.SampleAppPorts[i];
+            let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
+            traceid = await instrumentHTTPRequest('/outgoing-sampleapp', uri);
+        }
+    }
+    else {
+        traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
+    }
+    res.end(traceid);
 }
 
 function updateMetrics (res, apiName, requestStartTime) {
