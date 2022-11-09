@@ -16,7 +16,7 @@
 
 'use strict'
 
-const sdk = require("./common");
+const sdk = require("./nodeSDK");
 const metricsApi = require('@opentelemetry/api-metrics');
 
 // config
@@ -34,75 +34,63 @@ let threadCount = 0;
 let cpuUsage = 0;
 let totalHeapSize = 0;
 
-async function randomMetric() {
+// acquire meter 
+const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
 
-    // initialise sdk (metric and trace provider)
-    await sdk.nodeSDKBuilder();
-    
-    const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
+// counter metric
+const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC, {
+    description: 'Total amount of time that the application has been alive',
+    unit: 's'
+});
 
-    // counter metric
-    const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC, {
-        description: 'Total amount of time that the application has been alive',
-        unit: 's'
-    });
+// updown counter metric
+const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
+    description: 'The total number of threads active',
+    unit:'1'
+});
 
-    // updown counter metric
-    const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
-        description: 'The total number of threads active',
-        unit:'1'
-    });
+// observable gauge metric
+const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC, {
+    description: 'Cpu usage percent',
+    unit: '1'
+});
+cpuUsageMetric.addCallback((measurement) => {measurement.observe(cpuUsage, common_attributes)});
 
-    // observable gauge metric
-    const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC, {
-        description: 'Cpu usage percent',
-        unit: '1'
-    });
-    cpuUsageMetric.addCallback((measurement) => {measurement.observe(cpuUsage, common_attributes)});
+// observable updown counter metric
+const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC, {
+    description: 'The current total heap size',
+    unit:'1'
+});
+totalHeapSizeMetric.addCallback((measurement) => {measurement.observe(totalHeapSize, common_attributes)});
 
-    // observable updown counter metric
-    const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC, {
-        description: 'The current total heap size',
-        unit:'1'
-    });
-    totalHeapSizeMetric.addCallback((measurement) => {measurement.observe(totalHeapSize, common_attributes)});
-
-    // updates observable gauge
-    function updateCpuUsageMetric() {
-        cpuUsage = Math.random() * cfg.RandomCpuUsageUpperBound;
-    }
-
-    // updates updown counter
-    function updateSizeMetric() {
-        totalHeapSize += Math.random() * cfg.RandomTotalHeapSizeUpperBound;
-    }
-
-    // updates counter
-    function updateTimeAlive() {
-        timeAliveMetric.add(cfg.RandomTimeAliveIncrementer, common_attributes);
-    }
-
-    // updates updown counter metric
-    function updateThreadsActive() {
-        let min = -1;
-        let activeThreads = Math.floor(Math.random() * (cfg.RandomThreadsActiveUpperBound - min + 1) + min);
-
-        if (threadCount < activeThreads) {
-            threadsActiveMetric.add(1, common_attributes);
-            threadCount++;
-        }
-        else {
-            threadsActiveMetric.add(-1, common_attributes);
-            threadCount--;
-        }
-    }
-
-    setInterval(() => {
-        updateTimeAlive();
-        updateThreadsActive();
-        updateCpuUsageMetric();
-        updateSizeMetric();
-    }, cfg.TimeInterval * 1000);
+// updates observable gauge
+function updateCpuUsageMetric() {
+    cpuUsage = Math.random() * cfg.RandomCpuUsageUpperBound;
 }
 
-randomMetric();
+// updates updown counter
+function updateSizeMetric() {
+    totalHeapSize += Math.random() * cfg.RandomTotalHeapSizeUpperBound;
+}
+
+// updates counter
+function updateTimeAlive() {
+    timeAliveMetric.add(cfg.RandomTimeAliveIncrementer, common_attributes);
+}
+
+// updates updown counter metric
+function updateThreadsActive() {
+    let min = -1;
+    let activeThreads = Math.floor(Math.random() * (cfg.RandomThreadsActiveUpperBound - min + 1) + min);
+
+    if (threadCount < activeThreads) {
+        threadsActiveMetric.add(1, common_attributes);
+        threadCount++;
+    }
+    else {
+        threadsActiveMetric.add(-1, common_attributes);
+        threadCount--;
+    }
+}
+
+module.exports = { updateTimeAlive, updateThreadsActive, updateCpuUsageMetric, updateSizeMetric };

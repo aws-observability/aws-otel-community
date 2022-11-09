@@ -27,6 +27,7 @@ let totalApiRequests = 0;
 
 const commmon_attributes = { signal: 'metric',  language: 'javascript', metricType: 'request' };
 
+// acquire meter 
 const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
 
 const totalBytesSentMetric = meter.createCounter(TOTAL_BYTES_SENT_METRIC, {
@@ -62,4 +63,4 @@ function updateApiRequestsMetric() {
     console.log("API Requests:" + totalApiRequests);
 }
 
-module.exports = {totalBytesSentMetric, totalApiRequestsMetric, latencyTimeMetric, updateLatencyTime, updateTotalBytesSent, updateApiRequestsMetric}
+module.exports = { updateLatencyTime, updateTotalBytesSent, updateApiRequestsMetric };

@@ -30,7 +30,7 @@ There are two type of Java sample application that expose the exact same metrics
 ```
 npm install
 
-node server.js
+node index.js
 ```
 #### Docker
 

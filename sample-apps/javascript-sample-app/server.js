@@ -16,28 +16,22 @@
 
 'use strict'
 
-const sdk = require("./common");
-const Worker = require("worker_threads");
 const http = require('http');
 const AWS = require('aws-sdk');
 const fetch = require ("node-fetch");
-
-// tracer
-const api = require('@opentelemetry/api'); 
-const common_span_attributes = { signal: 'trace', language: 'javascript' };
 
 // config
 const create_cfg = require('./config');
 const cfg = create_cfg.create_config('./config.yaml');
 
+// tracer
+const api = require('@opentelemetry/api'); 
+const common_span_attributes = { signal: 'trace', language: 'javascript' };
 
-// initialise sdk (metric and trace provider) and start server and a separate thread for random-metrics generation.
-sdk.nodeSDKBuilder()
-    .then(() => {
-    startServer();
-    const worker = new Worker.Worker('./random-metrics.js'); 
-});
+// request metrics 
+const { updateTotalBytesSent, updateLatencyTime, updateApiRequestsMetric } = require('./request-metrics');
 
+// start server for request metrics and traces
 function startServer() {
     const server = http.createServer(handleRequest);
     server.listen(cfg.Port, cfg.Host, (err) => {
@@ -49,7 +43,6 @@ function startServer() {
 }
 
 function handleRequest(req, res) {
-    const { updateTotalBytesSent, updateLatencyTime, updateApiRequestsMetric } = require('./request-metrics');
     const requestStartTime = new Date().getMilliseconds();
     const routeMapper = {
         '/': (req, res) => {
@@ -71,22 +64,18 @@ function handleRequest(req, res) {
         '/outgoing-sampleapp': async (req, res) => {
             let traceid;
             if (cfg.SampleAppPorts.length > 0) {
-                for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
-                    let port = cfg.SampleAppPorts[i];
-                    if(!isNaN(port) && port > 0 && port <= 65535) {
-                        let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
-                        traceid = await instrument('/outgoing-sampleapp', uri);
-                        updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
-                    } else {
-                        console.log("SampleAppPorts is not a valid configuration!");
-                    }
-                }
+            for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
+                let port = cfg.SampleAppPorts[i];
+                    let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
+                    traceid = await instrument('/outgoing-sampleapp', uri);
+                    updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
             }
-            else {
-                traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
-                updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
-            }
-            res.end(traceid);
+        }
+        else {
+            traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
+            updateMetrics(res, '/outgoing-sampleapp', requestStartTime);
+        }
+        res.end(traceid);
         }
     }
     try {
@@ -97,14 +86,13 @@ function handleRequest(req, res) {
     } 
     catch (err) {
         console.log(err);
-    }
+    }   
+}
 
-    function updateMetrics(res, apiName, requestStartTime) {
-        updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), apiName, res.statusCode);
-        updateLatencyTime(new Date().getMilliseconds() - requestStartTime, apiName, res.statusCode);
-        updateApiRequestsMetric();
-    }
-    
+function updateMetrics (res, apiName, requestStartTime) {
+    updateTotalBytesSent(res._contentLength + mimicPayLoadSize(), apiName, res.statusCode);
+    updateLatencyTime(new Date().getMilliseconds() - requestStartTime, apiName, res.statusCode);
+    updateApiRequestsMetric();
 }
 
 function getTraceIdJson() {
@@ -118,7 +106,6 @@ function getTraceIdJson() {
 function mimicPayLoadSize() {
     return Math.random() * 1000;
 }
-
 
 async function httpCall(url) {
     try {
@@ -147,3 +134,5 @@ async function instrumentHTTPRequest(spanName, url) {
     });
     return traceid;
 }
+
+module.exports = {startServer};

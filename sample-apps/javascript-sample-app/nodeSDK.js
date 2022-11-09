@@ -45,10 +45,6 @@ const _metricReader = new PeriodicExportingMetricReader({
     exportIntervalMillis: 1000
 });
 
-const _metricConfig = {
-    reader: _metricReader,
-}
-
 async function nodeSDKBuilder() {
     const sdk = new opentelemetry.NodeSDK({
         textMapPropagator: new AWSXRayPropagator(),
