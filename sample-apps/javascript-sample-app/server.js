@@ -56,7 +56,6 @@ function handleRequest(req, res) {
         const handler = routeMapper[req.url]
         if (handler) {
             handler (req, res);
-            console.log("Content Length", res._contentLength);
             updateMetrics(res, req.url, requestStartTime);
         };
     } 
