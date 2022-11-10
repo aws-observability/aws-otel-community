@@ -26,6 +26,7 @@ const cfg = create_cfg.create_config('./config.yaml');
 
 // tracer
 const api = require('@opentelemetry/api'); 
+const tracer = api.trace.getTracer('js-sample-app-tracer'); 
 const common_span_attributes = { signal: 'trace', language: 'javascript' };
 
 // request metrics 
@@ -42,7 +43,7 @@ function startServer() {
     });
 }
 
-function handleRequest(req, res) {
+async function handleRequest(req, res) {
     const requestStartTime = new Date().getMilliseconds();
     const routeMapper = {
         '/': (req, res) => {
@@ -55,7 +56,7 @@ function handleRequest(req, res) {
     try {
         const handler = routeMapper[req.url]
         if (handler) {
-            handler (req, res);
+            await handler (req, res);
             updateMetrics(res, req.url, requestStartTime);
         };
     } 
@@ -64,16 +65,18 @@ function handleRequest(req, res) {
     }   
 }
 
-function sdkCall (req, res) {
-    const s3 = new AWS.S3();
-    s3.listBuckets(() => {
-        console.log("Responding to /aws-sdk-call");
-        res.end(getTraceIdJson());
+async function sdkCall (req, res) {
+    const traceid = await instrumentRequest('/aws-sdk-call', () => {
+        const s3 = new AWS.S3();
+        s3.listBuckets();
     });
+    res.end(traceid);
 }
 
 async function outgoingHTTPCall (req, res) {
-    const traceid = await instrumentHTTPRequest('outgoing-http-call', 'https://aws.amazon.com');
+    const traceid = await instrumentRequest('outgoing-http-call', () => { 
+        httpCall('https://aws.amazon.com')
+    });
     res.end(traceid);
 }
 
@@ -83,11 +86,15 @@ async function outgoingSampleApp (req, res) {
     for (let i = 0; i < cfg.SampleAppPorts.length; i++) {
         let port = cfg.SampleAppPorts[i];
             let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
-            traceid = await instrumentHTTPRequest('/outgoing-sampleapp', uri);
+            traceid = await instrumentRequest('/outgoing-sampleapp', () => { 
+                httpCall('https://aws.amazon.com')
+            });
         }
     }
     else {
-        traceid = await instrumentHTTPRequest('/outgoing-sampleapp', 'https://aws.amazon.com');
+        traceid = await instrumentRequest('/outgoing-sampleapp', () => { 
+            httpCall('https://aws.amazon.com')
+        });
     }
     res.end(traceid);
 }
@@ -122,8 +129,7 @@ async function httpCall(url) {
     }
 }
 
-async function instrumentHTTPRequest(spanName, url) {
-    const tracer = api.trace.getTracer('js-sample-app-tracer');  
+async function instrumentRequest(spanName, _callback) {
     const span = tracer.startSpan(spanName, {
         attributes: common_span_attributes
     });
@@ -131,7 +137,7 @@ async function instrumentHTTPRequest(spanName, url) {
     let traceid;
     await api.context.with(ctx, async () => {
         console.log(`Responding to ${spanName}`);
-        await httpCall(url); 
+        await _callback(); 
         traceid = getTraceIdJson();
         span.end();
     });
