@@ -18,3 +18,4 @@ rootProject.name = "java-sample-app"
 include("base")
 include("auto")
 include("manual")
+include("extension")

@@ -47,6 +47,8 @@ import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.services.s3.S3Client;
 import spark.Response;
 
+import java.util.List;
+
 public class ManualApp extends BaseApp {
 
     private static final String REQUEST_OTEL_SCOPE = "requestOtelContext";
@@ -54,8 +56,12 @@ public class ManualApp extends BaseApp {
 
     // Configures Opentelemetry Manually setting each parameter used in this application
     private static OpenTelemetry buildOpentelemetry() {
+        Attributes attr = Attributes.builder()
+                .put(ResourceAttributes.AWS_LOG_GROUP_NAMES, List.of(System.getProperty("adot.sampleapp.loggroup", "sample-app-trace-logs")))
+                .put(ResourceAttributes.SERVICE_NAME, "java-sample-app")
+                .build();
         Resource resource = Resource.getDefault().merge(
-                Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, "java-sample-app")));
+                Resource.create(attr));
 
         return OpenTelemetrySdk.builder()
                 .setPropagators(

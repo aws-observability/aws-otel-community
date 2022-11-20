@@ -1,0 +1,19 @@
+{
+  "agent": {
+    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+    "region": "us-west-2"
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [{
+          "file_path": "/var/tmp/app-trace.log",
+          "log_group_name": "sample-app-trace-logs",
+          "log_stream_name": "{instance_id}/java-app-traces",
+          "timezone": "UTC"
+        }]
+      }
+    },
+    "force_flush_interval": 15
+  }
+}
