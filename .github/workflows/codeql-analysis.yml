@@ -49,6 +49,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: 17
+        distribution: corretto
     - if: matrix.language == 'java' 
       name: Setup Gradle
       uses: gradle/gradle-build-action@v2
