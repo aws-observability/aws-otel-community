@@ -48,7 +48,7 @@ jobs:
     - if: matrix.language == 'java' 
       uses: actions/setup-java@v3
       with:
-        java-version: 17
+        java-version: 11
         distribution: corretto
     - if: matrix.language == 'java' 
       name: Setup Gradle
