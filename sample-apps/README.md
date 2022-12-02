@@ -39,6 +39,7 @@ List of sample apps across all repositories in [aws-observability](https://githu
 |-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 |Ruby-manual-instrumentation  |[aws-otel-ruby](https://github.com/aws-observability/aws-otel-ruby/tree/main/sample-apps/manual-instrumentation/ruby-on-rails)              |Cotinuous integration of ADOT X-Ray components and X-Ray service. Manual Instrumentation using OpenTelemetry Ruby                              |
 
+
 ## Standardized Sample App Spec - README
 
 ### Top level Requirements
@@ -139,6 +140,7 @@ Histogram
 * Description: “Measures latency time in buckets of 100 300 and 500”
 
 **Common Attributes for Request based metrics**
+
 These are Key Value pairs to be added on metrics.
 ```
 {
@@ -177,6 +179,7 @@ Asynchronous Gauge
 * Includes Callback Function
 
 **Common Attributes for Random based metrics**
+
 These are Key Value pairs to be added on metrics.
 ```
 {
@@ -240,7 +243,7 @@ The fourth endpoint will make GET request to all other sample app endpoints that
 An AWS X-Ray Trace ID should also be returned at the end of each request.
 Each sample app MUST register an AWS X-Ray Propagator.
 Each sample app should initialize a Tracer with the label ADOT-Tracer-Sample.  
-Spans that are added to a trace should be labeled as \<procedure-name\> where the procedure is a traceable event.
+Spans that are added to a trace should be labeled as **\<procedure-name\>** where the procedure is a traceable event.
 The events that must be present in every sample app are the following in respective order to the 4 endpoints.
 
 1. n/a
@@ -252,7 +255,9 @@ The events that must be present in every sample app are the following in respect
 
 The fourth endpoint must create a span that will have potentially two child spans. “invoke-sampleapp” is the case where there are more than 0 sample apps configured to make a call to.
 “leaf” request is the case where there are no sample apps to make a call to.
+
 **Common Attributes for Trace spans**
+
 These are Key Value pairs to be added on metrics.
 ```
 {
