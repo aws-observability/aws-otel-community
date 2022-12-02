@@ -40,7 +40,7 @@ List of sample apps across all repositories in [aws-observability](https://githu
 |Ruby-manual-instrumentation  |[aws-otel-ruby](https://github.com/aws-observability/aws-otel-ruby/tree/main/sample-apps/manual-instrumentation/ruby-on-rails)              |Cotinuous integration of ADOT X-Ray components and X-Ray service. Manual Instrumentation using OpenTelemetry Ruby                              |
 
 
-## Standardized Sample App Spec - README
+# Standardized Sample App Spec
 
 ### Top level Requirements
 
