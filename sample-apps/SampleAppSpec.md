@@ -88,6 +88,7 @@ Histogram
 * Description: “Measures latency time in buckets of 100 300 and 500”
 
 **Common Attributes for Request based metrics**
+
 These are Key Value pairs to be added on metrics.
 ```
 {
@@ -126,6 +127,7 @@ Asynchronous Gauge
 * Includes Callback Function
 
 **Common Attributes for Random based metrics**
+
 These are Key Value pairs to be added on metrics.
 ```
 {
@@ -176,16 +178,20 @@ Event Log
 
 At minimum, four GET requests endpoints must be present in each sample app. 
 
-1. GET - /
+**1. GET - /**
+
 The first endpoint will serve as a health check to confirm that the app has successfully ran.
 
-2. GET - /outgoing-http-call
+**2. GET - /outgoing-http-call**
+
 The second endpoint will make an HTTP GET request to aws.amazon.com (http://aws.amazon.com/). It will generate Traces and if applicable, Metrics.
 
-3. GET - /aws-sdk-call
+**3. GET - /aws-sdk-call**
+
 The third endpoint will make a request to AWS S3 and if credentials are provided, it will list all S3 buckets in the provided users S3.
 
-4. GET - /outgoing-sampleapp
+**4. GET - /outgoing-sampleapp**
+
 The fourth endpoint will make GET request to all other sample app endpoints that are configured. If no other sample apps are configured (leaf case), it will make a request to www.amazon.com (http://www.amazon.com/). 
 
 
@@ -204,7 +210,9 @@ The events that must be present in every sample app are the following in respect
 
 The fourth endpoint must create a span that will have potentially two child spans. “invoke-sampleapp” is the case where there are more than 0 sample apps configured to make a call to.
 “leaf” request is the case where there are no sample apps to make a call to.
+
 **Common Attributes for Trace spans**
+
 These are Key Value pairs to be added on traces.
 ```
 {
