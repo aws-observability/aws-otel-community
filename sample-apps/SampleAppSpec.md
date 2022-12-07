@@ -4,8 +4,8 @@
 
 #### Where the Sample Apps should live
 
-Each sample app that follows the requirements below should exist in a single repository as well as with this document. They will exist under the sample apps folder in https://github.com/aws-observability/aws-otel-community.
-The matrix that exists in the README should be updated with the sample apps in conformance to this document. The matrix must additionally display the status of Metrics Logs and Traces. (Stable or Unstable)
+Each sample app that follows the requirements below should be stored in the `sample-apps` folder in https://github.com/aws-observability/aws-otel-community.
+The matrix that exists in the README file in that directory should be updated with the sample apps in conformance to this document. The matrix must additionally display the status of Metrics Logs and Traces. (Stable or Unstable)
 
 #### How the Sample Apps should work
 
