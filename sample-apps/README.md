@@ -41,5 +41,5 @@ List of sample apps across all repositories in [aws-observability](https://githu
 
 # Sample App Specification
 
-Link to document: [Sample App Spec](SampleAppSpec.md)
+[Sample App Spec](SampleAppSpec.md)
 

@@ -1,46 +1,52 @@
-## Standardized Sample App Spec - README
+# Standardized Sample App Spec - README
 
-### Top level Requirements
+## Top level Requirements
 
-#### Where the Sample Apps should live
+### Where the Sample Apps should live
 
 Each sample app that follows the requirements below should be stored in the `sample-apps` folder in https://github.com/aws-observability/aws-otel-community.
-The matrix that exists in the README file in that directory should be updated with the sample apps in conformance to this document. The matrix must additionally display the status of Metrics Logs and Traces. (Stable or Unstable)
+The README file in the `sample-apps` directory contains a matrix which lists the sample apps in conformance to this document. New sample apps must be added to this matrix. The matrix must display the status of Metrics Logs and Traces (Stable or Unstable).
 
-#### How the Sample Apps should work
+### How the Sample Apps should work
 
-Each sample app should emit the same Metrics, Logs and Traces. If a sample app cannot emit the mentioned, then that will noted in that sample app’s documentation.
-Each Sample app should should be able to be built as an image. The sample app must be able to accept configuration through a configuration file (YAML) and environment variables.
+Each sample app must emit the same Metrics, Logs and Traces according to this specification. The sample app README should list any missing signal type in it's implementation. 
+Each Sample app should be able to be built as an image. The sample app must be able to accept configuration through a configuration file (YAML) and environment variables.
 
-#### Assumption on how the Sample Apps should emit Traces and Metrics
+### Assumption on how the Sample Apps should emit Traces and Metrics
 
-**Traces** are not something that could or should be generated arbitrarily but instead should reflect a real life cycle or flow.
-In existing sample applications, Trace instrumentation is coupled with a **Traffic Generator** (https://github.com/aws-observability/aws-otel-test-framework/tree/terraform/traffic-generator) that makes http requests to the Sample app and emits traces based on that those requests. In another example, **ho11y** (https://gitlab.aws.dev/hausenbl/); sample apps can create their own traffic by invoking other sample apps (invocation pattern). 
+#### Traces
+
+Trace generation in the sample app should reflect a real life cycle or flow.
+In existing sample applications, Trace instrumentation is coupled with a **Traffic Generator** (https://github.com/aws-observability/aws-otel-test-framework/tree/terraform/traffic-generator) that makes http requests to the sample app and emits traces based on those requests. In another example, **ho11y** (https://gitlab.aws.dev/hausenbl/); sample apps can create their own traffic by invoking other sample apps (invocation pattern). 
 
 
 Sample apps in conformance to this document will also include the invocation pattern as an optional configuration. This will allow for more extensive testing and demos if configured.
-A possible example can be seen below. This invocation capability can allow testing to be as complex or simple as needed.
+An example of the invocation pattern is shown below.
 
 ![Alt text](./invocation.png?raw=true "Invocation")
 
+#### Metrics
+
 The two patterns of metrics that will be generated are **Request-based** and **Random**. Request based metrics will also assume an invocation has been made to the Sample App. Random can be arbitrarily generated for metrics that do not correlate to incoming requests. 
 
-### Documentation Requirements
+## Documentation Requirements
 
-Each sample app MUST be coupled with a document that will have the following sections:
+Each sample app MUST be coupled with a README document that will go into each sample app’s code base detailing how to setup the sample app (this should be same across all sample apps); although redundant, each repository should still have it to avoid looking across sample apps for a README. This README should also contain the following sections:
 
-* **Description** - Information about the language being used and a link to this document for context
+* **Description** - Information about the language being used and a link to this Spec document for context
 * **Non-conformance** - Documentation on missing features or missing extensions that don’t allow a given sample app to conform with this document
-* **Workarounds** - Examples of workarounds include the use of an unstable API or SDK to produce signals. This code `workaround` code may require changes in the future.
-* **README** - The readme that will go into each sample app’s code base detailing how to setup the sample app (this should be same across all sample apps); although redundant, each repository should still have it to avoid looking across sample apps for a readme. This readme should also include the Non-conformance section specific to the sample app it belongs to.
+* **Workarounds** - Examples of workarounds include the use of an unstable API or SDK to produce signals. This `workaround` code may require changes in the future.
 
-### Functional Requirements
+
+## Functional Requirements
 
 Each sample app should be configured with manual instrumentation from OTel. Auto instrumentation can also be implemented.
 Metrics and traces should be OTLP and Logs should be in JSON format using any popular logging library for each respective language with the appropriate license. (e.g. Log4j for java, Logrus for Go)
 The model of how each sample app should function is displayed below:
 
 ![Alt text](./sampleapp.png?raw=true "Sample App")
+
+### Configuration
 
 **Metric type color code:** Counter (Green), Histogram (Orange), UpDownCounter (Blue), Gauge (Purple)
 The configuration file configures Host, Port, TimeAlive, TotalHeapSize, ThreadsActive, and CpuUsage. It will also configure TimeInterval. The following example YAML file demonstrates the structure and arbitrarily chosen default values for the previously mentioned configurable metrics.
@@ -62,7 +68,7 @@ ResourceDetector: ''                  # String to specify resource detector
 Every sample app will assume a configuration file with these variable names.
 The testing framework MUST not test against these Metrics due to upstream unstable SDK & API in certain languages. These are mainly for being able to demonstrate some type of metrics being generated in languages that support it. 
 
-#### Metrics
+### Metrics
 
 The sample app must include the 7 metrics listed below. The sample app must implement the name, unit and description as defined in the spec. The request based metrics will also be generated alongside traces from incoming requests from invocations or incoming traffic. Any languages that are not stable in metrics or are unable to be implemented under this structure must include documentation on that issue in their respective **Documentation** document as mentioned in the **Documentation requirements**.
 
@@ -137,7 +143,7 @@ These are Key Value pairs to be added on metrics.
 }
 ```
 
-#### Logs
+### Logs
 
 **Logs are OPTIONAL due to their status of preview upstream. Logs must not be tested against nor will the logging structure described be final. It is to be used as an example to construct and emit example logs.**
 Logs will be displayed in JSON format for simplicity and readability.  Logs will be sent out on three different occasions, requests, errors, and events. An example of each can be seen underneath this section of the document. We will try to keep logs consistent in all sample applications according to the Logs Data Model (https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md) found in the opentelemetry-specification repository.
@@ -174,7 +180,7 @@ Event Log
 }
 ```
 
-#### Traces
+### Traces
 
 At minimum, four GET requests endpoints must be present in each sample app. 
 
@@ -221,13 +227,13 @@ These are Key Value pairs to be added on traces.
 }
 ```
 
-#### Interactions
+### Interactions
 
 Each sample app should interact with at least one AWS service.
 An example of this would be interacting with S3 by tracing a request to get all buckets owned by an authenticated user.
 This example requires s3:ListAllMyBuckets permissions. Each sample app should also provide a description on how to set up this interaction if desired. If not desired then the sample app should just fail the request and emit the corresponding trace.
 
-#### AWS Resource detectors
+### AWS Resource detectors
 
 If possible (e.g. resource detectors are available in the given language), each sample app should include resource detectors (ECS, EKS, EC2)
 The configuration file has a field ResourceDetector which will be used to specify which resource detector to use.
