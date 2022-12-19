@@ -41,7 +41,7 @@ Each sample app MUST be coupled with a README document that will go into each sa
 ## Functional Requirements
 
 Each sample app should be configured with manual instrumentation from OTel. Auto instrumentation can also be implemented.
-Metrics and traces should be OTLP and Logs should be in JSON format using any popular logging library for each respective language with the appropriate license. (e.g. Log4j for java, Logrus for Go)
+Metrics, traces, and logs will all use an OTLP exporter to be exported from the sameple app in OTLP/JSON format.
 The model of how each sample app should function is displayed below:
 
 ![Alt text](./sampleapp.png?raw=true "Sample App")
@@ -66,7 +66,7 @@ ResourceDetector: ''                  # String to specify resource detector
 ```
 
 Every sample app will assume a configuration file with these variable names.
-The testing framework MUST not test against these Metrics due to upstream unstable SDK & API in certain languages. These are mainly for being able to demonstrate some type of metrics being generated in languages that support it. 
+The testing framework will validate the existence of these Metrics in the sample apps for certain languages with a stable upstream SDK & API.   
 
 ### Metrics
 
