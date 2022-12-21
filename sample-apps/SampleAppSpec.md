@@ -41,7 +41,7 @@ Each sample app MUST be coupled with a README document that will go into each sa
 ## Functional Requirements
 
 Each sample app should be configured with manual instrumentation from OTel. Auto instrumentation can also be implemented.
-Metrics, traces, and logs will all use an OTLP exporter to be exported from the sameple app in OTLP/JSON format.
+Metrics, traces, and logs will all use an OTLP exporter to ship data from the sample app.
 The model of how each sample app should function is displayed below:
 
 ![Alt text](./sampleapp.png?raw=true "Sample App")
