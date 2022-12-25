@@ -31,7 +31,7 @@ dependencies {
     // Exposed to dependent modules
     api("com.sparkjava:spark-core:2.9.4")
     api("com.squareup.okhttp3:okhttp:4.10.0")
-    api(platform("software.amazon.awssdk:bom:2.15.0"))
+    api(platform("software.amazon.awssdk:bom:2.19.4"))
     api("software.amazon.awssdk:s3")
 
     // Not exposed to dependent modules
