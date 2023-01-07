@@ -37,7 +37,7 @@ dependencies {
     // Not exposed to dependent modules
     implementation("org.yaml:snakeyaml:1.8")
     implementation("org.apache.logging.log4j:log4j-api:2.19.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.18.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.19.0")
     implementation("org.slf4j:slf4j-simple:2.0.6")
 
 }
