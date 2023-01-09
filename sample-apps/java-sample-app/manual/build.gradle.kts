@@ -19,9 +19,9 @@ plugins {
     application
 }
 
-val otelVersion = "1.19.0"
-val otelInstrumentationVersion = "1.19.2"
-val otelContribVersion = "1.19.1"
+val otelVersion = "1.21.0"
+val otelInstrumentationVersion = "1.21.0"
+val otelContribVersion = "1.21.0"
 
 repositories {
     mavenCentral()
@@ -44,8 +44,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry:opentelemetry-extension-aws")
-    implementation("io.opentelemetry:opentelemetry-sdk-extension-aws")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:${otelContribVersion}-alpha")
     implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:${otelContribVersion}")
 
     // OpenTelemetry AWS SDK Library Instrumentation

@@ -17,7 +17,7 @@ plugins {
     id("java-library")
 }
 
-val otelVersion = "1.17.0"
+val otelVersion = "1.21.0"
 
 repositories {
     mavenCentral()

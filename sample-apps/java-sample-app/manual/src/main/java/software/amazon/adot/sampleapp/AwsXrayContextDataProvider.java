@@ -1,10 +1,10 @@
 package software.amazon.adot.sampleapp;
 
-        import io.opentelemetry.api.trace.Span;
-        import io.opentelemetry.api.trace.SpanContext;
-        import java.util.Collections;
-        import java.util.Map;
-        import org.apache.logging.log4j.core.util.ContextDataProvider;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import java.util.Collections;
+import java.util.Map;
+import org.apache.logging.log4j.core.util.ContextDataProvider;
 
 /**
  * a format for consumption by AWS X-Ray and related services.
