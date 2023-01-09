@@ -62,4 +62,4 @@ Both the manual and auto instrumentation applications are implementing the steps
 2. Trace id injection.
   * Both applications use log4j Mapped Diagnostic Context (MDC). The format of the log is defined in the `log4j2.xml` file in each application directory.
 
-We are also including an example configuration file so that cloudwatch agent can capture the logs of the sample application when running locally.
+We are also including an example configuration file in `cw-agent.json` so that cloudwatch agent can capture the logs of the sample application when running locally.
