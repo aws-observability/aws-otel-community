@@ -19,7 +19,9 @@ plugins {
     application
 }
 
-val otelVersion = "1.17.0"
+val otelVersion = "1.21.0"
+val otelInstrumentationVersion = "1.21.0"
+val otelContribVersion = "1.21.0"
 
 repositories {
     mavenCentral()
@@ -42,18 +44,27 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry:opentelemetry-extension-aws")
-    implementation("io.opentelemetry:opentelemetry-sdk-extension-aws")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:${otelVersion}")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:${otelContribVersion}-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:${otelContribVersion}")
 
     // OpenTelemetry AWS SDK Library Instrumentation
-    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${otelVersion}-alpha"))
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${otelInstrumentationVersion}-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 
     // Opentelemetry OkHttp Library Instrumentation
-    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:${otelVersion}-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:${otelInstrumentationVersion}-alpha")
 
     implementation(project(":base"))
+
+    constraints {
+        implementation("com.fasterxml.jackson:jackson-bom:2.13.4.20221013") {
+            because("bom used upstream is problematic. https://github.com/FasterXML/jackson-bom/issues/52#issuecomment-1292883281")
+        }
+    }
+
+    implementation("org.apache.logging.log4j:log4j-api:2.18.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.18.0")
+    implementation("org.slf4j:slf4j-simple:2.0.3")
 }
 
 

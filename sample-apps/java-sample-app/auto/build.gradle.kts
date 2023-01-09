@@ -1,3 +1,4 @@
+
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -17,7 +18,7 @@ plugins {
     application
 }
 
-val otelVersion = "1.17.0"
+val otelVersion = "1.19.2"
 
 repositories {
     mavenCentral()
@@ -38,6 +39,7 @@ dependencies {
 
     // Necessary to download the jar of the Java Agent
     javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:${otelVersion}@jar")
+    javaagentDependency(project(":extension"))
 }
 
 
@@ -45,8 +47,10 @@ application {
     mainClass.set("software.amazon.adot.sampleapp.MainAuto")
     applicationDefaultJvmArgs = listOf(
         "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-${otelVersion}.jar", // Use the Java agent when the application is run
-        "-Dotel.service.name=java-sample-app")  // sets the name of the application in traces and metrics.
+        "-Dotel.service.name=java-sample-app",  // sets the name of the application in traces and metrics.
+        "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
 }
+
 
 tasks.register<Copy>("download") {
     from(javaagentDependency)

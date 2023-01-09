@@ -30,7 +30,7 @@ import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.contrib.awsxray.AwsXrayIdGenerator;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
-import io.opentelemetry.extension.aws.AwsXrayPropagator;
+import io.opentelemetry.contrib.awsxray.propagator.AwsXrayPropagator;
 import io.opentelemetry.instrumentation.awssdk.v2_2.AwsSdkTelemetry;
 import io.opentelemetry.instrumentation.okhttp.v3_0.OkHttpTelemetry;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -47,6 +47,8 @@ import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.services.s3.S3Client;
 import spark.Response;
 
+import java.util.List;
+
 public class ManualApp extends BaseApp {
 
     private static final String REQUEST_OTEL_SCOPE = "requestOtelContext";
@@ -54,8 +56,12 @@ public class ManualApp extends BaseApp {
 
     // Configures Opentelemetry Manually setting each parameter used in this application
     private static OpenTelemetry buildOpentelemetry() {
+        Attributes attr = Attributes.builder()
+                .put(ResourceAttributes.AWS_LOG_GROUP_NAMES, List.of(System.getProperty("adot.sampleapp.loggroup", "sample-app-trace-logs")))
+                .put(ResourceAttributes.SERVICE_NAME, "java-sample-app")
+                .build();
         Resource resource = Resource.getDefault().merge(
-                Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, "java-sample-app")));
+                Resource.create(attr));
 
         return OpenTelemetrySdk.builder()
                 .setPropagators(
