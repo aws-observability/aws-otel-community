@@ -178,7 +178,7 @@ GEM
       opentelemetry-instrumentation-active_record (~> 0.4.0)
       opentelemetry-instrumentation-active_support (~> 0.2.0)
       opentelemetry-instrumentation-base (~> 0.21.0)
-    opentelemetry-propagator-xray (0.21.0)
+    opentelemetry-propagator-xray (0.21.1)
       opentelemetry-api (~> 1.0)
     opentelemetry-registry (0.2.0)
       opentelemetry-api (~> 1.1)
