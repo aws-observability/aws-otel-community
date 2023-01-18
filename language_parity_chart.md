@@ -16,5 +16,5 @@ These charts outline the various language library components and features implem
 |Resource Detectors - AWS EKS	|Done	|Done	|Done |Done |Done	|
 |AWS X-Ray Trace ID injection into application logs	|Done	| NA	| NA	| NA	| NA   |
 |Metadata/Annotations	|Done (through ADOT Collector)	|Done (through ADOT Collector)	|Done (through ADOT Collector)	|Done (through ADOT Collector)	|Done (Through ADOT Collector)	|
-|AWS Lambda support	|Done	|Done	| NA |Done (with autoinstumentation)	| NA	|
-|Auto-instumentation	|Done	|Done	|Needs implementation in OTel	|Done	|Needs implementation in OTel	|
+|AWS Lambda support	|Done	|Done	| NA |Done (with auto-instrumentation)	| NA	|
+|Auto-instrumentation	|Done	|Done	|Needs implementation in OTel	|Done	|Needs implementation in OTel	|
