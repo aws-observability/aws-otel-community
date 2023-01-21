@@ -17,4 +17,4 @@ These charts outline the various language library components and features implem
 |AWS X-Ray Trace ID injection into application logs	|Done	| NA	| NA	| NA	| NA   |
 |Metadata/Annotations	|Done (through ADOT Collector)	|Done (through ADOT Collector)	|Done (through ADOT Collector)	|Done (through ADOT Collector)	|Done (Through ADOT Collector)	|
 |AWS Lambda support	|Done	|Done	| NA |Done (with auto-instrumentation)	| NA	|
-|Auto-instrumentation	|Done	|Done	|Needs implementation in OTel	|Done	|Needs implementation in OTel	|
+|Auto-instrumentation	|Done	|Needs implementation in OTel	|Needs implementation in OTel	|Done	|N/A	|
