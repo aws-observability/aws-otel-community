@@ -160,7 +160,7 @@ GEM
     opentelemetry-instrumentation-base (0.21.1)
       opentelemetry-api (~> 1.0)
       opentelemetry-registry (~> 0.1)
-    opentelemetry-instrumentation-concurrent_ruby (0.20.0)
+    opentelemetry-instrumentation-concurrent_ruby (0.20.1)
       opentelemetry-api (~> 1.0)
       opentelemetry-instrumentation-base (~> 0.21.0)
     opentelemetry-instrumentation-net_http (0.21.1)
