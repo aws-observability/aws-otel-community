@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+  otel:
+    image: amazon/aws-otel-collector:latest
+    command: --config /config/collector-config-local.yml
+    volumes:
+      - .:/config
+    environment:
+      - AWS_ACCESS_KEY_ID=<your_AWS_ACCESS_KEY_ID>
+      - AWS_SECRET_ACCESS_KEY=<your_AWS_SECRET_ACCESS_KEY>
+      - AWS_REGION=us-west-2
+    ports:
+      - '4317:4317'
+
+  app:
+    image: aspnetapp:latest
+    environment:
+      - AWS_ACCESS_KEY_ID=<your_AWS_ACCESS_KEY_ID>
+      - AWS_SECRET_ACCESS_KEY=<your_AWS_SECRET_ACCESS_KEY>
+      - AWS_REGION=us-west-2
+      - INSTANCE_ID
+      - LISTEN_ADDRESS=0.0.0.0:8080
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=aws-otel-integ-test
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4317
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - '8080:8080'      
