@@ -12,13 +12,16 @@ namespace integration_test_app.Controllers
         const string DIMENSION_API_NAME = "apiName";
         const string DIMENSION_STATUS_CODE = "statusCode";
         
+        // Request based metrics
+        static string API_SUM_METRIC = "totalApiRequests";
+        static string API_COUNTER_METRIC = "totalBytesSent";
+        static string API_LATENCY_METRIC = "latencyTime";
 
-        static string API_COUNTER_METRIC = "apiBytesSent";
-        static string API_LATENCY_METRIC = "latency";
-        static string API_SUM_METRIC = "totalApiBytesSent";
-        static string API_LAST_LATENCY_METRIC = "lastLatency";
-        static string API_UP_DOWN_COUNTER_METRIC = "queueSizeChange";
-        static string API_UP_DOWN_SUM_METRIC = "actualQueueSize";
+        // Random metrics
+        static string API_TIME_ALIVE = "timeAlive";
+        static string API_TOTAL_HEAP_SIZE = "totalHeapSize";
+        static string API_THREAD_ACTIVE = "threadsActive";
+        static string API_CPU_USAGE = "cpuUsage";
 
         Histogram<double> apiLatencyRecorder;
         Counter<long> totalBytesSentObserver;
@@ -42,9 +45,9 @@ namespace integration_test_app.Controllers
                 .AddOtlpExporter()
                 .Build();
             
-            string latencyTime = API_LATENCY_METRIC;
-            string totalBytesSent = API_COUNTER_METRIC;
             string totalApiRequests = API_SUM_METRIC;
+            string totalBytesSent = API_COUNTER_METRIC;
+            string latencyTime = API_LATENCY_METRIC;
             string timeAlive = API_TIME_ALIVE;
             string totalHeapSize = API_TOTAL_HEAP_SIZE;
             string threadsActive = API_THREAD_ACTIVE;
@@ -71,26 +74,26 @@ namespace integration_test_app.Controllers
             KeyValuePair<string, object> dimStatusCode =
                 new KeyValuePair<string, object>(DIMENSION_STATUS_CODE, statusCodeValue);
             
+            meter.CreateObservableGauge(totalApiRequests, () => totalApiRequests, 
+                "1",
+                "Increments by one every time a sampleapp endpoint is used");
+            
             meter.CreateObservableCounter(totalBytesSent,() => apiBytesSent, 
                 "By",
                 "Keeps a sum of the total amount of bytes sent while the application is alive");
 
-            meter.CreateObservableGauge(totalApiRequests, () => totalBytesSent, 
-                "1",
-                "Increments by one every time a sampleapp endpoint is used");
+            meter.CreateObservableCounter(timeAlive,() => timeAlive, 
+                "ms",
+                "Total amount of time that the application has been alive");
 
-            meter.CreateObservableGauge(actualQueueSizeMetricName, () => actualQueueSize, 
+            meter.CreateObservableGauge(totalHeapSize, () => totalHeapSize, 
                 "one", "The actual queue size observed at collection interval");
 
-            meter.CreateObservableCounter(timeAlive,() => apiBytesSent, 
-                "ms",
-                "Total amount of time that the application has been alive");
+            meter.CreateObservableCounter(threadsActive,() => threadsActive, 
+                "1",
+                "The total number of threads active");
 
-            meter.CreateObservableCounter(totalBytesSent,() => apiBytesSent, 
-                "ms",
-                "Total amount of time that the application has been alive");
-
-            meter.CreateObservableGauge(totalBytesSent,() => apiBytesSent, 
+            meter.CreateObservableGauge(cpuUsage,() => cpuUsage, 
                 "ms",
                 "Total amount of time that the application has been alive");
 
