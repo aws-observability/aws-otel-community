@@ -28,7 +28,7 @@ namespace integration_test_app
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             Sdk.CreateTracerProviderBuilder()
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("aws-otel-integ-test").AddTelemetrySdk())
+                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("adot-integ-test").AddTelemetrySdk())
                 .AddXRayTraceId()
                 .AddAWSInstrumentation()
                 .AddAspNetCoreInstrumentation()
