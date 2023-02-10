@@ -4,19 +4,18 @@ services:
     image: amazon/aws-otel-collector:latest
     command: --config /config/collector-config-local.yml
     volumes:
+      - ~/.aws:/root/.aws:ro
       - .:/config
     environment:
-      - AWS_ACCESS_KEY_ID=<your_AWS_ACCESS_KEY_ID>
-      - AWS_SECRET_ACCESS_KEY=<your_AWS_SECRET_ACCESS_KEY>
       - AWS_REGION=us-west-2
     ports:
       - '4317:4317'
 
   app:
-    image: aspnetapp:latest
-    environment:
-      - AWS_ACCESS_KEY_ID=<your_AWS_ACCESS_KEY_ID>
-      - AWS_SECRET_ACCESS_KEY=<your_AWS_SECRET_ACCESS_KEY>
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment: 
       - AWS_REGION=us-west-2
       - INSTANCE_ID
       - LISTEN_ADDRESS=0.0.0.0:8080
@@ -24,4 +23,6 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4317
       - ASPNETCORE_URLS=http://+:8080
     ports:
-      - '8080:8080'      
+      - '8080:8080'     
+    volumes:
+      - ~/.aws:/root/.aws:ro
