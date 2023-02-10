@@ -39,7 +39,7 @@ namespace integration_test_app.Controllers
         
         public MetricEmitter()
         {
-            Meter meter = new Meter("aws-otel", "1.0");
+            Meter meter = new Meter("adot", "1.0");
             using var meterProvider = Sdk.CreateMeterProviderBuilder()
                 .AddMeter("aws-otel")
                 .AddOtlpExporter()
