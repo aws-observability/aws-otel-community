@@ -28,7 +28,7 @@ In order to run the application
 `git clone https://github.com/aws-observability/aws-otel-community.git`
 - Switch into the directory
 `cd sample-apps/donet-sample-app`
-- Run the go server
+- Run the DONET server
 `docker-compose up`
 Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
 
