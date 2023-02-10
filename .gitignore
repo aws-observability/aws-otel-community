@@ -3,7 +3,7 @@
 **/.gradle
 **/.idea
 
-## DONET releated files
+## .NET releated files
 *.swp
 *.*~
 project.lock.json
