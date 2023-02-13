@@ -5,7 +5,7 @@ using System.Diagnostics.Metrics;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Instrumentation;
 
-namespace integration_test_app.Controllers
+namespace donet_sample_app.Controllers
 {
     public class MetricEmitter
     {

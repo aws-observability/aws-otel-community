@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace integration_test_app
+namespace donet_sample_app
 {
     public class Program
     {
