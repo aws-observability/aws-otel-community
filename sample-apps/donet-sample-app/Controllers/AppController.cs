@@ -49,7 +49,7 @@ namespace integration_test_app.Controllers
         }
 
         [HttpGet]
-        [Route("/aws-sdk-call")]
+        [Route("/get-aws-s3-bucket")]
         public string AWSSDKCall()
         {
             var res = s3Client.ListBucketsAsync().Result;
@@ -71,6 +71,15 @@ namespace integration_test_app.Controllers
         [Route("/")]
         public string Default()
         {
+            return "Application started!";
+        }
+
+        [HttpGet]
+        [Route("/outgoing-sampleapp")]
+        public string Default()
+        {
+            var port = 4567
+            
             return "Application started!";
         }
 
