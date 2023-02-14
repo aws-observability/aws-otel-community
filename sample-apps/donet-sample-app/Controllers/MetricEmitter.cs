@@ -5,7 +5,7 @@ using System.Diagnostics.Metrics;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Instrumentation;
 
-namespace integration_test_app.Controllers
+namespace donet_sample_app.Controllers
 {
     public class MetricEmitter
     {
@@ -39,9 +39,9 @@ namespace integration_test_app.Controllers
         
         public MetricEmitter()
         {
-            Meter meter = new Meter("aws-otel", "1.0");
+            Meter meter = new Meter("adot", "1.0");
             using var meterProvider = Sdk.CreateMeterProviderBuilder()
-                .AddMeter("aws-otel")
+                .AddMeter("adot")
                 .AddOtlpExporter()
                 .Build();
             

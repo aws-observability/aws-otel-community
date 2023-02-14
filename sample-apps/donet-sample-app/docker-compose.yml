@@ -19,7 +19,7 @@ services:
       - AWS_REGION=us-west-2
       - INSTANCE_ID
       - LISTEN_ADDRESS=0.0.0.0:8080
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=aws-otel-integ-test
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=adot-integ-test
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4317
       - ASPNETCORE_URLS=http://+:8080
     ports:

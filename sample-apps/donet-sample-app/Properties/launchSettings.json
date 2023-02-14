@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "integration_test_app": {
+    "donet-sample-app": {
       "commandName": "Project",
       "launchBrowser": true,
       "applicationUrl": "http://localhost:8080",

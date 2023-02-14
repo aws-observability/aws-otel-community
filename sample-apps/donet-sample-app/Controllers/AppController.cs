@@ -8,8 +8,10 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Instrumentation;
 using System.Diagnostics.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
-namespace integration_test_app.Controllers
+namespace donet_sample_app.Controllers
 {
     [ApiController]
     [Route("[controller]")]
