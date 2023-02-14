@@ -17,7 +17,7 @@ namespace donet_sample_app.Controllers
         static string API_LATENCY_METRIC = "latencyTime";
         static string API_SUM_METRIC = "totalBytesSent";
         static string API_TOTAL_TIME_METRIC = "timeAlive";
-        static string API_TOTAL_HEAP_SIZE = "totalHeapSiz";
+        static string API_TOTAL_HEAP_SIZE = "totalHeapSize";
         static string API_TOTAL_THREAD_SIZE = "threadsActive";
         static string API_CPU_USAGE = "cpuUsage";
     
