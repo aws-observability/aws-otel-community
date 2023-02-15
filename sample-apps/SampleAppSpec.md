@@ -55,7 +55,7 @@ This configuration file should be set by an environment variable (SAMPLE_APP_CON
 ```
 ---
 Host: "0.0.0.0"                       # Host - String Address
-Port: "8080"                          # Port - String Port
+Port: "4567"                          # Port - String Port
 TimeInterval: 1                       # Interval - Time in seconds to generate new metrics
 RandomTimeAliveIncrementer: 1         # Metric - Amount to incremement metric by every TimeInterval
 RandomTotalHeapSizeUpperBound: 100    # Metric - UpperBound for TotalHeapSize for random metric value every TimeInterval
@@ -143,6 +143,144 @@ These are Key Value pairs to be added on metrics.
 }
 ```
 
+**Expected Metrics Test File**
+
+The Metric names should have "_{{testingID}}" added onto the end of the metric name to ensure the correct metric is grabbed for verification.  The {{Testing ID}} is usually set to the INSTANCE_ID environment variable so an example of a metricName is `cpuUsage + "_" + INSTANCE_ID` or `cpuUsage_c2f47fc1fb1f5bb7`.
+```
+-
+  metricName: totalApiRequests_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: request
+    -
+      name: language
+      value: {{language}}
+
+-
+  metricName: totalBytesSent_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: request
+    -
+      name: language
+      value: {{language}}
+    -
+      name: apiName
+      value: SKIP
+    -
+      name: http.status_code
+      value: SKIP
+
+-
+  metricName: latencyTime_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: request
+    -
+      name: language
+      value: {{language}}
+    -
+      name: apiName
+      value: SKIP
+    -
+      name: http.status_code
+      value: SKIP
+
+-
+  metricName: timeAlive_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: random
+    -
+      name: language
+      value: {{language}}
+
+-
+  metricName: totalHeapSize_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: random
+    -
+      name: language
+      value: {{language}}
+
+-
+  metricName: threadsActive_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: random
+    -
+      name: language
+      value: {{language}}
+
+-
+  metricName: cpuUsage_{{testingId}}
+  namespace: {{metricNamespace}}
+  dimensions:
+    -
+      name: OTelLib
+      value: SKIP
+    -
+      name: signal
+      value: metric
+    -
+      name: metricType
+      value: random
+    -
+      name: language
+      value: {{language}}
+
+```
+
+
 ### Logs
 
 **Logs are OPTIONAL due to their status of preview upstream. Logs must not be tested against nor will the logging structure described be final. It is to be used as an example to construct and emit example logs.**
@@ -209,7 +347,7 @@ The events that must be present in every sample app are the following in respect
 
 1. n/a
 2. “outgoing-http-call”
-3. “get-aws-s3-buckets”
+3. “aws-sdk-call”
 4. “invoke-sample-apps” 
     1. “invoke-sampleapp”
     2. “leaf-request”
@@ -226,6 +364,79 @@ These are Key Value pairs to be added on traces.
 “language”:   (string)<name of language used>
 }
 ```
+
+**Expected Traces Test Files**
+
+The subsegment span names will be tested against and are displayed below.
+
+The outgoing-sampleapp trace *will not be tested* for this iteration as it is out of scope due to no need to test this functionality.  However, if we were to test this sample app chaining then we would have the assertion validate shape of the trace and it's subsegments/spans.  For example:
+E.g. Go → Go or Go → Ruby or Ruby → Go
+
+
+`/outgoing-http-call`
+```
+[{
+  "http": {
+    "request": {
+      "url": "{{endpoint}}/outgoing-http-call",
+      "method": "GET"
+    },
+    "response": {
+      "status": 200
+    }
+  },
+  "subsegments": [
+    {
+      "name": "outgoing-http-call",
+      "metadata": {
+        "default": {
+          "language": "{{language}}",
+          "signal": "trace"
+        }
+      },
+      "subsegments": [
+        {
+          "name": "aws.amazon.com:443",
+          "http": {
+            "request": {
+              "url": "https://aws.amazon.com/",
+              "method": "GET"
+            }
+          },
+          "namespace": "remote"
+        }
+      ]
+    }
+  ]
+}]
+```
+
+`/aws-sdk-call`
+```
+[{
+  "http":{
+    "request": {
+      "url": "{{endpoint}}/aws-sdk-call",
+      "method": "GET"
+    },
+    "response":{
+      "status": 200
+    }
+  },
+  "subsegments": [
+    {
+      "name": "/aws-sdk-call",
+      "metadata": {
+        "default": {
+          "language": "{{language}}",
+          "signal": "trace"
+        }
+      }
+    }
+  ]
+}]
+```
+
 
 ### Interactions
 
