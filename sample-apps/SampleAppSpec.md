@@ -134,7 +134,7 @@ Asynchronous Gauge
 
 **Common Attributes for Random based metrics**
 
-These are Key Value pairs to be added on metrics.
+These are Key Value pairs to be added on metrics and will be tested for.
 ```
 {
 “signal”:     (string)“metric”
@@ -143,143 +143,7 @@ These are Key Value pairs to be added on metrics.
 }
 ```
 
-**Expected Metrics Test File**
-
-The Metric names should have "_{{testingID}}" added onto the end of the metric name to ensure the correct metric is grabbed for verification.  The {{Testing ID}} is usually set to the INSTANCE_ID environment variable so an example of a metricName is `cpuUsage + "_" + INSTANCE_ID` or `cpuUsage_c2f47fc1fb1f5bb7`.
-```
--
-  metricName: totalApiRequests_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: request
-    -
-      name: language
-      value: {{language}}
-
--
-  metricName: totalBytesSent_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: request
-    -
-      name: language
-      value: {{language}}
-    -
-      name: apiName
-      value: SKIP
-    -
-      name: http.status_code
-      value: SKIP
-
--
-  metricName: latencyTime_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: request
-    -
-      name: language
-      value: {{language}}
-    -
-      name: apiName
-      value: SKIP
-    -
-      name: http.status_code
-      value: SKIP
-
--
-  metricName: timeAlive_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: random
-    -
-      name: language
-      value: {{language}}
-
--
-  metricName: totalHeapSize_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: random
-    -
-      name: language
-      value: {{language}}
-
--
-  metricName: threadsActive_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: random
-    -
-      name: language
-      value: {{language}}
-
--
-  metricName: cpuUsage_{{testingId}}
-  namespace: {{metricNamespace}}
-  dimensions:
-    -
-      name: OTelLib
-      value: SKIP
-    -
-      name: signal
-      value: metric
-    -
-      name: metricType
-      value: random
-    -
-      name: language
-      value: {{language}}
-
-```
-
+Upon implementation, the Metric names should also have the instance ID appended onto the end of the name like so "\<metric name\>_\<instance ID\>".  The instance ID can be retrieved through the INSTANCE_ID environment variable.  An example of what this would look like: `cpuUsage_a1b2c3d4e5f6g7h8`.
 
 ### Logs
 
@@ -352,91 +216,20 @@ The events that must be present in every sample app are the following in respect
     1. “invoke-sampleapp”
     2. “leaf-request”
 
+These span names will be tested.
+
 The fourth endpoint must create a span that will have potentially two child spans. “invoke-sampleapp” is the case where there are more than 0 sample apps configured to make a call to.
 “leaf” request is the case where there are no sample apps to make a call to.
 
 **Common Attributes for Trace spans**
 
-These are Key Value pairs to be added on traces.
+These are Key Value pairs to be added on traces and will be tested for as well.
 ```
 {
 “signal”:     (string)“trace”
 “language”:   (string)<name of language used>
 }
 ```
-
-**Expected Traces Test Files**
-
-The subsegment span names will be tested against and are displayed below.
-
-The outgoing-sampleapp trace *will not be tested* for this iteration as it is out of scope due to no need to test this functionality.  However, if we were to test this sample app chaining then we would have the assertion validate shape of the trace and it's subsegments/spans.  For example:
-E.g. Go → Go or Go → Ruby or Ruby → Go
-
-
-`/outgoing-http-call`
-```
-[{
-  "http": {
-    "request": {
-      "url": "{{endpoint}}/outgoing-http-call",
-      "method": "GET"
-    },
-    "response": {
-      "status": 200
-    }
-  },
-  "subsegments": [
-    {
-      "name": "outgoing-http-call",
-      "metadata": {
-        "default": {
-          "language": "{{language}}",
-          "signal": "trace"
-        }
-      },
-      "subsegments": [
-        {
-          "name": "aws.amazon.com:443",
-          "http": {
-            "request": {
-              "url": "https://aws.amazon.com/",
-              "method": "GET"
-            }
-          },
-          "namespace": "remote"
-        }
-      ]
-    }
-  ]
-}]
-```
-
-`/aws-sdk-call`
-```
-[{
-  "http":{
-    "request": {
-      "url": "{{endpoint}}/aws-sdk-call",
-      "method": "GET"
-    },
-    "response":{
-      "status": 200
-    }
-  },
-  "subsegments": [
-    {
-      "name": "/aws-sdk-call",
-      "metadata": {
-        "default": {
-          "language": "{{language}}",
-          "signal": "trace"
-        }
-      }
-    }
-  ]
-}]
-```
-
 
 ### Interactions
 
