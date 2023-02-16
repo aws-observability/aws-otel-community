@@ -99,7 +99,7 @@ These are Key Value pairs to be added on metrics.
 ```
 {
 “signal”:     (string)“metric”
-“language”:   (string)<name of language used>
+“language”:   (string)<name of language used. Should be set to the name of the sample app preceeding "-sample-app" for standardization purposes>
 “metricType”: (string)“request”
 }
 ```
@@ -138,7 +138,7 @@ These are Key Value pairs to be added on metrics and will be tested for.
 ```
 {
 “signal”:     (string)“metric”
-“language”:   (string)<name of language used>
+“language”:   (string)<name of language used. Should be set to the name of the sample app preceeding "-sample-app" for standardization purposes> 
 “metricType”: (string)“random”
 }
 ```
@@ -227,7 +227,7 @@ These are Key Value pairs to be added on traces and will be tested for as well.
 ```
 {
 “signal”:     (string)“trace”
-“language”:   (string)<name of language used>
+“language”:   (string)<name of language used. Should be set to the name of the sample app preceeding "-sample-app" for standardization purposes>
 }
 ```
 
