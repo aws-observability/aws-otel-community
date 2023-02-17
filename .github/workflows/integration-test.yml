@@ -2,7 +2,7 @@ name: "Integration Test"
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master, AddIntegTest ]
   workflow_dispatch:
      inputs:
       push: 
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: ${{ github.event.inputs.push == 'true' || 
-            ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
+            ( github.event_name == 'push' && ( github.ref == 'refs/heads/master' || github.ref == 'refs/heads/AddIntegTest' ))
             }}
           context: ${{ env.APP_PATH }}
           tags: |
