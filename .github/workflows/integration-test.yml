@@ -3,7 +3,7 @@ name: "Integration Test"
 on:
   push:
     branches: [ main ]
-  workflow dispatch:
+  workflow_dispatch:
      inputs:
       push: 
         description: 'Should workflow push sample app docker image'
