@@ -95,11 +95,11 @@ Histogram
 
 **Common Attributes for Request based metrics**
 
-These are Key Value pairs to be added on metrics.
+These Key Value pairs MUST be present on request based metrics.
 ```
 {
 “signal”:     (string)“metric”
-“language”:   (string)<name of language used. Should be set to the name of the sample app preceeding "-sample-app" for standardization purposes>
+“language”:   (string)<name of language used. Should be set to the name of the sample app that precedes "-sample-app" for standardization purposes. Example: language should be set to `java` for the `java-sample-app`>
 “metricType”: (string)“request”
 }
 ```
@@ -134,16 +134,16 @@ Asynchronous Gauge
 
 **Common Attributes for Random based metrics**
 
-These are Key Value pairs to be added on metrics and will be tested for.
+These Key Value pairs MUST be present on random based metrics.
 ```
 {
 “signal”:     (string)“metric”
-“language”:   (string)<name of language used. Should be set to the name of the sample app preceeding "-sample-app" for standardization purposes> 
+“language”:   (string)<name of language used. Should be set to the name of the sample app that precedes "-sample-app" for standardization purposes. Example: language should be set to `java` for the `java-sample-app`> 
 “metricType”: (string)“random”
 }
 ```
 
-Upon implementation, the Metric names should also have the instance ID appended onto the end of the name like so "\<metric name\>_\<instance ID\>".  The instance ID can be retrieved through the INSTANCE_ID environment variable.  An example of what this would look like: `cpuUsage_a1b2c3d4e5f6g7h8`.
+If the `INSTANCE_ID` environment variable exists then the sample app MUST append it to all metric names following an underscore(`_`). Example: `cpuUsage_a1b2c3d4e5f6g7h8`.
 
 ### Logs
 
@@ -223,11 +223,11 @@ The fourth endpoint must create a span that will have potentially two child span
 
 **Common Attributes for Trace spans**
 
-These are Key Value pairs to be added on traces and will be tested for as well.
+These Key Value pairs MUST be present on trace spans.
 ```
 {
 “signal”:     (string)“trace”
-“language”:   (string)<name of language used. Should be set to the name of the sample app preceeding "-sample-app" for standardization purposes>
+“language”:   (string)<name of language used. Should be set to the name of the sample app that precedes "-sample-app" for standardization purposes. Example: language should be set to `java` for the `java-sample-app`>
 }
 ```
 
