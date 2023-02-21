@@ -4,6 +4,9 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 
+processors:
+  batch:
+
 exporters:
   logging:
     loglevel: info
@@ -23,12 +26,16 @@ service:
     traces:
       receivers:
         - otlp
+      processor:
+        - batch
       exporters:
         - logging
         - awsxray
     metrics:
       receivers:
         - otlp
+      processor:
+        - batch
       exporters:
         - logging
         - awsemf
