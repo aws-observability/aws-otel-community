@@ -26,7 +26,7 @@ service:
     traces:
       receivers:
         - otlp
-      processor:
+      processors:
         - batch
       exporters:
         - logging
@@ -34,7 +34,7 @@ service:
     metrics:
       receivers:
         - otlp
-      processor:
+      processors:
         - batch
       exporters:
         - logging
