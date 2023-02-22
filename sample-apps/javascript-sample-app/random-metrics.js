@@ -36,28 +36,29 @@ let totalHeapSize = 0;
 
 // acquire meter 
 const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
+const instanceID = process.env.INSTANCE_ID
 
 // counter metric
-const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC, {
+const timeAliveMetric = meter.createCounter(TIME_ALIVE_METRIC + "_" + instanceID, {
     description: 'Total amount of time that the application has been alive',
     unit: 's'
 });
 
 // updown counter metric
-const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC, {
+const threadsActiveMetric = meter.createUpDownCounter(THREADS_ACTIVE_METRIC + "_" + instanceID, {
     description: 'The total number of threads active',
     unit:'1'
 });
 
 // observable gauge metric
-const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC, {
+const cpuUsageMetric = meter.createObservableGauge(CPU_USAGE_METRIC + "_" + instanceID, {
     description: 'Cpu usage percent',
     unit: '1'
 });
 cpuUsageMetric.addCallback((measurement) => {measurement.observe(cpuUsage, common_attributes)});
 
 // observable updown counter metric
-const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC, {
+const totalHeapSizeMetric = meter.createObservableUpDownCounter(HEAP_SIZE_METRIC + "_" + instanceID, {
     description: 'The current total heap size',
     unit:'1'
 });
