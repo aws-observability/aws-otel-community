@@ -12,11 +12,8 @@ exporters:
     loglevel: info
   awsxray:
     region: us-west-2
-    local_mode: true
-    no_verify_ssl: false
   awsemf:
     region: us-west-2
-    no_verify_ssl: false    
 
 service:
   telemetry:
