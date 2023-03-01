@@ -30,6 +30,7 @@ namespace donet_sample_app.Controllers
             _metricEmitter.updateTotalHeapSizeMetric(rand.Next(100,500));
             _metricEmitter.updateTotalThreadSizeMetric(rand.Next(1,20));
             _metricEmitter.updateCpuUsageMetric(rand.Next(1,100));
+            // _metricEmitter.updateTotalHeapMetric(rand.Next(1,100));
         }
 
         
@@ -41,7 +42,7 @@ namespace donet_sample_app.Controllers
             string statusCode = res.StatusCode.ToString();
             
             // Request Based Metrics
-            _metricEmitter.emitReturnTimeMetric(MimicLatency(),Request.GetDisplayUrl(),statusCode);
+            _metricEmitter.emitReturnTimeMetric(MimicLatency());
             int loadSize = MimicPayLoadSize();
             _metricEmitter.apiRequestSentMetric(Request.GetDisplayUrl(),statusCode);
             _metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
@@ -58,12 +59,11 @@ namespace donet_sample_app.Controllers
             string statusCode = res.HttpStatusCode.ToString();
             
             // Request Based Metrics
-            _metricEmitter.emitReturnTimeMetric(MimicLatency(),Request.GetDisplayUrl(),statusCode);
+            _metricEmitter.emitReturnTimeMetric(MimicLatency());
             int loadSize = MimicPayLoadSize();
             _metricEmitter.apiRequestSentMetric(Request.GetDisplayUrl(),statusCode);
             _metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
-
-
+            _metricEmitter.totalTimeSentObserver.Add(3);
 
 
             return GetTraceId();
@@ -78,9 +78,9 @@ namespace donet_sample_app.Controllers
 
         [HttpGet]
         [Route("/outgoing-sampleapp")]
-        public string Default()
+        public string Default2()
         {
-            var port = 4567
+            var port = 4567;
             
             return "Application started!";
         }

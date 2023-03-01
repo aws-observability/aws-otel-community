@@ -13,23 +13,29 @@ namespace donet_sample_app.Controllers
         const string DIMENSION_STATUS_CODE = "statusCode";
         
 
-        static string API_COUNTER_METRIC = "totalApiRequests";
+        static string API_COUNTER_METRIC = "totalApiRequests"; //works
         static string API_LATENCY_METRIC = "latencyTime";
-        static string API_SUM_METRIC = "totalBytesSent";
+        static string API_SUM_METRIC = "totalBytesSent"; //works
         static string API_TOTAL_TIME_METRIC = "timeAlive";
         static string API_TOTAL_HEAP_SIZE = "totalHeapSize";
-        static string API_TOTAL_THREAD_SIZE = "threadsActive";
-        static string API_CPU_USAGE = "cpuUsage";
+        static string API_TOTAL_THREAD_SIZE = "threadsActive";//works
+        static string API_CPU_USAGE = "cpuUsage"; //works
     
 
-        Histogram<double> apiLatencyRecorder;
-        Counter<long> totalTimeSentObserver;
+        public Histogram<double> apiLatencyRecorder;
+        public Counter<int> totalTimeSentObserver;
+        public ObservableUpDownCounter<long> totalHeapSizeObserver;
+        public UpDownCounter<int> totalThreadsObserver;
+        
 
         static long apiRequestSent = 0;
         static long totalBytesSent = 0;
         static long totalHeapSize  = 0;
-        static long totalThreadSize = 0;
         static int cpuUsage = 0;
+        static int totaltime = 1;
+        static int totalthreads = 0;
+        static int UpDowntick = 1;
+        static int returnTime = 100;
 
         // The below API name and status code dimensions are currently shared by all metrics observer in
         // this class.
@@ -45,6 +51,7 @@ namespace donet_sample_app.Controllers
                 .AddOtlpExporter()
                 .Build();
             
+
             string latencyMetricName = API_LATENCY_METRIC;
             string totalApiRequestSent = API_COUNTER_METRIC;
             string totalApiBytesSentMetricName = API_SUM_METRIC;
@@ -68,41 +75,60 @@ namespace donet_sample_app.Controllers
             }
             
 
-            meter.CreateObservableCounter(totalApiRequestSent,() => apiRequestSent, 
+            meter.CreateObservableCounter(totalApiRequestSent,() => apiRequestSent, //works
                 "1",
                 "Increments by one every time a sampleapp endpoint is used");
 
-            meter.CreateObservableCounter(totalApiBytesSentMetricName, () => totalBytesSent, 
+            meter.CreateObservableCounter(totalApiBytesSentMetricName, () => totalBytesSent, //works
                 "By",
                 "Keeps a sum of the total amount of bytes sent while the application is alive");
 
-            apiLatencyRecorder = meter.CreateHistogram<double>(latencyMetricName,
-                 "ms", 
-                 "Measures latency time in buckets of 100 300 and 500");
-
-            totalTimeSentObserver = meter.CreateCounter<long>(totaltimealiveMetricName,
-                "ms",
-                "Measures the total time the application has been alive");
-
-            meter.CreateObservableUpDownCounter(totalHeapSizeMetricName, () => totalHeapSize, 
-                "By",
-                "The current total heap size”");  
-
-            meter.CreateObservableCounter(totalThreadsMetricName, () => totalThreadSize,
-                "1",
-                "The current total number of threads”");
-
-            meter.CreateObservableGauge(cpuUsageMetricName, () => cpuUsage,
+            meter.CreateObservableGauge(cpuUsageMetricName, () => cpuUsage, //works
                 "1",
                 "Cpu usage percent");
 
+            meter.CreateObservableUpDownCounter(totalHeapSizeMetricName, () => { //works
+                    return new List<Measurement<long>>()
+                    {
+                        new Measurement<long>(UpDowntick++ * 10),
+                    };
+                }, 
+                "By",
+                "The current total heap size”");  
+
+            apiLatencyRecorder = meter.CreateHistogram<double>(latencyMetricName, //works
+                 "ms", 
+                 "Measures latency time in buckets of 100 300 and 500");
+
+            totalThreadsObserver = meter.CreateUpDownCounter<int>(totalThreadsMetricName, //works
+                "1",
+                "The total number of threads active”");
+
+            totalTimeSentObserver = meter.CreateCounter<int>(totaltimealiveMetricName,
+                "ms",
+                "Measures the total time the application has been alive");
+            
+
+            totalTimeSentObserver.Add(totaltime,
+                new KeyValuePair<string, object>("signal", "metric"),
+                new KeyValuePair<string, object>("language", "dotnet"),
+                new KeyValuePair<string, object>("metricType", "request"));
+            totalThreadsObserver.Add(totalthreads++,
+                new KeyValuePair<string, object>("signal", "metric"),
+                new KeyValuePair<string, object>("language", "dotnet"),
+                new KeyValuePair<string, object>("metricType", "request"));
+            apiLatencyRecorder.Record(returnTime,
+                new KeyValuePair<string, object>("signal", "metric"),
+                new KeyValuePair<string, object>("language", "dotnet"),
+                new KeyValuePair<string, object>("metricType", "request"));
         }   
         
-        public void emitReturnTimeMetric(long returnTime, String apiName, String statusCode) {
+        public void emitReturnTimeMetric(int returnTime) {
             apiLatencyRecorder.Record(
                 returnTime,
-                new KeyValuePair<string, object>(DIMENSION_API_NAME, apiName),
-                new KeyValuePair<string, object>(DIMENSION_STATUS_CODE, statusCode));
+                new KeyValuePair<string, object>("signal", "metric"),
+                new KeyValuePair<string, object>("language", "dotnet"),
+                new KeyValuePair<string, object>("metricType", "request"));
         }
 
         public void apiRequestSentMetric(String apiName, String statusCode) {
@@ -119,18 +145,25 @@ namespace donet_sample_app.Controllers
 
         public void updateTotalHeapSizeMetric(int heapSize) {
             totalHeapSize += heapSize;
+            //totalHeapSizeObserver.Publish(totalheap);
         }
 
-        public void updateTotalThreadSizeMetric(int threadSize) {
-            totalThreadSize += threadSize;
-        }
+        public void updateTotalThreadSizeMetric(int totalthreads) {
+            totalThreadsObserver.Add(totalthreads,
+                new KeyValuePair<string, object>("signal", "metric"),
+                new KeyValuePair<string, object>("language", "dotnet"),
+                new KeyValuePair<string, object>("metricType", "request"));
+        }   
 
         public void updateCpuUsageMetric(int cpuUsage) {
-            cpuUsage = cpuUsage;
+            cpuUsage += cpuUsage;
         }
 
         public void updateTotalTimeMetric(int totaltime) {
-           totalTimeSentObserver.Add(totaltime);
+           totalTimeSentObserver.Add(totaltime,
+                new KeyValuePair<string, object>("signal", "metric"),
+                new KeyValuePair<string, object>("language", "dotnet"),
+                new KeyValuePair<string, object>("metricType", "request"));
         }
 
     }
