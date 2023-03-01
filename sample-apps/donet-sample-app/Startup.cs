@@ -9,7 +9,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System;
 
-namespace donet_sample_app
+namespace dotnet_sample_app
 {
     public class Startup
     {
