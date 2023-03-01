@@ -1,0 +1,36 @@
+name: "Integration Test"
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  publish_and_test_app:
+    name: Build and test sample app
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        app-language: [ javascript ]
+    env:
+      APP_PATH: sample-apps/${{ matrix.app-language }}-sample-app
+    steps:
+      - name: Checkout This Repo
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+          role-duration-seconds: 1200
+          aws-region: us-west-2
+      - name: Run test containers
+        run: docker-compose up --abort-on-container-exit
+        working-directory: .github/collector
+        env:
+          INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
+          LISTEN_ADDRESS: 0.0.0.0:8080
+          VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/aws-otel-integ-test -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
