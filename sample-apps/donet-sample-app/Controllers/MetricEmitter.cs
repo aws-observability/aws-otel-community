@@ -12,14 +12,13 @@ namespace donet_sample_app.Controllers
         const string DIMENSION_API_NAME = "apiName";
         const string DIMENSION_STATUS_CODE = "statusCode";
         
-
-        static string API_COUNTER_METRIC = "totalApiRequests"; //works
-        static string API_LATENCY_METRIC = "latencyTime";
-        static string API_SUM_METRIC = "totalBytesSent"; //works
-        static string API_TOTAL_TIME_METRIC = "timeAlive";
-        static string API_TOTAL_HEAP_SIZE = "totalHeapSize";
-        static string API_TOTAL_THREAD_SIZE = "threadsActive";//works
-        static string API_CPU_USAGE = "cpuUsage"; //works
+        static string API_COUNTER_METRIC = "totalApiRequests";
+        static string API_LATENCY_METRIC = "latencytime";
+        static string API_SUM_METRIC = "totalbytessent"; 
+        static string API_TOTAL_TIME_METRIC = "timealive";
+        static string API_TOTAL_HEAP_SIZE = "totalheapsize";
+        static string API_TOTAL_THREAD_SIZE = "threadsactive";
+        static string API_CPU_USAGE = "cpusage"; 
     
 
         public Histogram<double> apiLatencyRecorder;
@@ -75,19 +74,19 @@ namespace donet_sample_app.Controllers
             }
             
 
-            meter.CreateObservableCounter(totalApiRequestSent,() => apiRequestSent, //works
+            meter.CreateObservableCounter(totalApiRequestSent,() => apiRequestSent, 
                 "1",
                 "Increments by one every time a sampleapp endpoint is used");
 
-            meter.CreateObservableCounter(totalApiBytesSentMetricName, () => totalBytesSent, //works
+            meter.CreateObservableCounter(totalApiBytesSentMetricName, () => totalBytesSent, 
                 "By",
                 "Keeps a sum of the total amount of bytes sent while the application is alive");
 
-            meter.CreateObservableGauge(cpuUsageMetricName, () => cpuUsage, //works
+            meter.CreateObservableGauge(cpuUsageMetricName, () => cpuUsage, 
                 "1",
                 "Cpu usage percent");
 
-            meter.CreateObservableUpDownCounter(totalHeapSizeMetricName, () => { //works
+            meter.CreateObservableUpDownCounter(totalHeapSizeMetricName, () => { 
                     return new List<Measurement<long>>()
                     {
                         new Measurement<long>(UpDowntick++ * 10),
@@ -96,11 +95,11 @@ namespace donet_sample_app.Controllers
                 "By",
                 "The current total heap size”");  
 
-            apiLatencyRecorder = meter.CreateHistogram<double>(latencyMetricName, //works
+            apiLatencyRecorder = meter.CreateHistogram<double>(latencyMetricName, 
                  "ms", 
                  "Measures latency time in buckets of 100 300 and 500");
 
-            totalThreadsObserver = meter.CreateUpDownCounter<int>(totalThreadsMetricName, //works
+            totalThreadsObserver = meter.CreateUpDownCounter<int>(totalThreadsMetricName, 
                 "1",
                 "The total number of threads active”");
 
