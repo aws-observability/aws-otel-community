@@ -11,7 +11,7 @@ using System.Diagnostics.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace donet_sample_app.Controllers
+namespace dotnet_sample_app.Controllers
 {
     [ApiController]
     [Route("[controller]")]
