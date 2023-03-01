@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace donet_sample_app
+namespace dotnet_sample_app
 {
     public class Program
     {
