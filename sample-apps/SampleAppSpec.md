@@ -55,7 +55,7 @@ This configuration file should be set by an environment variable (SAMPLE_APP_CON
 ```
 ---
 Host: "0.0.0.0"                       # Host - String Address
-Port: "8080"                          # Port - String Port
+Port: "4567"                          # Port - String Port
 TimeInterval: 1                       # Interval - Time in seconds to generate new metrics
 RandomTimeAliveIncrementer: 1         # Metric - Amount to incremement metric by every TimeInterval
 RandomTotalHeapSizeUpperBound: 100    # Metric - UpperBound for TotalHeapSize for random metric value every TimeInterval
@@ -95,11 +95,11 @@ Histogram
 
 **Common Attributes for Request based metrics**
 
-These are Key Value pairs to be added on metrics.
+These Key Value pairs MUST be present on request based metrics.
 ```
 {
 “signal”:     (string)“metric”
-“language”:   (string)<name of language used>
+“language”:   (string)<name of language used. Should be set to the name of the sample app that precedes "-sample-app" for standardization purposes. Example: language should be set to `java` for the `java-sample-app`>
 “metricType”: (string)“request”
 }
 ```
@@ -134,14 +134,16 @@ Asynchronous Gauge
 
 **Common Attributes for Random based metrics**
 
-These are Key Value pairs to be added on metrics.
+These Key Value pairs MUST be present on random based metrics.
 ```
 {
 “signal”:     (string)“metric”
-“language”:   (string)<name of language used>
+“language”:   (string)<name of language used. Should be set to the name of the sample app that precedes "-sample-app" for standardization purposes. Example: language should be set to `java` for the `java-sample-app`> 
 “metricType”: (string)“random”
 }
 ```
+
+If the `INSTANCE_ID` environment variable exists then the sample app MUST append it to all metric names following an underscore(`_`). Example: `cpuUsage_a1b2c3d4e5f6g7h8`.
 
 ### Logs
 
@@ -209,21 +211,23 @@ The events that must be present in every sample app are the following in respect
 
 1. n/a
 2. “outgoing-http-call”
-3. “get-aws-s3-buckets”
+3. “aws-sdk-call”
 4. “invoke-sample-apps” 
     1. “invoke-sampleapp”
     2. “leaf-request”
+
+These span names will be tested.
 
 The fourth endpoint must create a span that will have potentially two child spans. “invoke-sampleapp” is the case where there are more than 0 sample apps configured to make a call to.
 “leaf” request is the case where there are no sample apps to make a call to.
 
 **Common Attributes for Trace spans**
 
-These are Key Value pairs to be added on traces.
+These Key Value pairs MUST be present on trace spans.
 ```
 {
 “signal”:     (string)“trace”
-“language”:   (string)<name of language used>
+“language”:   (string)<name of language used. Should be set to the name of the sample app that precedes "-sample-app" for standardization purposes. Example: language should be set to `java` for the `java-sample-app`>
 }
 ```
 
