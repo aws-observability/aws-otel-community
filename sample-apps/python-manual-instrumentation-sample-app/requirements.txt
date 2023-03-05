@@ -1,4 +1,4 @@
-boto3==1.26.45
+boto3==1.26.84
 Flask==2.2.2
 opentelemetry-distro==0.36b0
 opentelemetry-exporter-otlp==1.12.0rc2
