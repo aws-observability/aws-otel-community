@@ -4,6 +4,7 @@ import random_metrics
 import requests
 import random
 import boto3
+import os
 
 from opentelemetry import propagate, trace, metrics
 
@@ -63,9 +64,10 @@ def setup_opentelemetry(tracer, meter):
     # Set up AWS X-Ray Propagator
     propagate.set_global_textmap(AwsXRayPropagator())
     # Service name is required for most backends
-    resource = Resource(attributes={
-        SERVICE_NAME: 'python-manual-instrumentation-sampleapp'
-    })
+    resource_attributes = { 'service.name': 'python-manual-instrumentation-sample-app' }
+    if (os.environ.get("OTEL_RESOURCE_ATTRIBUTES")):
+        resource_attributes = None
+    resource = Resource.create(attributes=resource_attributes)
 
     # Setting up Traces
     processor = BatchSpanProcessor(OTLPSpanExporter())
@@ -84,23 +86,24 @@ def setup_opentelemetry(tracer, meter):
     metrics.set_meter_provider(metric_provider)
     meter = metrics.get_meter(__name__)
 
+common_attributes = { 'signal': 'metric', 'language': 'python-manual-instrumentation', 'metricType': 'request' }
 
 # update_total_bytes_sent updates the metric with a value between 0 and 1024
 def update_total_bytes_sent():
     min = 0 
     max = 1024
-    total_bytes_sent.add(random.randint(min,max))
+    total_bytes_sent.add(random.randint(min,max), attributes=common_attributes)
 
 # update latency time updates the metric with a value between 0 and 512
 def update_latency_time():
     min = 0
     max = 512
-    latency_time.record(random.randint(min, max))
+    latency_time.record(random.randint(min, max), attributes=common_attributes)
 
 def api_requests_callback(options: CallbackOptions):
     global n
     n += 1
-    add_api_request = Observation(value=n)
+    add_api_request = Observation(value=n, attributes=common_attributes)
     print("api_requests called by SDK")
     yield add_api_request
 
@@ -116,16 +119,20 @@ def convert_otel_trace_id_to_xray(otel_trace_id_decimal):
     )
     return '{{"traceId": "{}"}}'.format(x_ray_trace_id)
 
+testingId = ""
+if (os.environ.get("INSTANCE_ID")):
+            testingId = "_" + os.environ["INSTANCE_ID"]
+
 # register total bytes sent counter
 total_bytes_sent=meter.create_counter(
-    name="totalBytesSent",
+    name="total_bytes_sent" + testingId,
     description="Keeps a sum of the total amount of bytes sent while application is alive",
     unit='By'
 )
 
 # register api requests observable counter
 total_api_requests=meter.create_observable_counter(
-    name="apiRequests",
+    name="total_api_requests" + testingId,
     callbacks=[api_requests_callback],
     description="Increments by one every time a sampleapp endpoint is used",
     unit='1'
@@ -133,7 +140,7 @@ total_api_requests=meter.create_observable_counter(
 
 # registers latency time histogram
 latency_time=meter.create_histogram(
-    name="latencyTime",
+    name="latency_time" + testingId,
     description="Measures latency time in buckets of 100, 300 and 500",
     unit='ms'
         )
@@ -144,29 +151,32 @@ def call_http():
     with tracer.start_as_current_span("outgoing-http-call") as span:
 
         # Demonstrates setting an attribute, a k/v pairing.
-        span.set_attribute("operation.name", "outgoing-http-call")
+        span.set_attribute("language", "python-manual-instrumentation")
+        span.set_attribute("signal", "trace")
 
         # Demonstrating adding events to the span. Think of events as a primitive log.
         span.add_event("Making a request to https://aws.amazon.com/")
-        with tracer.start_as_current_span("amazon-request") as child:
-            requests.get("https://aws.amazon.com/")
+        requests.get("https://aws.amazon.com/")
 
-            print("updating bytes sent & latency time...")
-            update_total_bytes_sent()
-            update_latency_time()
+        print("updating bytes sent & latency time...")
+        update_total_bytes_sent()
+        update_latency_time()
 
-            return app.make_response(
-                convert_otel_trace_id_to_xray(
-                    trace.get_current_span().get_span_context().trace_id
-                )
+        return app.make_response(
+            convert_otel_trace_id_to_xray(
+                trace.get_current_span().get_span_context().trace_id
             )
+        )
 
 # Test AWS SDK instrumentation
 @app.route("/aws-sdk-call")
 def call_aws_sdk():
 
     with tracer.start_as_current_span("aws-sdk-call") as span:
-        span.set_attribute("operation.name", "aws-sdk-call")
+
+        span.set_attribute("language", "python-manual-instrumentation")
+        span.set_attribute("signal", "trace")
+
         print("updating bytes sent & latency time...")
         update_total_bytes_sent()
         update_latency_time()

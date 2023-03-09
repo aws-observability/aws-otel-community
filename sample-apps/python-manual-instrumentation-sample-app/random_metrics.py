@@ -1,6 +1,7 @@
 import random
 import threading
 import time
+import os
 
 from config import *
 from opentelemetry.metrics import CallbackOptions, Observation
@@ -10,11 +11,13 @@ cfg = create_config('config.yaml')
 
 meter = metrics.get_meter(__name__)
 
+common_attributes = { 'signal': 'metric', 'language': 'python-manual-instrumentation', 'metricType': 'random' }
+
 # Starts the callback for cpu usage
 def cpu_usage_callback(options: CallbackOptions):
     min = 0
     max = cfg['RandomCpuUsageUpperBound']
-    cpu_usage = Observation(value=random.randint(min, max))
+    cpu_usage = Observation(value=random.randint(min, max), attributes=common_attributes)
     print('CPU Usage asked by SDK')
     yield cpu_usage
 
@@ -22,7 +25,7 @@ def cpu_usage_callback(options: CallbackOptions):
 def heap_size_callback(options: CallbackOptions):
     min = 0
     max = cfg['RandomTotalHeapSizeUpperBound']
-    total_heap_size = Observation(value=random.randint(min, max))
+    total_heap_size = Observation(value=random.randint(min, max), attributes=common_attributes)
     print("Heapsize asked by SDK")
     yield total_heap_size
 
@@ -31,24 +34,28 @@ class RandomMetricCollector():
     
     # Init registers 4 different metrics
     def __init__(self):
+        testingId = ""
+        if (os.environ.get("INSTANCE_ID")):
+            testingId = "_" + os.environ["INSTANCE_ID"]
+
         self.time_alive=meter.create_counter(
-            name="timeAlive",
+            name="time_alive" + testingId,
             description="Total amount of time that the application has been alive",
             unit='ms'
         )
         self.cpu_usage=meter.create_observable_gauge(
-            name="cpuUsage",
+            name="cpu_usage" + testingId,
             callbacks=[cpu_usage_callback],
             description="Cpu usage percent",
             unit='1'
         )
         self.threads_active=meter.create_up_down_counter(
-            name="threadsActive",
+            name="threads_active" + testingId,
             description="The total number of threads active",
             unit='1'
         )
         self.total_heap_size=meter.create_observable_gauge(
-            name="TotalHeapSize",
+            name="total_heap_size" + testingId,
             callbacks=[heap_size_callback],
             description="The current total heap size",
             unit='By'
@@ -58,13 +65,13 @@ class RandomMetricCollector():
 
     # Adds one to the time alive counter
     def update_time_alive(self, cfg=None):
-        self.time_alive.add(cfg['RandomTimeAliveIncrementer'])
+        self.time_alive.add(cfg['RandomTimeAliveIncrementer'], attributes=common_attributes)
     
     # Updates the currently active threads based on its current bounds.
     def update_threads_active(self, cfg=None):
         if self.thread_bool:
             if self.thread_count < cfg['RandomThreadsActiveUpperBound']:
-                self.threads_active.add(1)
+                self.threads_active.add(1, attributes=common_attributes)
                 self.thread_count += 1
             else:
                 self.thread_bool = False
@@ -72,7 +79,7 @@ class RandomMetricCollector():
         
         else:
             if self.thread_count > 0 :
-                self.threads_active.add(-1)
+                self.threads_active.add(-1, attributes=common_attributes)
                 self.thread_count -= 1
             else:
                 self.thread_bool = True
