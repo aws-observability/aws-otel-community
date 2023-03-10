@@ -20,7 +20,7 @@ services:
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
       - AWS_SESSION_TOKEN
-      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=aws-otel,service.name=${{ matrix.app-language }}-sample-app
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=aws-otel,service.name=${LANGUAGE}-sample-app
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4317
       - AWS_REGION=us-west-2
     ports:
