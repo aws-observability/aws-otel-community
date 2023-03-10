@@ -33,4 +33,5 @@ jobs:
         env:
           INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
           LISTEN_ADDRESS: 0.0.0.0:8080
-          VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/aws-otel-integ-test -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
+          LANGUAGE: ${{ matrix.app-language }}
+          VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/${{ matrix.app-language }}-sample-app -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
