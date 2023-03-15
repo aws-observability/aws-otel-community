@@ -97,7 +97,10 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 			}
 		}()
 		// pushes any last exports to the receiver
-		err = meterProvider.Shutdown(ctx)
+		mpErr := meterProvider.Shutdown(ctx)
+		if mpErr != nil {
+			err = mpErr
+		}
 		return
 	}, nil
 }
