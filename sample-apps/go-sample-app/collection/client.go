@@ -105,10 +105,7 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 // setupTraceProvider configures a trace exporter and an AWS X-Ray ID Generator.
 func setupTraceProvider(ctx context.Context, res *resource.Resource) (*sdktrace.TracerProvider, error) {
 	// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
-
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure())
-	//otlptracegrpc.WithReconnectionPeriod(50*time.Millisecond))
-	//otlptracegrpc.WithDialOption(grpc.WithBlock()))
 
 	if err != nil {
 		return nil, err
