@@ -1,0 +1,49 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Centralized Sampling Integration Tests
+
+on:
+  push:
+    branches: 
+      - master
+    paths:
+      - 'centralized-sampling-tests/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+
+jobs:
+  run_tests:
+    name: Run centralized sampling integration tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_CENTRALIZED_SAMPLING_ROLE }}
+          role-duration-seconds: 1200
+          aws-region: us-west-2
+      - name: Build with Gradle Spring Boot App
+        run: ./gradlew :sample-apps:spring-boot:build
+        working-directory: centralized-sampling-tests
+      - name: Build with Gradle Integration Tests
+        run: ./gradlew :integration-tests:build
+        working-directory: centralized-sampling-tests
+      - name: Run test containers
+        run: docker-compose up --abort-on-container-exit
+        working-directory: centralized-sampling-tests
+        env:
+          INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
+          LISTEN_ADDRESS: 0.0.0.0:8080
