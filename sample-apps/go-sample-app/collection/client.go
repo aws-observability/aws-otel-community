@@ -19,8 +19,6 @@ import (
 
 var cfg = GetConfiguration()
 
-//const grpcEndpoint = "0.0.0.0:4317"
-
 const serviceName = "go"
 
 var testingId = ""
@@ -56,7 +54,7 @@ var traceCommonLabels = []attribute.KeyValue{
 	attribute.String("port", cfg.Port),
 }
 
-// StartClient starts the OTEL controller which periodically collects signals and exports them.
+// StartClient starts the traces and metrics providers which periodically collects signals and exports them.
 // Trace exporter and Metric exporter are both configured.
 func StartClient(ctx context.Context) (func(context.Context) error, error) {
 
@@ -126,29 +124,3 @@ func setupTraceProvider(ctx context.Context, res *resource.Resource) (*sdktrace.
 	)
 	return tp, nil
 }
-
-// setupMetricsController configures a metric exporter and a controller with a histogram tracking latency.
-/*func setupMetricsController(ctx context.Context) (*controller.Controller, error) {
-	metricClient := otlpmetricgrpc.NewClient(
-		// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
-		otlpmetricgrpc.WithInsecure(),
-		otlpmetricgrpc.WithEndpoint(grpcEndpoint))
-	metricExp, _ := otlpmetric.New(ctx, metricClient)
-
-	controller := controller.New(
-		processor.NewFactory(
-			selector.NewWithHistogramDistribution(
-				histogram.WithExplicitBoundaries([]float64{100, 300, 500}), // Tracking latency
-			),
-			metricExp,
-		),
-		controller.WithExporter(metricExp),
-		controller.WithCollectPeriod(3*time.Second),
-	)
-
-	if err := controller.Start(ctx); err != nil {
-		return nil, err
-	}
-
-	return controller, nil
-}*/
