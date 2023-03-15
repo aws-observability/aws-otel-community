@@ -15,7 +15,7 @@ import (
 // Contains all of the endpoint logic.
 
 type response struct {
-	TraceID string `json:"traceID"`
+	TraceId string `json:"traceId"`
 }
 
 type s3Client struct {
@@ -40,7 +40,7 @@ func AwsSdkCall(w http.ResponseWriter, r *http.Request, rqmc *requestBasedMetric
 
 	ctx, span := tracer.Start(
 		r.Context(),
-		"get-aws-s3-buckets",
+		"aws-sdk-call",
 		trace.WithAttributes(traceCommonLabels...),
 	)
 	defer span.End()
@@ -126,7 +126,7 @@ func invoke(ctx context.Context, port string, client http.Client) {
 
 }
 
-// OutgoingHttpCall makes an HTTP GET request to https://aws.amazon.com and generates an Xray Trace ID.
+// OutgoingHttpCall makes an HTTP GET request to https://aws.amazon.com/ and generates an Xray Trace ID.
 func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client, rqmc *requestBasedMetricCollector) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -139,7 +139,7 @@ func OutgoingHttpCall(w http.ResponseWriter, r *http.Request, client http.Client
 
 	defer span.End()
 
-	req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com", nil)
+	req, _ := http.NewRequestWithContext(ctx, "GET", "https://aws.amazon.com/", nil)
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
@@ -163,7 +163,7 @@ func getXrayTraceID(span trace.Span) string {
 
 func writeResponse(span trace.Span, w http.ResponseWriter) {
 	xrayTraceID := getXrayTraceID(span)
-	payload, _ := json.Marshal(response{TraceID: xrayTraceID})
+	payload, _ := json.Marshal(response{TraceId: xrayTraceID})
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(payload)
 }

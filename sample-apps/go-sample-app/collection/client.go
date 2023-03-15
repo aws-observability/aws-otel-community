@@ -2,42 +2,39 @@ package collection
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/metric/global"
-	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
-	"google.golang.org/grpc"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 
-	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
-	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
-	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
+	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 var cfg = GetConfiguration()
 
-const grpcEndpoint = "0.0.0.0:4317"
+//const grpcEndpoint = "0.0.0.0:4317"
 
 const serviceName = "go"
+
+var testingId = ""
 
 var tracer = otel.Tracer("github.com/aws-otel-commnunity/sample-apps/go-sample-app/collection")
 
 // Names for metric instruments
-const apiTimeAlive = "timeAlive"
-const apiCpuUsage = "cpuUsage"
-const apiTotalHeapSize = "totalHeapSize"
-const apiThreadsActive = "threadsActive"
-const apiTotalBytesSent = "totalBytesSent"
-const apiTotalApiRequests = "totalApiRequests"
-const apiLatencyTime = "latencyTime"
+const time_alive = "time_alive"
+const cpu_usage = "cpu_usage"
+const total_heap_size = "total_heap_size"
+const threads_active = "threads_active"
+const total_bytes_sent = "total_bytes_sent"
+const total_api_requests = "total_api_requests"
+const latency_time = "latency_time"
 
 // Common attributes for traces and metrics (random, request)
 var requestMetricCommonLabels = []attribute.KeyValue{
@@ -63,8 +60,19 @@ var traceCommonLabels = []attribute.KeyValue{
 // Trace exporter and Metric exporter are both configured.
 func StartClient(ctx context.Context) (func(context.Context) error, error) {
 
+	if id, present := os.LookupEnv("INSTANCE_ID"); present {
+		testingId = "_" + id
+	}
+	res := resource.NewWithAttributes(
+		semconv.SchemaURL,
+		semconv.ServiceName("go-sample-app"),
+	)
+	if _, present := os.LookupEnv("OTEL_RESOURCE_ATTRIBUTES"); present {
+		res, _ = resource.New(ctx, resource.WithFromEnv())
+	}
+
 	// Setup trace related
-	tp, err := setupTraceProvider(ctx)
+	tp, err := setupTraceProvider(ctx, res)
 	if err != nil {
 		return nil, err
 	}
@@ -72,12 +80,13 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(xray.Propagator{}) // Set AWS X-Ray propagator
 
-	// Setup metric related
-	ctrl, err := setupMetricsController(ctx)
+	exp, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	global.SetMeterProvider(ctrl)
+	meterProvider := metric.NewMeterProvider(metric.WithResource(res), metric.WithReader(metric.NewPeriodicReader(exp)))
+
+	otel.SetMeterProvider(meterProvider)
 
 	return func(context.Context) (err error) {
 		ctx, cancel := context.WithTimeout(ctx, time.Second)
@@ -90,27 +99,24 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 			}
 		}()
 		// pushes any last exports to the receiver
-		err = ctrl.Stop(ctx)
+		err = meterProvider.Shutdown(ctx)
 		return
 	}, nil
 }
 
 // setupTraceProvider configures a trace exporter and an AWS X-Ray ID Generator.
-func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
+func setupTraceProvider(ctx context.Context, res *resource.Resource) (*sdktrace.TracerProvider, error) {
 	// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
-	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(),
-		otlptracegrpc.WithEndpoint(grpcEndpoint),
-		otlptracegrpc.WithDialOption(grpc.WithBlock()))
+
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure())
+	//otlptracegrpc.WithReconnectionPeriod(50*time.Millisecond))
+	//otlptracegrpc.WithDialOption(grpc.WithBlock()))
+
 	if err != nil {
 		return nil, err
 	}
 
 	idg := xray.NewIDGenerator()
-
-	res := resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("go-sample-app"), // Should have a unique name. Service name displayed in backends
-	)
 
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
@@ -122,7 +128,7 @@ func setupTraceProvider(ctx context.Context) (*sdktrace.TracerProvider, error) {
 }
 
 // setupMetricsController configures a metric exporter and a controller with a histogram tracking latency.
-func setupMetricsController(ctx context.Context) (*controller.Controller, error) {
+/*func setupMetricsController(ctx context.Context) (*controller.Controller, error) {
 	metricClient := otlpmetricgrpc.NewClient(
 		// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
 		otlpmetricgrpc.WithInsecure(),
@@ -145,4 +151,4 @@ func setupMetricsController(ctx context.Context) (*controller.Controller, error)
 	}
 
 	return controller, nil
-}
+}*/

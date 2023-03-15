@@ -8,8 +8,6 @@ import (
 
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/instrument"
-	"go.opentelemetry.io/otel/metric/instrument/asyncint64"
-	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 )
 
 var (
@@ -19,11 +17,11 @@ var (
 
 // randomMetricCollector contains all the random based metric instruments.
 type randomMetricCollector struct {
-	timeAlive     syncint64.Counter
-	cpuUsage      asyncint64.Gauge
-	heapSize      asyncint64.UpDownCounter
-	threadsActive syncint64.UpDownCounter
-	meter         metric.Meter
+	time_alive      instrument.Int64Counter
+	cpu_usage       instrument.Int64ObservableGauge
+	total_heap_size instrument.Int64ObservableUpDownCounter
+	threads_active  instrument.Int64UpDownCounter
+	meter           metric.Meter
 }
 
 // NewRandomMetricCollector returns a new type struct that holds and registers the 4 random based metric instruments used in the Go-Sample-App;
@@ -40,56 +38,56 @@ func NewRandomMetricCollector(mp metric.MeterProvider) randomMetricCollector {
 
 // registerTimeAlive registers a Synchronous Counter called TimeAlive.
 func (rmc *randomMetricCollector) registerTimeAlive() {
-	timeAlive, err := rmc.meter.SyncInt64().Counter(
-		serviceName+"."+apiTimeAlive,
+	time_alive, err := rmc.meter.Int64Counter(
+		time_alive+testingId,
 		instrument.WithDescription("Total amount of time that the application has been alive"),
 		instrument.WithUnit("ms"),
 	)
 	if err != nil {
 		fmt.Println(err)
 	}
-	rmc.timeAlive = timeAlive
+	rmc.time_alive = time_alive
 }
 
 // registerCpuUsage registers an Asynchronous Gauge called CpuUsage.
 func (rmc *randomMetricCollector) registerCpuUsage() {
-	cpuUsage, err := rmc.meter.AsyncInt64().Gauge(
-		serviceName+"."+apiCpuUsage,
+	cpu_usage, err := rmc.meter.Int64ObservableGauge(
+		cpu_usage+testingId,
 		instrument.WithDescription("Cpu usage percent"),
 		instrument.WithUnit("1"),
 	)
 	if err != nil {
 		fmt.Println(err)
 	}
-	rmc.cpuUsage = cpuUsage
+	rmc.cpu_usage = cpu_usage
 
 }
 
 // registerHeapSize registers an Asynchronous UpDownCounter called HeapSize.
 func (rmc *randomMetricCollector) registerHeapSize() {
-	totalHeapSize, err := rmc.meter.AsyncInt64().UpDownCounter(
-		serviceName+"."+apiTotalHeapSize,
+	total_heap_size, err := rmc.meter.Int64ObservableUpDownCounter(
+		total_heap_size+testingId,
 		instrument.WithDescription("The current total heap size"),
 		instrument.WithUnit("By"),
 	)
 	if err != nil {
 		fmt.Println(err)
 	}
-	rmc.heapSize = totalHeapSize
+	rmc.total_heap_size = total_heap_size
 
 }
 
 // registerThreadsActive registers a Synchronous UpDownCounter called ThreadsActive.
 func (rmc *randomMetricCollector) registerThreadsActive() {
-	threadsActive, err := rmc.meter.SyncInt64().UpDownCounter(
-		serviceName+"."+apiThreadsActive,
+	threads_active, err := rmc.meter.Int64UpDownCounter(
+		threads_active+testingId,
 		instrument.WithUnit("1"),
 		instrument.WithDescription("The total amount of threads active"),
 	)
 	if err != nil {
 		fmt.Println(err)
 	}
-	rmc.threadsActive = threadsActive
+	rmc.threads_active = threads_active
 }
 
 // UpdateMetricsClient generates new metric values for Synchronous instruments every TimeInterval and
@@ -108,22 +106,22 @@ func (rmc *randomMetricCollector) RegisterMetricsClient(ctx context.Context, cfg
 
 // updateTimeAlive updates TimeAlive by TimeAliveIncrementer increments.
 func (rmc *randomMetricCollector) updateTimeAlive(ctx context.Context, cfg Config) {
-	rmc.timeAlive.Add(ctx, cfg.TimeAliveIncrementer*1000, randomMetricCommonLabels...) // in millisconds
+	rmc.time_alive.Add(ctx, cfg.TimeAliveIncrementer*1000, randomMetricCommonLabels...) // in millisconds
 }
 
 // updateCpuUsage updates CpuUsage by a value between 0 and CpuUsageUpperBound every SDK call.
 func (rmc *randomMetricCollector) updateCpuUsage(ctx context.Context, cfg Config) {
 	min := 0
 	max := int(cfg.CpuUsageUpperBound)
-	if err := rmc.meter.RegisterCallback(
-		[]instrument.Asynchronous{
-			rmc.cpuUsage,
-		},
+	if _, err := rmc.meter.RegisterCallback(
 		// SDK periodically calls this function to collect data.
-		func(ctx context.Context) {
+		func(ctx context.Context, o metric.Observer) error {
 			cpuUsage := int64(rand.Intn(max-min) + min)
-			rmc.cpuUsage.Observe(ctx, cpuUsage, randomMetricCommonLabels...)
+			o.ObserveInt64(rmc.cpu_usage, cpuUsage, randomMetricCommonLabels...)
+
+			return nil
 		},
+		rmc.cpu_usage,
 	); err != nil {
 		panic(err)
 	}
@@ -133,15 +131,15 @@ func (rmc *randomMetricCollector) updateCpuUsage(ctx context.Context, cfg Config
 func (rmc *randomMetricCollector) updateTotalHeapSize(ctx context.Context, cfg Config) {
 	min := 0
 	max := int(cfg.TotalHeapSizeUpperBound)
-	if err := rmc.meter.RegisterCallback(
-		[]instrument.Asynchronous{
-			rmc.heapSize,
-		},
+	if _, err := rmc.meter.RegisterCallback(
 		// SDK periodically calls this function to collect data.
-		func(ctx context.Context) {
+		func(ctx context.Context, o metric.Observer) error {
 			totalHeapSize := int64(rand.Intn(max-min) + min)
-			rmc.heapSize.Observe(ctx, totalHeapSize, randomMetricCommonLabels...)
+			o.ObserveInt64(rmc.total_heap_size, totalHeapSize, randomMetricCommonLabels...)
+
+			return nil
 		},
+		rmc.total_heap_size,
 	); err != nil {
 		panic(err)
 	}
@@ -151,7 +149,7 @@ func (rmc *randomMetricCollector) updateTotalHeapSize(ctx context.Context, cfg C
 func (rmc *randomMetricCollector) updateThreadsActive(ctx context.Context, cfg Config) {
 	if threadsBool {
 		if threadsActive < int64(cfg.ThreadsActiveUpperBound) {
-			rmc.threadsActive.Add(ctx, 1, randomMetricCommonLabels...)
+			rmc.threads_active.Add(ctx, 1, randomMetricCommonLabels...)
 			threadsActive++
 		} else {
 			threadsBool = false
@@ -160,7 +158,7 @@ func (rmc *randomMetricCollector) updateThreadsActive(ctx context.Context, cfg C
 
 	} else {
 		if threadsActive > 0 {
-			rmc.threadsActive.Add(ctx, -1, randomMetricCommonLabels...)
+			rmc.threads_active.Add(ctx, -1, randomMetricCommonLabels...)
 			threadsActive--
 		} else {
 			threadsBool = true
