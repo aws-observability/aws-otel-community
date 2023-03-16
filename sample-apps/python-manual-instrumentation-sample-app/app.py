@@ -80,7 +80,7 @@ def setup_opentelemetry(tracer, meter):
     tracer = trace.get_tracer(__name__)
 
     # Setting up Metrics
-    metric_reader = PeriodicExportingMetricReader(exporter=OTLPMetricExporter(), export_interval_millis= 1000)
+    metric_reader = PeriodicExportingMetricReader(exporter=OTLPMetricExporter(), export_interval_millis=1000)
     metric_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
 
     metrics.set_meter_provider(metric_provider)
