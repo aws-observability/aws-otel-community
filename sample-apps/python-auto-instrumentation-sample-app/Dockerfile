@@ -4,8 +4,10 @@ WORKDIR /app
 
 COPY . .
 
+RUN pip install --upgrade pip
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENV OTEL_RESOURCE_ATTRIBUTES='service.name=python-auto-instrumentation-sampleapp'
+#ENV OTEL_RESOURCE_ATTRIBUTES='service.name=python-auto-instrumentation-sampleapp'
 
 ENTRYPOINT OTEL_PROPAGATORS=xray OTEL_PYTHON_ID_GENERATOR=xray opentelemetry-instrument python app.py
