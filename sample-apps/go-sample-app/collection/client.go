@@ -70,9 +70,8 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 		envResource, err := resource.New(ctx, resource.WithFromEnv())
 		if err != nil {
 			return nil, err
-		} else {
-			res = envResource
 		}
+		res = envResource
 	}
 
 	// Setup trace related
