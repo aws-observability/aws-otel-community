@@ -23,10 +23,10 @@ const metricsApi = require('@opentelemetry/api-metrics');
 const create_cfg = require('./config');
 const cfg = create_cfg.create_config('./config.yaml');
 
-const TIME_ALIVE_METRIC = 'timeAlive';
-const CPU_USAGE_METRIC = 'cpuUsage';
-const THREADS_ACTIVE_METRIC = 'threadsActive';
-const HEAP_SIZE_METRIC = 'totalHeapSize';
+const TIME_ALIVE_METRIC = 'time_alive';
+const CPU_USAGE_METRIC = 'cpu_usage';
+const THREADS_ACTIVE_METRIC = 'threads_active';
+const HEAP_SIZE_METRIC = 'total_heap_size';
 
 const common_attributes = { signal: 'metric',  language: 'javascript', metricType: 'random' };
 
