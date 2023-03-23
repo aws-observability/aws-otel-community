@@ -55,7 +55,7 @@ This configuration file should be set by an environment variable (SAMPLE_APP_CON
 ```
 ---
 Host: "0.0.0.0"                       # Host - String Address
-Port: "4567"                          # Port - String Port
+Port: "8080"                          # Port - String Port
 TimeInterval: 1                       # Interval - Time in seconds to generate new metrics
 RandomTimeAliveIncrementer: 1         # Metric - Amount to incremement metric by every TimeInterval
 RandomTotalHeapSizeUpperBound: 100    # Metric - UpperBound for TotalHeapSize for random metric value every TimeInterval
@@ -76,20 +76,20 @@ The sample app must include the 7 metrics listed below. The sample app must impl
 
 AsyncCounter
 
-* Name: totalApiRequests
+* Name: total_api_requests
 * Unit: “1”
 * Description: “Increments by one every time a sampleapp endpoint is used”
 
 Counter
 
-* Name: totalBytesSent
+* Name: total_bytes_sent
 * Unit: “By”
 * Description: “Keeps a sum of the total amount of bytes sent while the application is alive”
 * Includes Callback Function
 
 Histogram
 
-* Name: latencyTime
+* Name: latency_time
 * Unit: “ms”
 * Description: “Measures latency time in buckets of 100 300 and 500”
 
@@ -108,26 +108,26 @@ These Key Value pairs MUST be present on request based metrics.
 
 Counter
 
-* Name: timeAlive
+* Name: time_alive
 * Unit: “ms”
 * Description: “Total amount of time that the application has been alive”
 
 Asynchronous UpDown Counter
 
-* Name: totalHeapSize
+* Name: total_heap_size
 * Unit: “By”
 * Description: “The current total heap size”
 * Includes Callback Function
 
 UpDown Counter
 
-* Name: threadsActive
+* Name: threads_active
 * Unit: “1”
 * Description: “The total number of threads active”
 
 Asynchronous Gauge
 
-* Name: cpuUsage
+* Name: cpu_usage
 * Unit: “1”
 * Description: “Cpu usage percent”
 * Includes Callback Function
