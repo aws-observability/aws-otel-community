@@ -10,4 +10,4 @@ opentelemetry-sdk-extension-aws==2.0.1
 opentelemetry-propagator-aws-xray==1.0.1
 protobuf==3.20.2
 PyYAML==6.0
-requests==2.28.1
+requests==2.28.2
