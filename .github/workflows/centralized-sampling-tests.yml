@@ -30,7 +30,7 @@ jobs:
         with:
           java-version: 17
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_CENTRALIZED_SAMPLING_ROLE }}
           role-duration-seconds: 1200
