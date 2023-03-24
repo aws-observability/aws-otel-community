@@ -21,7 +21,7 @@ dependencies {
 	implementation("com.squareup.okhttp3:okhttp")
 	implementation("io.opentelemetry:opentelemetry-sdk")
 	implementation("io.opentelemetry:opentelemetry-api")
-	implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.6.0")
+	implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.23.0")
 	implementation("io.opentelemetry:opentelemetry-extension-aws")
 	implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 }
