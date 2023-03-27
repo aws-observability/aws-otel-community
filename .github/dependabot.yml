@@ -34,3 +34,13 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
+  - package-ecosystem: "gradle"
+    directory: "/centralized-sampling-tests/integration-tests"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "gradle"
+    directory: "/centralized-sampling-tests/sample-apps/spring-boot"
+    schedule:
+      interval: "weekly"
+      day: "sunday"

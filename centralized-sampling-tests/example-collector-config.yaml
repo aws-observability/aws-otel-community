@@ -1,0 +1,32 @@
+extensions:
+  health_check:
+  awsproxy:
+    local_mode: true
+    region: 'us-west-2'
+    endpoint: 0.0.0.0:2000
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: debug
+  awsxray:
+    local_mode: true
+    region: 'us-west-2'
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging, awsxray]
+    metrics:
+      receivers: [otlp]
+      exporters: [logging]
+  extensions: [health_check, awsproxy]
+  telemetry:
+    logs:
+      level: "debug"

@@ -1,0 +1,12 @@
+pluginManagement {
+  plugins {
+    id("com.google.cloud.tools.jib") version "3.3.0"
+  }
+}
+rootProject.name = 'centralized-samplings-tests'
+
+include 'sample-apps:spring-boot'
+findProject(':sample-apps:spring-boot')?.name = 'spring-boot'
+
+include 'integration-tests'
+findProject(':integration-tests')?.name = 'integration-tests'
