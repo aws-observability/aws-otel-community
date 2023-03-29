@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer shutdown(ctx)
+	defer log.Fatal(shutdown(ctx))
 
 	// (Metric related) Creates and configures random based metrics based on a configuration file (config.yaml).
 	mp := otel.GetMeterProvider()

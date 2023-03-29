@@ -2,7 +2,6 @@ package collection
 
 import (
 	"context"
-	"log"
 	"os"
 	"time"
 
@@ -101,16 +100,16 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 		ctx, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 
-		err = tp.Shutdown(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
 		// pushes any last exports to the receiver
 		err = meterProvider.Shutdown(ctx)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		return
+		err = tp.Shutdown(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
 	}, nil
 }
 
