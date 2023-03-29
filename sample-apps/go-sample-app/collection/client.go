@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/sdk/metric/aggregation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -87,7 +88,12 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 	if err != nil {
 		return nil, err
 	}
-	meterProvider := metric.NewMeterProvider(metric.WithResource(res), metric.WithReader(metric.NewPeriodicReader(exp)))
+	meterProvider := metric.NewMeterProvider(metric.WithResource(res), metric.WithReader(metric.NewPeriodicReader(exp)), metric.WithView(metric.NewView(
+		metric.Instrument{Name: "mp_histogram"},
+		metric.Stream{Aggregation: aggregation.ExplicitBucketHistogram{
+			Boundaries: []float64{100, 300, 500},
+		}},
+	)),)
 
 	otel.SetMeterProvider(meterProvider)
 
@@ -95,15 +101,12 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 		ctx, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 
-		tpErr := tp.Shutdown(ctx)
-		if tpErr != nil {
-			err = tpErr
+		err = tp.Shutdown(ctx)
+		if err != nil {
+			log.Fatal(err)
 		}
 		// pushes any last exports to the receiver
-		mpErr := meterProvider.Shutdown(ctx)
-		if mpErr != nil {
-			err = mpErr
-		}
+		err = meterProvider.Shutdown(ctx)
 		if err != nil {
 			log.Fatal(err)
 		}
