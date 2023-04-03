@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/metric/global"
+	"go.opentelemetry.io/otel"
 )
 
 // This sample application is in conformance with the ADOT SampleApp requirements spec.
@@ -31,7 +31,7 @@ func main() {
 	defer shutdown(ctx)
 
 	// (Metric related) Creates and configures random based metrics based on a configuration file (config.yaml).
-	mp := global.MeterProvider()
+	mp := otel.GetMeterProvider()
 	cfg := collection.GetConfiguration()
 
 	// (Metric related) Starts request based metric and registers necessary callbacks
@@ -65,6 +65,9 @@ func main() {
 		collection.OutgoingSampleApp(w, r, client, &rqmc)
 	})
 
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	// Root endpoint
 	http.Handle("/", r)
 
