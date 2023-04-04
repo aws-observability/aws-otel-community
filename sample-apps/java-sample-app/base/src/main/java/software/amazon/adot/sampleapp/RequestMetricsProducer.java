@@ -29,20 +29,14 @@ import org.apache.logging.log4j.Logger;
 public class RequestMetricsProducer {
     private static final Logger logger = LogManager.getLogger();
 
-
     static final AttributeKey<String> DIMENSION_API_NAME = AttributeKey.stringKey("apiName");
     static final AttributeKey<String> DIMENSION_STATUS_CODE = AttributeKey.stringKey("statusCode");
 
-    static String API_COUNTER_METRIC = "totalBytesSent";
+    static String API_COUNTER_METRIC = "total_bytes_sent";
+    static String API_ASYNC_COUNTER_METRIC = "total_api_requests";
+    static String API_HISTOGRAM_METRIC = "latency_time";
 
-    static String API_ASYNC_COUNTER_METRIC = "totalApiRequests";
-
-    static String API_HISTOGRAM_METRIC = "latencyTime";
-
-    static private final Attributes COMMON_REQUEST_METRICS_ATTRIBUTES = Attributes.of(
-            AttributeKey.stringKey("signal"), "metric",
-            AttributeKey.stringKey("language"), "java",
-            AttributeKey.stringKey("metricType"), "request");
+    private static Attributes COMMON_REQUEST_METRICS_ATTRIBUTES;
 
 
     // Declaring variables to track values of metrics
@@ -53,7 +47,11 @@ public class RequestMetricsProducer {
 
     private long currentBytesSent = 0;
 
-    public RequestMetricsProducer() {
+    public RequestMetricsProducer(String instrumentation) {
+        COMMON_REQUEST_METRICS_ATTRIBUTES = Attributes.of(
+                AttributeKey.stringKey("signal"), "metric",
+                AttributeKey.stringKey("language"), instrumentation,
+                AttributeKey.stringKey("metricType"), "request");
         Meter meter =
                 GlobalOpenTelemetry.meterBuilder("adot-java-sample-app")
                         .setInstrumentationVersion("1.0")
@@ -109,7 +107,7 @@ public class RequestMetricsProducer {
         Attributes bytesAttributes = Attributes.builder()
                 .putAll(COMMON_REQUEST_METRICS_ATTRIBUTES)
                 .put(DIMENSION_API_NAME, apiName)
-                .put(DIMENSION_STATUS_CODE, statusCode)
+                //.put(DIMENSION_STATUS_CODE, statusCode)
                 .build();
         bytesCounter.add(bytes, bytesAttributes);
         currentBytesSent += bytes;
@@ -136,7 +134,7 @@ public class RequestMetricsProducer {
         Attributes latencyAttributes = Attributes.builder()
                 .putAll(COMMON_REQUEST_METRICS_ATTRIBUTES)
                 .put(DIMENSION_API_NAME, apiName)
-                .put(DIMENSION_STATUS_CODE, statusCode)
+                //.put(DIMENSION_STATUS_CODE, statusCode)
                 .build();
 
         apiLatencyHistogram.record(returnTime, latencyAttributes);

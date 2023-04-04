@@ -17,6 +17,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    id("com.google.cloud.tools.jib")
 }
 
 val otelVersion = "1.21.0"
@@ -31,6 +32,18 @@ repositories {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+}
+
+jib {
+    from {
+        image= "eclipse-temurin:17"
+    }
+    to {
+        image = "java-manual-instrumentation-sample-app"
+    }
+    container {
+        ports = listOf("4567")
+    }
 }
 
 dependencies {

@@ -16,9 +16,10 @@
  */
 plugins {
     application
+    id("com.google.cloud.tools.jib")
 }
 
-val otelVersion = "1.19.2"
+val otelVersion = "1.21.0"
 
 repositories {
     mavenCentral()
@@ -31,6 +32,28 @@ val javaagentDependency by configurations.creating {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+}
+
+jib {
+    from {
+        image= "eclipse-temurin:17"
+    }
+    to {
+        image = "java-auto-instrumentation-sample-app"
+    }
+    extraDirectories {
+        paths { 
+            path {
+                setFrom("$buildDir/javaagent")
+            }
+        }
+    }
+    container {
+        ports = listOf("4567")
+        jvmFlags = listOf(
+            "-javaagent:aws-opentelemetry-agent-${otelVersion}.jar",
+            "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
+    }
 }
 
 dependencies {
@@ -58,5 +81,9 @@ tasks.register<Copy>("download") {
 }
 
 tasks.named("run") {
+    dependsOn("download")
+}
+
+tasks.named("jibDockerBuild") {
     dependsOn("download")
 }
