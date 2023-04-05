@@ -15,7 +15,7 @@
 #
 ---
 Host: "0.0.0.0"                       # Host - String Address
-port: "4567"                          # Port - String Port
+port: "8080"                          # Port - String Port
 TimeInterval: 1                       # Interval - Time in seconds to generate new metrics
 RandomTimeAliveIncrementer: 1         # Metric - Amount to incremement metric by every TimeInterval
 RandomTotalHeapSizeUpperBound: 100    # Metric - UpperBound for TotalHeapSize for random metric value every TimeInterval
