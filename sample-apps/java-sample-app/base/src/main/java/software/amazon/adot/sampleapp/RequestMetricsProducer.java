@@ -107,7 +107,6 @@ public class RequestMetricsProducer {
         Attributes bytesAttributes = Attributes.builder()
                 .putAll(COMMON_REQUEST_METRICS_ATTRIBUTES)
                 .put(DIMENSION_API_NAME, apiName)
-                //.put(DIMENSION_STATUS_CODE, statusCode)
                 .build();
         bytesCounter.add(bytes, bytesAttributes);
         currentBytesSent += bytes;
@@ -134,7 +133,6 @@ public class RequestMetricsProducer {
         Attributes latencyAttributes = Attributes.builder()
                 .putAll(COMMON_REQUEST_METRICS_ATTRIBUTES)
                 .put(DIMENSION_API_NAME, apiName)
-                //.put(DIMENSION_STATUS_CODE, statusCode)
                 .build();
 
         apiLatencyHistogram.record(returnTime, latencyAttributes);

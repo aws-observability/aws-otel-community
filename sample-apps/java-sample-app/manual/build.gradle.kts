@@ -42,7 +42,7 @@ jib {
         image = "java-manual-instrumentation-sample-app"
     }
     container {
-        ports = listOf("4567")
+        ports = listOf("8080")
     }
 }
 

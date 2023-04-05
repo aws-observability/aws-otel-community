@@ -49,7 +49,7 @@ jib {
         }
     }
     container {
-        ports = listOf("4567")
+        ports = listOf("8080")
         jvmFlags = listOf(
             "-javaagent:aws-opentelemetry-agent-${otelVersion}.jar",
             "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
