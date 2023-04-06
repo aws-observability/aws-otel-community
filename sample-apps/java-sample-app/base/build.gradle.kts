@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     // Used to have access to the APIs
-    api("io.opentelemetry:opentelemetry-api:${otelVersion}")
+    api("io.opentelemetry:opentelemetry-api:1.23.0")
 
     // Third party libraries used in this application
     // Exposed to dependent modules

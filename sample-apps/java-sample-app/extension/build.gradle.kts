@@ -14,10 +14,10 @@ dependencies {
     compileOnly("com.google.auto.service:auto-service:1.0.1")
     annotationProcessor("com.google.auto.service:auto-service:1.0.1")
 
-    compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:${otelVersion}")
+    compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:1.23.0")
     compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:${otelInstrumentationVersion}")
     compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:${otelInstrumentationVersion}-alpha")
-    compileOnly("io.opentelemetry:opentelemetry-semconv:${otelVersion}-alpha")
+    compileOnly("io.opentelemetry:opentelemetry-semconv:1.23.0-alpha")
 }
 
 tasks.getByName<Test>("test") {
