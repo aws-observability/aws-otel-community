@@ -24,17 +24,26 @@ Additionally, you can generate Traces and request based Metrics by making reques
 
 ### Getting Started:
 
-##### Local
+#### Running the application (local)
 
-```
-npm install
+In order to run the application
 
-node index.js
-```
+- Clone the repository
+`git clone https://github.com/aws-observability/aws-otel-community.git`
+- Switch into the directory
+`cd sample-apps/javascript-sample-app`
+- Install dependencies
+`npm install`
+- Run the javascript server
+`node index.js`
+Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
+
 #### Docker
 
-```
-docker build -t javascript-sample-app .
+In order to build the Docker image and run it in a container
 
-docker run -p 8080:8080 javascript-sample-app
-```
+- Build the image
+`docker build -t javascript-sample-app .`
+- Run the image in a container
+`docker run -p 8080:8080 javascript-sample-app`
+

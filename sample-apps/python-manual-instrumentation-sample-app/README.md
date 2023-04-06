@@ -30,24 +30,24 @@ This application uses Manual instrumentation
 
 ### Getting Started:
 
-#### Local
+#### Running the application (Local)
 
-```
-# create venv
-python3 -m venv .
+In order to run the application
 
-source bin/activate
-
-# install requirements
-pip install --no-cache-dir -r requirements.txt
-
-# run app with environment variables set.
-python app.py
-```
+- Create venv
+`python3 -m venv .`
+`source bin/activate`
+- Install requirements
+`pip install --no-cache-dir -r requirements.txt`
+- Run app
+`python app.py`
+Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
 
 #### Docker
-Build the image using the dockerfile and run the image in a container.
 
-docker build -t python-manual-instrumentation-sample-app .
+In order to build the Docker image and run it in a container
 
-docker run -p 8080:8080 --name python-manual-app python-manual-instrumentation-sample-app 
+- Build the image
+`docker build -t python-manual-instrumentation-sample-app .`
+- Run the image in a container
+`docker run -p 8080:8080 python-manual-instrumentation-sample-app`

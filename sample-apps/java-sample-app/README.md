@@ -1,4 +1,6 @@
-### Application interface
+## Java Opentelemetry Sample App
+
+### Description
 
 This Java sample app will emit Traces and Metrics. There are two types of metrics emitted;
 Request Based and Random Based.
@@ -30,7 +32,9 @@ There are two type of Java sample application that expose the exact same metrics
 * JDK 1.8+
 * Gradle 7.1.1
 
-### Running the application
+### Getting Started:
+
+#### Running the application (local)
 
 In order to run the application, please follow the steps:
 
@@ -50,7 +54,7 @@ Obs: This directory also contains `collector-config.yaml` file that can be used 
 
 https://github.com/aws-observability/aws-otel-collector
 
-### Creating an image of the application
+#### Creating an image of the application
 
 In order to create docker images for the auto and manual instrumentations, please follow the steps:
 

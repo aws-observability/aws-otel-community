@@ -30,21 +30,25 @@ This application uses Auto instrumentation
 
 ### Getting Started:
 
-#### Local
+#### Running the application (Local)
 
-```
-# create venv
-python3 -m venv .
+In order to run the application
 
-source bin/activate
-
-# install requirements
-pip install --no-cache-dir -r requirements.txt
-
-# run app with environment variables set.
-OTEL_RESOURCE_ATTRIBUTES='service.name=python-auto-instrumentation-sampleapp' OTEL_PROPAGATORS=xray OTEL_PYTHON_ID_GENERATOR=xray opentelemetry-instrument python app.py
-```
+- Create venv
+`python3 -m venv .`
+`source bin/activate`
+- Install requirements
+`pip install --no-cache-dir -r requirements.txt`
+- Run app with environment variables set
+`OTEL_RESOURCE_ATTRIBUTES='service.name=python-auto-instrumentation-sample-app' OTEL_PROPAGATORS=xray OTEL_PYTHON_ID_GENERATOR=xray opentelemetry-instrument python app.py`
+Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
 
 #### Docker
-Build the image using the dockerfile and run the image in a container. 
+
+In order to build the Docker image and run it in a container
+
+- Build the image
+`docker build -t python-auto-instrumentation-sample-app .`
+- Run the image in a container
+`docker run -p 8080:8080 python-auto-instrumentation-sample-app`
 

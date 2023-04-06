@@ -1,4 +1,6 @@
-### Application interface
+## Go Opentelemetry Sample App
+
+### Description
 
 This Go sample app will emit Traces and Metrics with Logs as experimental. There are two types of metrics emitted;
 Request Based and Random Based.
@@ -17,14 +19,16 @@ Due to the upstream Go SDK being unstable for metrics, we do not support metrics
 
 [Sample App Spec](../SampleAppSpec.md)
 
-* Non-conformance: This SDK language is not missing any features or extensions required
+* Non-conformance: This SDK language is not missing any features or extensions required other than Resource Detectors
 * Workarounds: No workarounds are being used in this application, but Metrics are still in Beta so it is important to note that metrics may change
 
 ### Requirements
 
 * Go 1.17+
 
-### Running the application
+### Getting Started:
+
+#### Running the application (local)
 
 For more information on running a Go application using manual instrumentation, please refer to ADOT Getting Started with the OpenTelemetry Go SDK on Traces Instrumentation (https://aws-otel.github.io/docs/getting-started/go-sdk). In this context, the ADOT Collector is being run locally as a sidecar.
 By default, in the provided configuration file, the host and port are set to 0.0.0.0:8080.
@@ -38,3 +42,12 @@ In order to run the application
 - Run the go server
 `go run main.go`
 Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
+
+#### Docker
+
+In order to build the Docker image and run it in a container
+
+- Build the image
+`docker build -t go-sample-app .`
+- Run the image in a container
+`docker run -p 8080:8080 go-sample-app`
