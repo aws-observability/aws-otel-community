@@ -19,8 +19,6 @@ plugins {
     id("com.google.cloud.tools.jib")
 }
 
-val otelVersion = "1.21.0"
-
 repositories {
     mavenCentral()
 }
