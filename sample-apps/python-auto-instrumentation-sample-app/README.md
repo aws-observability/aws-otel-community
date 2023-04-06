@@ -35,7 +35,7 @@ This application uses Auto instrumentation
 In order to run the application
 
 - Create venv
-`python3 -m venv .`
+`python3 -m venv .` and
 `source bin/activate`
 - Install requirements
 `pip install --no-cache-dir -r requirements.txt`
