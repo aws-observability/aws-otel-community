@@ -37,7 +37,6 @@ jobs:
         if: ${{ contains(matrix.app-language, 'java-') }}
         working-directory: sample-apps/java-sample-app
         run: |
-          chmod +x gradlew
           ./gradlew jibDockerBuild
       - name: Run test containers (java)
         if: ${{ contains(matrix.app-language, 'java-') }}
