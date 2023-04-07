@@ -231,7 +231,6 @@ public class CentralizedSamplingIntegrationTests {
             }
             boolean passed = false;
             for (int j = 0; j < GenericConstants.MAX_RETRIES; j++) {
-                TimeUnit.SECONDS.sleep(GenericConstants.WAIT_FOR_RESERVOIR);
                 try {
                     passed = makeCalls(testCasesObj.getDefaultUser(), sampleRule);
                 } catch (Exception e) {
@@ -241,6 +240,7 @@ public class CentralizedSamplingIntegrationTests {
                         break;
                     } else if (j < GenericConstants.MAX_RETRIES - 1) {
                         logger.warn("Test failed, attempting retry");
+                        TimeUnit.SECONDS.sleep(GenericConstants.WAIT_FOR_RESERVOIR);
                     } else {
                         logger.error(
                                 "Test failed for Sample rule: "
@@ -295,6 +295,7 @@ public class CentralizedSamplingIntegrationTests {
                         break;
                     } else if (k < GenericConstants.MAX_RETRIES - 1) {
                         logger.warn("Test failed, attempting retry");
+                        TimeUnit.SECONDS.sleep(GenericConstants.RETRY_WAIT);
                     }
                 }
             }
@@ -354,8 +355,8 @@ public class CentralizedSamplingIntegrationTests {
                             break;
                         } else if (k < GenericConstants.MAX_RETRIES - 1) {
                             logger.warn("Test failed here, attempting retry");
+                            TimeUnit.SECONDS.sleep(GenericConstants.RETRY_WAIT);
                         }
-                        TimeUnit.SECONDS.sleep(GenericConstants.RETRY_WAIT);
                     }
                 }
                 if (!passed) {
