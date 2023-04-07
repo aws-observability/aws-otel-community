@@ -13,7 +13,7 @@ receivers:
 
 exporters:
   logging:
-    loglevel: debug
+    loglevel: error
   awsxray:
     local_mode: true
     region: 'us-west-2'
@@ -29,4 +29,4 @@ service:
   extensions: [health_check, awsproxy]
   telemetry:
     logs:
-      level: "debug"
+      level: error
