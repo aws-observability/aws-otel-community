@@ -46,7 +46,6 @@ import okhttp3.OkHttpClient;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.services.s3.S3Client;
 import spark.Response;
-import java.util.concurrent.TimeUnit;
 
 import java.util.List;
 
@@ -83,7 +82,7 @@ public class ManualApp extends BaseApp {
                 .setMeterProvider(
                         SdkMeterProvider.builder()
                                 .registerMetricReader(
-                                        PeriodicMetricReader.builder(OtlpGrpcMetricExporter.builder().setEndpoint(exporter).build()).setInterval(1, TimeUnit.SECONDS).build())
+                                        PeriodicMetricReader.builder(OtlpGrpcMetricExporter.builder().setEndpoint(exporter).build()).build())
                                 .setResource(resource)
                                 .build())
                 .buildAndRegisterGlobal();
