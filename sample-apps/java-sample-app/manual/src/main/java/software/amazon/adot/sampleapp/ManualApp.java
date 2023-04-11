@@ -56,10 +56,13 @@ public class ManualApp extends BaseApp {
 
     // Configures Opentelemetry Manually setting each parameter used in this application
     private static OpenTelemetry buildOpentelemetry() {
+        final String exporter = System.getenv().getOrDefault("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317");
+        final String resourceattr = System.getenv().getOrDefault("OTEL_RESOURCE_ATTRIBUTES", "service.name=java-manual-instrumentation-sample-app");
         Attributes attr = Attributes.builder()
-                .put(ResourceAttributes.AWS_LOG_GROUP_NAMES, List.of(System.getProperty("adot.sampleapp.loggroup", "sample-app-trace-logs")))
-                .put(ResourceAttributes.SERVICE_NAME, "java-sample-app")
-                .build();
+        .put(ResourceAttributes.SERVICE_NAMESPACE, "aws-otel")
+        .put(ResourceAttributes.SERVICE_NAME, resourceattr.split("service.name=")[1].split(",")[0])
+        .build();
+        
         Resource resource = Resource.getDefault().merge(
                 Resource.create(attr));
 
@@ -72,24 +75,24 @@ public class ManualApp extends BaseApp {
                 .setTracerProvider(
                         SdkTracerProvider.builder()
                                 .addSpanProcessor(
-                                        BatchSpanProcessor.builder(OtlpGrpcSpanExporter.getDefault()).build())
+                                        BatchSpanProcessor.builder(OtlpGrpcSpanExporter.builder().setEndpoint(exporter).build()).build())
                                 .setIdGenerator(AwsXrayIdGenerator.getInstance())
                                 .setResource(resource)
                                 .build())
                 .setMeterProvider(
                         SdkMeterProvider.builder()
                                 .registerMetricReader(
-                                        PeriodicMetricReader.builder(OtlpGrpcMetricExporter.getDefault()).build())
+                                        PeriodicMetricReader.builder(OtlpGrpcMetricExporter.builder().setEndpoint(exporter).build()).build())
                                 .setResource(resource)
-
                                 .build())
                 .buildAndRegisterGlobal();
     }
 
     private static final OpenTelemetry otel = buildOpentelemetry();
+    //private static final OpenTelemetry otel = AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk();
 
-    public ManualApp(Config config) {
-        super(config);
+    public ManualApp(Config config, String instrumentation) {
+        super(config, instrumentation);
     }
 
     // Customizations for sample application using Manual Instrumentation. We are instrumenting third party libraries

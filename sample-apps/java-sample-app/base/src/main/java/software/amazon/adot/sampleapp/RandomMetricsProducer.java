@@ -33,16 +33,13 @@ public class RandomMetricsProducer {
     static int currentTimeAlive = 0;
     static int currentActiveThreads = 0;
 
-    static String API_RANDOM_COUNTER_METRIC = "timeAlive";
-    static String API_RANDOM_ASYNC_UPDOWN_METRIC = "totalHeapSize";
-    static String API_RANDOM_UPDOWN_METRIC = "threadsActive";
-    static String API_RANDOM_GAUGE = "cpuUsage";
+    static String API_RANDOM_COUNTER_METRIC = "time_alive";
+    static String API_RANDOM_ASYNC_UPDOWN_METRIC = "total_heap_size";
+    static String API_RANDOM_UPDOWN_METRIC = "threads_active";
+    static String API_RANDOM_GAUGE = "cpu_usage";
 
 
-    static private final Attributes COMMON_RANDOM_METRIC_ATTRIBUTES = Attributes.of(
-            AttributeKey.stringKey("signal"), "metric",
-            AttributeKey.stringKey("language"), "java",
-            AttributeKey.stringKey("metricType"), "random");
+    private static Attributes COMMON_RANDOM_METRIC_ATTRIBUTES;
 
     LongCounter timeCounter;
     LongCounter threadsCounter;
@@ -51,11 +48,15 @@ public class RandomMetricsProducer {
     long cpuUsage;
 
     private final Config config;
-
+    
     static ScheduledThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(1);
 
-    public RandomMetricsProducer(Config cfg) {
+    public RandomMetricsProducer(Config cfg, String instrumentation) {
         this.config = cfg;
+        COMMON_RANDOM_METRIC_ATTRIBUTES = Attributes.of(
+            AttributeKey.stringKey("signal"), "metric",
+            AttributeKey.stringKey("language"), instrumentation,
+            AttributeKey.stringKey("metricType"), "random");
         Meter meter =
                 GlobalOpenTelemetry.meterBuilder("adot-java-sample-app")
                         .setInstrumentationVersion("1.0")
@@ -130,7 +131,7 @@ public class RandomMetricsProducer {
      * @param threadChange
      */
     public void emitActiveThreadsMetric(int threadChange) {
-        threadsCounter.add(threadChange);
+        threadsCounter.add(threadChange, COMMON_RANDOM_METRIC_ATTRIBUTES);
         currentActiveThreads += threadChange;
         logger.info("Threads Active: " + currentActiveThreads);
     }
