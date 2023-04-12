@@ -19,8 +19,8 @@ permissions:
   id-token: write
 
 jobs:
-  run_tests:
-    name: Run centralized sampling integration tests
+  run_java_tests:
+    name: Run centralized sampling integration tests for OTel Java
     runs-on: ubuntu-latest
 
     steps:
@@ -43,7 +43,7 @@ jobs:
         run: ./gradlew :integration-tests:build
         working-directory: centralized-sampling-tests
       - name: Run test containers
-        run: docker-compose up --abort-on-container-exit
+        run: docker-compose -f docker-compose-integration-tests.yml -f docker-compose-java-app.yml up --abort-on-container-exit
         working-directory: centralized-sampling-tests
         env:
           INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
