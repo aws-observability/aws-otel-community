@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.5.0-alpha"))
+    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.24.0-alpha"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter")
