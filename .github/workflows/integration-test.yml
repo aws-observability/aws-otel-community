@@ -64,3 +64,27 @@ jobs:
           LISTEN_ADDRESS: 0.0.0.0:8080
           LANGUAGE: ${{ matrix.app-language }}
           VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/${{ matrix.app-language }}-sample-app -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
+  publish-ci-status:  
+    runs-on: ubuntu-latest
+    needs: [publish_and_test_app]
+    if: always()
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.COLLECTOR_ASSUMABLE_ROLE_ARN }}
+          aws-region: us-west-2
+
+      - name: Publish CI status
+        run: |
+          if [ '${{ needs.publish_and_test_app.result }}' = 'success' ]; then
+            aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
+              --metric-name Success \
+              --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
+              --value 1.0
+          else
+            aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
+              --metric-name Success \
+              --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
+              --value 0.0
+          fi
