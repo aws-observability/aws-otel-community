@@ -28,8 +28,7 @@ public class SampleRules {
           getImportantRule(),
           getImportantAttribute(),
           getAttributeatEndpoint(),
-          getMethodRule(),
-          getServiceNameRule()
+          getMethodRule()
         };
 
     this.reservoirRules = new SampleRule[] {getHighReservoirLowRate(), getMixedReservoir()};
@@ -191,7 +190,7 @@ public class SampleRules {
   private SampleRule getServiceNameRule() {
     return new SampleRule.SampleRuleBuilder(
             GenericConstants.SampleRuleName.ImportantServiceName, 3, 1, 1)
-        .setServiceName("ImportantServiceName")
+        .setServiceName("aws-otel-integ-test")
         .build();
   }
 
