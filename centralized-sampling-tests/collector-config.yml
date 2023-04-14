@@ -2,7 +2,7 @@ extensions:
   health_check:
   awsproxy:
     local_mode: true
-    region: 'us-west-2'
+    region: ${AWS_REGION}
     endpoint: 0.0.0.0:2000
 
 receivers:
@@ -16,7 +16,7 @@ exporters:
     verbosity: normal
   awsxray:
     local_mode: true
-    region: 'us-west-2'
+    region: ${AWS_REGION}
 
 service:
   pipelines:
