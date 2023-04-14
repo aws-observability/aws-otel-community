@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
+	sampler "go.opentelemetry.io/contrib/samplers/aws/xray"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	sample "go.opentelemetry.io/contrib/samplers/aws/xray"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/trace"
 	oteltrace "go.opentelemetry.io/otel/trace"
 
@@ -24,7 +24,12 @@ func getSampledSpanCount(name string, totalSpans string, attributes []attribute.
 	tracer := otel.Tracer(name)
 
 	var sampleCount = 0
-	totalSamples, _ := strconv.Atoi(totalSpans)
+	totalSamples, err := strconv.Atoi(totalSpans)
+	if err != nil {
+		log.Println(err)
+		return -1
+	}
+
 	ctx := context.Background()
 
 	for i := 0; i < totalSamples; i++ {
@@ -42,76 +47,83 @@ func getSampledSpanCount(name string, totalSpans string, attributes []attribute.
 
 func webServer() {
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("healthcheck"))
+		_, err := w.Write([]byte("healthcheck"))
+		if err != nil {
+			log.Println(err)
+		}
 	}))
 
 	http.Handle("/getSampled", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userAttribute := r.Header["User"][0]
-		required := r.Header["Required"][0]
+		serviceName := r.Header.Get("Service_name")
+		totalSpans := r.Header.Get("Totalspans")
 
 		var attributes = []attribute.KeyValue{
 			attribute.KeyValue{"http.method", attribute.StringValue(r.Method)},
 			attribute.KeyValue{"http.url", attribute.StringValue("http://localhost:8080/getSampled")},
-			attribute.KeyValue{"user", attribute.StringValue(userAttribute)},
 			attribute.KeyValue{"http.route", attribute.StringValue("/getSampled")},
-			attribute.KeyValue{"required", attribute.StringValue(required)},
 			attribute.KeyValue{"http.target", attribute.StringValue("/getSampled")},
 		}
 
-		var totalSampled = getSampledSpanCount(r.Header["Service_name"][0], r.Header["Totalspans"][0], attributes)
-		_, _ = w.Write([]byte(strconv.Itoa(totalSampled)))
+		var totalSampled = getSampledSpanCount(serviceName, totalSpans, attributes)
+		_, err := w.Write([]byte(strconv.Itoa(totalSampled)))
+		if err != nil {
+			log.Println(err)
+		}
 	}))
 
 	http.Handle("/importantEndpoint", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userAttribute := r.Header["User"][0]
-		required := r.Header["Required"][0]
+		serviceName := r.Header.Get("Service_name")
+		totalSpans := r.Header.Get("Totalspans")
 
 		var attributes = []attribute.KeyValue{
 			attribute.KeyValue{"http.method", attribute.StringValue("GET")},
 			attribute.KeyValue{"http.url", attribute.StringValue("http://localhost:8080/importantEndpoint")},
-			attribute.KeyValue{"user", attribute.StringValue(userAttribute)},
 			attribute.KeyValue{"http.route", attribute.StringValue("/importantEndpoint")},
-			attribute.KeyValue{"required", attribute.StringValue(required)},
 			attribute.KeyValue{"http.target", attribute.StringValue("/importantEndpoint")},
 		}
 
-		var totalSampled = getSampledSpanCount(r.Header["Service_name"][0], r.Header["Totalspans"][0], attributes)
-		_, _ = w.Write([]byte(strconv.Itoa(totalSampled)))
+		var totalSampled = getSampledSpanCount(serviceName, totalSpans, attributes)
+		_, err := w.Write([]byte(strconv.Itoa(totalSampled)))
+		if err != nil {
+			log.Println(err)
+		}
 	}))
 
 	listenAddress := os.Getenv("LISTEN_ADDRESS")
 	if listenAddress == "" {
-		listenAddress = "0.0.0.0:8080"
+		listenAddress = "localhost:8080"
 	}
 	log.Println("App is listening on %s !", listenAddress)
 	_ = http.ListenAndServe(listenAddress, nil)
 }
 
-func start_xray() {
+func start_xray() (bool, error) {
 	ctx := context.Background()
 
 	exporterEndpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 	if exporterEndpoint == "" {
-		exporterEndpoint = "0.0.0.0:4317"
+		exporterEndpoint = "localhost:4317"
 	}
 
 	log.Println("Creating new OTLP trace exporter...")
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), otlptracegrpc.WithEndpoint(exporterEndpoint), otlptracegrpc.WithDialOption(grpc.WithBlock()))
 	if err != nil {
-		log.Fatalf("failed to create new OTLP trace exporter: %v", err)
+		log.Fatalf("Failed to create new OTLP trace exporter: %v", err)
+		return false, err
 	}
 
 	idg := xray.NewIDGenerator()
 
 	samplerEndpoint := os.Getenv("XRAY_ENDPOINT")
 	if samplerEndpoint == "" {
-		samplerEndpoint = "http://0.0.0.0:2000"
+		samplerEndpoint = "http://localhost:2000"
 	}
 	endpointUrl, err := url.Parse(samplerEndpoint)
 
-	res, err := sample.NewRemoteSampler(ctx, "aws-otel-integ-test", "", sample.WithEndpoint(*endpointUrl), sample.WithSamplingRulesPollingInterval(10*time.Second))
+	res, err := sampler.NewRemoteSampler(ctx, "aws-otel-integ-test", "", sampler.WithEndpoint(*endpointUrl), sampler.WithSamplingRulesPollingInterval(10*time.Second))
 	if err != nil {
-		return
+		log.Fatalf("Failed to create new XRay Remote Sampler: %v", err)
+		return false, err
 	}
 
 	// attach remote sampler to tracer provider
@@ -123,11 +135,18 @@ func start_xray() {
 
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(xray.Propagator{})
+
+	return true, nil
 }
 
 func main() {
 	log.Println("Starting Golang OTel Sample App...")
 
-	start_xray()
+	_, err := start_xray()
+	if err != nil {
+		log.Fatalf("Failed to start XRay: %v", err)
+		return
+	}
+
 	webServer()
 }

@@ -39,6 +39,11 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
+  - package-ecosystem: "gomod"
+    directory: "/centralized-sampling-tests/sample-apps/golang-http-server"
+    schedule:
+      interval: "weekly"
+      day: sunday
   - package-ecosystem: "gradle"
     directory: "/centralized-sampling-tests/sample-apps/spring-boot"
     schedule:

@@ -1,4 +1,4 @@
-module application.go
+module github.com/aws-otel-community/centralized-sampling-tests/sample-apps/golang-http-server
 
 go 1.19
 
