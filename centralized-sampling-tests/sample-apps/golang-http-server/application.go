@@ -54,13 +54,17 @@ func webServer() {
 	}))
 
 	http.Handle("/getSampled", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userAttribute := r.Header.Get("User")
+		required := r.Header.Get("Required")
 		serviceName := r.Header.Get("Service_name")
 		totalSpans := r.Header.Get("Totalspans")
 
 		var attributes = []attribute.KeyValue{
 			attribute.KeyValue{"http.method", attribute.StringValue(r.Method)},
 			attribute.KeyValue{"http.url", attribute.StringValue("http://localhost:8080/getSampled")},
+			attribute.KeyValue{"user", attribute.StringValue(userAttribute)},
 			attribute.KeyValue{"http.route", attribute.StringValue("/getSampled")},
+			attribute.KeyValue{"required", attribute.StringValue(required)},
 			attribute.KeyValue{"http.target", attribute.StringValue("/getSampled")},
 		}
 
@@ -72,13 +76,17 @@ func webServer() {
 	}))
 
 	http.Handle("/importantEndpoint", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userAttribute := r.Header.Get("User")
+		required := r.Header.Get("Required")
 		serviceName := r.Header.Get("Service_name")
 		totalSpans := r.Header.Get("Totalspans")
 
 		var attributes = []attribute.KeyValue{
 			attribute.KeyValue{"http.method", attribute.StringValue("GET")},
 			attribute.KeyValue{"http.url", attribute.StringValue("http://localhost:8080/importantEndpoint")},
+			attribute.KeyValue{"user", attribute.StringValue(userAttribute)},
 			attribute.KeyValue{"http.route", attribute.StringValue("/importantEndpoint")},
+			attribute.KeyValue{"required", attribute.StringValue(required)},
 			attribute.KeyValue{"http.target", attribute.StringValue("/importantEndpoint")},
 		}
 
