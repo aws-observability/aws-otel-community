@@ -1,4 +1,4 @@
-FROM gradle:7.3.3-jdk11 as builder
+FROM gradle:8.1.0-jdk11 as builder
 
 WORKDIR /app
 COPY ./build.gradle ./build.gradle
