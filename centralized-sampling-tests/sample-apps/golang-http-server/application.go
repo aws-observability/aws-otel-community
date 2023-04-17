@@ -20,14 +20,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-func getSampledSpanCount(name string, totalSpans string, attributes []attribute.KeyValue) int {
+func getSampledSpanCount(name string, totalSpans string, attributes []attribute.KeyValue) (int, error) {
 	tracer := otel.Tracer(name)
 
 	var sampleCount = 0
 	totalSamples, err := strconv.Atoi(totalSpans)
 	if err != nil {
-		log.Println(err)
-		return -1
+		return 0, err
 	}
 
 	ctx := context.Background()
@@ -42,7 +41,7 @@ func getSampledSpanCount(name string, totalSpans string, attributes []attribute.
 		span.End()
 	}
 
-	return sampleCount
+	return sampleCount, nil
 }
 
 func webServer() {
@@ -68,8 +67,12 @@ func webServer() {
 			attribute.KeyValue{"http.target", attribute.StringValue("/getSampled")},
 		}
 
-		var totalSampled = getSampledSpanCount(serviceName, totalSpans, attributes)
-		_, err := w.Write([]byte(strconv.Itoa(totalSampled)))
+		totalSampled, err := getSampledSpanCount(serviceName, totalSpans, attributes)
+		if err != nil {
+			log.Println(err)
+		}
+
+		_, err = w.Write([]byte(strconv.Itoa(totalSampled)))
 		if err != nil {
 			log.Println(err)
 		}
@@ -90,8 +93,12 @@ func webServer() {
 			attribute.KeyValue{"http.target", attribute.StringValue("/importantEndpoint")},
 		}
 
-		var totalSampled = getSampledSpanCount(serviceName, totalSpans, attributes)
-		_, err := w.Write([]byte(strconv.Itoa(totalSampled)))
+		totalSampled, err := getSampledSpanCount(serviceName, totalSpans, attributes)
+		if err != nil {
+			log.Println(err)
+		}
+		
+		_, err = w.Write([]byte(strconv.Itoa(totalSampled)))
 		if err != nil {
 			log.Println(err)
 		}
@@ -105,7 +112,7 @@ func webServer() {
 	_ = http.ListenAndServe(listenAddress, nil)
 }
 
-func start_xray() (bool, error) {
+func start_xray() error {
 	ctx := context.Background()
 
 	exporterEndpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
@@ -117,7 +124,7 @@ func start_xray() (bool, error) {
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure(), otlptracegrpc.WithEndpoint(exporterEndpoint), otlptracegrpc.WithDialOption(grpc.WithBlock()))
 	if err != nil {
 		log.Fatalf("Failed to create new OTLP trace exporter: %v", err)
-		return false, err
+		return err
 	}
 
 	idg := xray.NewIDGenerator()
@@ -128,10 +135,10 @@ func start_xray() (bool, error) {
 	}
 	endpointUrl, err := url.Parse(samplerEndpoint)
 
-	res, err := sampler.NewRemoteSampler(ctx, "aws-otel-integ-test", "", sampler.WithEndpoint(*endpointUrl), sampler.WithSamplingRulesPollingInterval(10*time.Second))
+	res, err := sampler.NewRemoteSampler(ctx, "adot-integ-test", "", sampler.WithEndpoint(*endpointUrl), sampler.WithSamplingRulesPollingInterval(10*time.Second))
 	if err != nil {
 		log.Fatalf("Failed to create new XRay Remote Sampler: %v", err)
-		return false, err
+		return err
 	}
 
 	// attach remote sampler to tracer provider
@@ -144,13 +151,13 @@ func start_xray() (bool, error) {
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(xray.Propagator{})
 
-	return true, nil
+	return nil
 }
 
 func main() {
 	log.Println("Starting Golang OTel Sample App...")
 
-	_, err := start_xray()
+	err := start_xray()
 	if err != nil {
 		log.Fatalf("Failed to start XRay: %v", err)
 		return

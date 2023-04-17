@@ -49,7 +49,17 @@ updates:
     schedule:
       interval: "weekly"
       day: sunday
+  - package-ecosystem: "docker"
+    directory: "/centralized-sampling-tests/sample-apps/golang-http-server"
+    schedule:
+      interval: "weekly"
+      day: sunday
   - package-ecosystem: "gradle"
+    directory: "/centralized-sampling-tests/sample-apps/spring-boot"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "docker"
     directory: "/centralized-sampling-tests/sample-apps/spring-boot"
     schedule:
       interval: "weekly"
