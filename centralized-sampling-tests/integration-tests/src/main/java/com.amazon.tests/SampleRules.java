@@ -190,7 +190,7 @@ public class SampleRules {
   private SampleRule getServiceNameRule() {
     return new SampleRule.SampleRuleBuilder(
             GenericConstants.SampleRuleName.ImportantServiceName, 3, 1, 1)
-        .setServiceName("aws-otel-integ-test")
+        .setServiceName("adot-integ-test")
         .build();
   }
 

@@ -57,3 +57,9 @@ AWS_CENTRALIZED_SAMPLING_ROLE: arn:aws:iam::123456789012:role/S3Access
 See [Setup AWS GitHub](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
 for more information. Once the secret is added go to your forks actions, select the Centralized Sampling Integration Tests workflow and
 click the Run workflow button.
+
+## Add a new sample app to the Centralized Sampling Integration Tests workflow
+
+1. Make sure that a Dockerfile is associated with the sample app in the `./sample-apps` directory. Similarly to the existing Dockerfiles, it should run the sample app on port 8080.
+2. Create a `docker-compose-<language>-app.yml` file in this directory. It should be the same as the existing docker-compose files, except the `services.app.build.context` value should point to the new sample app Dockerfile.
+3. Add a new job in the `.github/workflows/centralized-sampling-tests.yml` workflow, similar to the existing jobs. The steps may need to be modified to use the new sample app and remove the previous sample app. It will need to use the new `docker-compose-<language>-app.yml` file as well. For the sample app integration tests to run in parallel (and not interfere with each other), the `AWS_REGION` environment variable will need to be different than the other jobs.

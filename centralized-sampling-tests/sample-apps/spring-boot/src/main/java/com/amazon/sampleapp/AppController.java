@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class AppController {
   private final Tracer tracer;
-  private final String serviceName = "aws-otel-integ-test";
+  private final String serviceName = "adot-integ-test";
 
   /**
    * Injects the tracer into application controller, so it can be used by a later function Creates a
