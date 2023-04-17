@@ -5,13 +5,14 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+permissions: 
+  id-token: write
+  contents: read
+
 jobs:
   publish_and_test_app:
     name: Build and test sample app
     runs-on: ubuntu-latest
-    permissions: 
-      id-token: write
-      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -31,7 +32,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
-          role-duration-seconds: 1200
           aws-region: us-west-2
       - name: Login to Amazon ECR Public
         id: login-ecr-public
@@ -70,9 +70,9 @@ jobs:
     if: always()
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.COLLECTOR_ASSUMABLE_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: us-west-2
 
       - name: Publish CI status
