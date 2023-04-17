@@ -15,6 +15,12 @@
  */
 rootProject.name = "java-sample-app"
 
+pluginManagement {
+    plugins {
+        id("com.google.cloud.tools.jib") version "3.3.1"
+    }
+}
+
 include("base")
 include("auto")
 include("manual")

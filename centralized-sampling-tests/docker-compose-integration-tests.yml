@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  otel:
+    image: amazon/aws-otel-collector:latest
+    command: --config /config/collector-config.yml
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+    volumes:
+      - .:/config
+      - /tmp/awscreds:/tmp/awscreds
+    ports:
+      - '4317:4317'
+      - '2000:2000'
+
+  integration-tests:
+    build:
+      context: ./integration-tests
+    depends_on:
+      - otel
+      - app
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_REGION=us-west-2
+      - XRAY_ENDPOINT=http://otel:2000
+      - TARGET_ADDRESS=http://app:8080
+    volumes:
+      - /tmp/awscreds:/tmp/awscreds

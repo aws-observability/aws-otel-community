@@ -12,6 +12,8 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import java.time.Duration;
 
+import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_NAME;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class AppController {
   private final Tracer tracer;
+  private final String serviceName = "aws-otel-integ-test";
 
   /**
    * Injects the tracer into application controller, so it can be used by a later function Creates a
@@ -31,7 +34,11 @@ public class AppController {
     if (host == null) {
       host = "http://localhost:2000";
     }
-    Resource resource = Resource.builder().build();
+
+    Resource resource = Resource.builder()
+            .put(SERVICE_NAME, serviceName)
+            .build();
+
     OpenTelemetry openTelemetry =
         OpenTelemetrySdk.builder()
             .setTracerProvider(
@@ -40,7 +47,7 @@ public class AppController {
                     .setSampler(
                         AwsXrayRemoteSampler.newBuilder(resource)
                             .setEndpoint(host)
-                            .setPollingInterval(Duration.ofSeconds(1))
+                            .setPollingInterval(Duration.ofSeconds(10))
                             .build())
                     .build())
             .buildAndRegisterGlobal();
@@ -58,7 +65,6 @@ public class AppController {
       @RequestHeader("service_name") String name,
       @RequestHeader("required") String required,
       @RequestHeader("totalSpans") String totalSpans) {
-
     Attributes attributes =
         Attributes.of(
             AttributeKey.stringKey("http.method"), "GET",
@@ -107,9 +113,9 @@ public class AppController {
         Attributes.of(
             AttributeKey.stringKey("http.method"), "GET",
             AttributeKey.stringKey("http.url"), "http://localhost:8080/importantEndpoint",
+            AttributeKey.stringKey("user"), userAttribute,
             AttributeKey.stringKey("http.route"), "/importantEndpoint",
             AttributeKey.stringKey("required"), required,
-            AttributeKey.stringKey("user"), userAttribute,
             AttributeKey.stringKey("http.target"), "/importantEndpoint");
     return getSampledSpanCount(name, totalSpans, attributes);
   }
@@ -131,7 +137,7 @@ public class AppController {
 
       Span span =
           this.tracer
-              .spanBuilder(name)
+              .spanBuilder(serviceName)
               .setSpanKind(SpanKind.SERVER)
               .setAllAttributes(attributes)
               .startSpan();

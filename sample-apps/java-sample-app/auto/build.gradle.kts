@@ -16,9 +16,8 @@
  */
 plugins {
     application
+    id("com.google.cloud.tools.jib")
 }
-
-val otelVersion = "1.19.2"
 
 repositories {
     mavenCentral()
@@ -33,12 +32,34 @@ repositories {
     mavenCentral()
 }
 
+jib {
+    from {
+        image= "eclipse-temurin:17"
+    }
+    to {
+        image = "java-auto-instrumentation-sample-app"
+    }
+    extraDirectories {
+        paths { 
+            path {
+                setFrom("$buildDir/javaagent")
+            }
+        }
+    }
+    container {
+        ports = listOf("8080")
+        jvmFlags = listOf(
+            "-javaagent:aws-opentelemetry-agent-1.23.0.jar",
+            "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
+    }
+}
+
 dependencies {
     // Base application
     implementation(project(":base"))
 
     // Necessary to download the jar of the Java Agent
-    javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:${otelVersion}@jar")
+    javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:1.23.0")
     javaagentDependency(project(":extension"))
 }
 
@@ -46,7 +67,7 @@ dependencies {
 application {
     mainClass.set("software.amazon.adot.sampleapp.MainAuto")
     applicationDefaultJvmArgs = listOf(
-        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-${otelVersion}.jar", // Use the Java agent when the application is run
+        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-1.23.0.jar", // Use the Java agent when the application is run
         "-Dotel.service.name=java-sample-app",  // sets the name of the application in traces and metrics.
         "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
 }
@@ -58,5 +79,9 @@ tasks.register<Copy>("download") {
 }
 
 tasks.named("run") {
+    dependsOn("download")
+}
+
+tasks.named("jibDockerBuild") {
     dependsOn("download")
 }
