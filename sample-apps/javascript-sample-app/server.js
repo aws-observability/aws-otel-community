@@ -66,7 +66,7 @@ async function handleRequest(req, res) {
 }
 
 async function sdkCall (req, res) {
-    const traceid = await instrumentRequest('/aws-sdk-call', () => {
+    const traceid = await instrumentRequest('aws-sdk-call', () => {
         const s3 = new AWS.S3();
         s3.listBuckets();
     });

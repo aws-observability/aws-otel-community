@@ -19,7 +19,7 @@ package software.amazon.adot.sampleapp;
 public class MainManual {
     public static void main(String argv[]) {
         Config config = Config.fromEnvVarOrResource();
-        ManualApp app = new ManualApp(config);
+        ManualApp app = new ManualApp(config, "java-manual-instrumentation");
 
         app.start();
     }

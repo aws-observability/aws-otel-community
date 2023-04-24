@@ -1,0 +1,37 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.9'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'java-library'
+    id 'application'
+}
+
+group 'org.example'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.5.0-alpha"))
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation ("io.opentelemetry:opentelemetry-sdk")
+    implementation("io.opentelemetry:opentelemetry-api")
+    implementation ("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.6.0")
+    implementation("io.opentelemetry:opentelemetry-extension-trace-propagators")
+    implementation("io.opentelemetry:opentelemetry-extension-aws")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
+    implementation ("com.jayway.jsonpath:json-path:2.8.0")
+
+}
+
+application {
+    // Define the main class for the application.
+    mainClassName = 'com.amazon.tests.CentralizedSamplingIntegrationTests'
+}

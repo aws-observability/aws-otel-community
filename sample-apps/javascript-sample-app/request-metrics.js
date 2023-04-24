@@ -19,9 +19,9 @@
 const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
 const metricsApi = require('@opentelemetry/api-metrics');
 
-const TOTAL_BYTES_SENT_METRIC = 'totalBytesSent';
-const TOTAL_API_REQUESTS = 'totalApiRequests';
-const LATENCY_TIME = 'latencyTime';
+const TOTAL_BYTES_SENT_METRIC = 'total_bytes_sent';
+const TOTAL_API_REQUESTS = 'total_api_requests';
+const LATENCY_TIME = 'latency_time';
 
 let totalApiRequests = 0;
 
