@@ -44,7 +44,8 @@ public class testCases {
         GenericConstants.SampleRuleName.SampleNone,
         GenericConstants.SampleRuleName.HighReservoir,
         GenericConstants.SampleRuleName.MixedReservoir,
-        GenericConstants.SampleRuleName.LowReservoir);
+        GenericConstants.SampleRuleName.LowReservoir,
+        GenericConstants.SampleRuleName.ImportantServiceName);
   }
 
   /**
@@ -309,9 +310,7 @@ public class testCases {
    * @return testCases serviceName user
    */
   private testCase getServiceNameTest() {
-    List<GenericConstants.SampleRuleName> matches =
-        getMatches(
-            new ArrayList<>(Arrays.asList(GenericConstants.SampleRuleName.ImportantServiceName)));
+    List<GenericConstants.SampleRuleName> matches = getDefaultMatches();
     return new testCase(
         GenericConstants.Users.Test.getUser(),
         "ImportantServiceName",
@@ -331,9 +330,7 @@ public class testCases {
     List<GenericConstants.SampleRuleName> matches =
         getMatches(
             new ArrayList<>(
-                Arrays.asList(
-                    GenericConstants.SampleRuleName.ImportantServiceName,
-                    GenericConstants.SampleRuleName.ImportantAttribute)));
+                Arrays.asList(GenericConstants.SampleRuleName.ImportantAttribute)));
     return new testCase(
         GenericConstants.Users.Admin.getUser(),
         "ImportantServiceName",

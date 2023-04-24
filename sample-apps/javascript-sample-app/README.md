@@ -17,25 +17,33 @@ Additionally, you can generate Traces and request based Metrics by making reques
 4. /outgoing-sampleapp
     1. Makes a call to all other sample app ports configured at `<host>:<port>/outgoing-sampleapp`. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/)
 
-There are two type of Java sample application that expose the exact same metrics and endpoints:
+[Sample App Spec](../SampleAppSpec.md)
 
-* Auto - No code is necessary to instrument supported third party libraries and the initialization of opentelemetry is done through system properties.
-* Manual - All setup needs to be done explicitly using Java code.
-
+* Non-conformance: This SDK language is not missing any features or extensions required other than Resource Detectors
+* Workarounds: No workarounds are being used in this application
 
 ### Getting Started:
 
-##### Local
+#### Running the application (local)
 
-```
-npm install
+In order to run the application
 
-node index.js
-```
+- Clone the repository
+`git clone https://github.com/aws-observability/aws-otel-community.git`
+- Switch into the directory
+`cd sample-apps/javascript-sample-app`
+- Install dependencies
+`npm install`
+- Run the javascript server
+`node index.js`
+Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
+
 #### Docker
 
-```
-docker build -t javascript-sample-app .
+In order to build the Docker image and run it in a container
 
-docker run -p 8080:8080 javascript-sample-app
-```
+- Build the image
+`docker build -t javascript-sample-app .`
+- Run the image in a container
+`docker run -p 8080:8080 javascript-sample-app`
+
