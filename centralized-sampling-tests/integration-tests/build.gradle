@@ -27,7 +27,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-extension-aws")
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
-    implementation ("com.jayway.jsonpath:json-path:2.7.0")
+    implementation ("com.jayway.jsonpath:json-path:2.8.0")
 
 }
 
