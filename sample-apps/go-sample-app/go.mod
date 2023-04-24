@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.248
 	github.com/gorilla/mux v1.8.0
 	github.com/spf13/viper v1.15.0
-	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.37.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/contrib/propagators/aws v1.15.0
 	go.opentelemetry.io/otel v1.15.0-rc.1
