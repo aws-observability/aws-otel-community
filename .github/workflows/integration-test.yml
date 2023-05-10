@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app-language: [ javascript, python-manual-instrumentation, python-auto-instrumentation, go, java-manual-instrumentation, java-auto-instrumentation ]
+        app-language: [ javascript, python-manual-instrumentation, python-auto-instrumentation, go, java-manual-instrumentation, java-auto-instrumentation, dotnet ]
     env:
       APP_PATH: sample-apps/${{ matrix.app-language }}-sample-app
     steps:
