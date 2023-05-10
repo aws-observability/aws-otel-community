@@ -44,7 +44,7 @@ jobs:
         languages: ${{ matrix.language }}
     - name: Autobuild
       if: matrix.language == 'go'
-      uses: github/codeql-action/autobuild@v1
+      uses: github/codeql-action/autobuild@v2
     - if: matrix.language == 'java' 
       uses: actions/setup-java@v3
       with:

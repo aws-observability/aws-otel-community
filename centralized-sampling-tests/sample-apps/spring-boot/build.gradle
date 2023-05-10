@@ -1,0 +1,31 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.5'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'java'
+	id 'java-library'
+	id 'application'
+}
+
+version = '1.0'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.24.0-alpha"))
+
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("io.opentelemetry:opentelemetry-sdk")
+	implementation("io.opentelemetry:opentelemetry-api")
+	implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.24.0")
+	implementation("io.opentelemetry:opentelemetry-extension-aws")
+	implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
+}
+
+application {
+	// Define the main class for the application.
+	mainClassName = 'com.amazon.sampleapp.Application'
+}
+

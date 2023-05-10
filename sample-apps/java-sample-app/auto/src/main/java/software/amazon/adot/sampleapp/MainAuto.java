@@ -18,7 +18,7 @@ package software.amazon.adot.sampleapp;
 public class MainAuto {
     public static void main(String argv[]) {
         Config config = Config.fromEnvVarOrResource();
-        AutoApp app = new AutoApp(config);
+        AutoApp app = new AutoApp(config, "java-auto-instrumentation");
 
         app.start();
     }

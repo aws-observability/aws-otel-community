@@ -14,6 +14,11 @@ updates:
     schedule:
       interval: "weekly"
       day: "sunday"
+  - package-ecosystem: 'npm'
+    directory: '/sample-apps/javascript-sample-app'
+    schedule:
+      interval: "weekly"
+      day: "sunday"
   - package-ecosystem: "gomod"
     directory: "/sample-apps/prometheus-sample-app"
     schedule:
@@ -31,6 +36,31 @@ updates:
       day: "sunday"
   - package-ecosystem: "bundler"
     directory: "/sample-apps/ruby-rails-sample-app"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "gradle"
+    directory: "/centralized-sampling-tests/integration-tests"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "gomod"
+    directory: "/centralized-sampling-tests/sample-apps/golang-http-server"
+    schedule:
+      interval: "weekly"
+      day: sunday
+  - package-ecosystem: "docker"
+    directory: "/centralized-sampling-tests/sample-apps/golang-http-server"
+    schedule:
+      interval: "weekly"
+      day: sunday
+  - package-ecosystem: "gradle"
+    directory: "/centralized-sampling-tests/sample-apps/spring-boot"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "docker"
+    directory: "/centralized-sampling-tests/sample-apps/spring-boot"
     schedule:
       interval: "weekly"
       day: "sunday"

@@ -19,9 +19,9 @@
 const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
 const metricsApi = require('@opentelemetry/api-metrics');
 
-const TOTAL_BYTES_SENT_METRIC = 'totalBytesSent';
-const TOTAL_API_REQUESTS = 'apiRequests';
-const LATENCY_TIME = 'latencyTime';
+const TOTAL_BYTES_SENT_METRIC = 'total_bytes_sent';
+const TOTAL_API_REQUESTS = 'total_api_requests';
+const LATENCY_TIME = 'latency_time';
 
 let totalApiRequests = 0;
 
@@ -29,19 +29,23 @@ const commmon_attributes = { signal: 'metric',  language: 'javascript', metricTy
 
 // acquire meter 
 const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
+var testingId = "";
+if (process.env.INSTANCE_ID) {
+    testingId = "_" + process.env.INSTANCE_ID
+}
 
-const totalBytesSentMetric = meter.createCounter(TOTAL_BYTES_SENT_METRIC, {
+const totalBytesSentMetric = meter.createCounter(TOTAL_BYTES_SENT_METRIC + testingId, {
     description: "Keeps a sum of the total amount of bytes sent while the application is alive.",
     unit: 'mb'
 });
 
-const totalApiRequestsMetric = meter.createObservableCounter(TOTAL_API_REQUESTS, {
+const totalApiRequestsMetric = meter.createObservableCounter(TOTAL_API_REQUESTS + testingId, {
     description: "Increments by 1 every time a sample-app endpoint is used.",
     unit: '1'
 });
 totalApiRequestsMetric.addCallback((measurement) => {measurement.observe(totalApiRequests, commmon_attributes)});
 
-const latencyTimeMetric = meter.createHistogram(LATENCY_TIME, {
+const latencyTimeMetric = meter.createHistogram(LATENCY_TIME + testingId, {
     description: "Measures latency time.",
     unit: 'ms'
 });

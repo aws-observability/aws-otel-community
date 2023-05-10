@@ -24,8 +24,8 @@ import software.amazon.awssdk.services.s3.S3Client;
  */
 public class AutoApp extends BaseApp {
 
-    public AutoApp(Config config) {
-        super(config);
+    public AutoApp(Config config, String instrumentation) {
+        super(config, instrumentation);
     }
 
     // Customizations for Auto instrumentation using the Agent. We can see that we are using the defaults because the

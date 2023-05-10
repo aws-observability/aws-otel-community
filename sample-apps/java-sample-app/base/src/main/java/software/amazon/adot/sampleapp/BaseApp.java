@@ -48,10 +48,7 @@ public abstract class BaseApp {
     final Logger logger = LogManager.getLogger();
 
     private final String REQUEST_TIME = "request-time";
-    private static final Attributes COMMON_SPAN_ATTRIBUTES = Attributes.of(
-            AttributeKey.stringKey("signal"), "trace",
-            AttributeKey.stringKey("language"), "java"
-    );
+    private static Attributes COMMON_SPAN_ATTRIBUTES;
 
     private final RandomMetricsProducer randomMetricsProducer;
     private final RequestMetricsProducer requestMetricsProducer;
@@ -65,10 +62,14 @@ public abstract class BaseApp {
 
     private final Config config;
 
-    public BaseApp(Config config) {
+    public BaseApp(Config config, String instrumentation) {
         this.config = config;
-        randomMetricsProducer = new RandomMetricsProducer(config);
-        requestMetricsProducer = new RequestMetricsProducer();
+        COMMON_SPAN_ATTRIBUTES = Attributes.of(
+            AttributeKey.stringKey("signal"), "trace",
+            AttributeKey.stringKey("language"), instrumentation
+        );
+        randomMetricsProducer = new RandomMetricsProducer(config, instrumentation);
+        requestMetricsProducer = new RequestMetricsProducer(instrumentation);
         s3Client = buildS3Client();
         httpClient = buildHttpClient();
     }
@@ -114,12 +115,12 @@ public abstract class BaseApp {
         // Define the handlers for each of the 4 endpoints supported by the sample app
         get("/", (req, res) -> "healthcheck");
         get("/outgoing-http-call", (req, res) -> {
-            instrument("outgoint-http-call", () -> httpCall("https://aws.amazon.com"));
+            instrument("outgoing-http-call", () -> httpCall("https://aws.amazon.com"));
 
             return getXrayTraceId();
         });
         get("/aws-sdk-call", (req, res) -> {
-            instrument("get-aws-s3-buckets", () -> s3Client.listBuckets());
+            instrument("aws-sdk-call", () -> s3Client.listBuckets());
 
             return getXrayTraceId();
         });

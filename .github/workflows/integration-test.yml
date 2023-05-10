@@ -1,0 +1,90 @@
+name: "Integration Test"
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions: 
+  id-token: write
+  contents: read
+
+jobs:
+  publish_and_test_app:
+    name: Build and test sample app
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app-language: [ javascript, python-manual-instrumentation, python-auto-instrumentation, go, java-manual-instrumentation, java-auto-instrumentation ]
+    env:
+      APP_PATH: sample-apps/${{ matrix.app-language }}-sample-app
+    steps:
+      - name: Checkout This Repo
+        uses: actions/checkout@v3
+      - name: Setup Java
+        if: ${{ contains(matrix.app-language, 'java-') }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+          aws-region: us-west-2
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_REGION: us-east-1
+        with:
+          registry-type: public
+      - name: Build with Gradle
+        if: ${{ contains(matrix.app-language, 'java-') }}
+        working-directory: sample-apps/java-sample-app
+        run: |
+          ./gradlew jibDockerBuild
+      - name: Run test containers (java)
+        if: ${{ contains(matrix.app-language, 'java-') }}
+        run: docker-compose -f docker-compose-java.yml up --abort-on-container-exit
+        working-directory: .github/collector
+        env:
+          INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
+          LISTEN_ADDRESS: 0.0.0.0:8080
+          APP_IMAGE: ${{ matrix.app-language }}-sample-app:latest
+          LANGUAGE: ${{ matrix.app-language }}
+          VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/${{ matrix.app-language }}-sample-app -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
+      - name: Run test containers (non-java)
+        if: ${{ !contains(matrix.app-language, 'java-') }}
+        run: docker-compose -f docker-compose.yml up --abort-on-container-exit
+        working-directory: .github/collector
+        env:
+          INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
+          LISTEN_ADDRESS: 0.0.0.0:8080
+          LANGUAGE: ${{ matrix.app-language }}
+          VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/${{ matrix.app-language }}-sample-app -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
+  publish-ci-status:  
+    runs-on: ubuntu-latest
+    needs: [publish_and_test_app]
+    if: always()
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
+          aws-region: us-west-2
+
+      - name: Publish CI status
+        run: |
+          if [ '${{ needs.publish_and_test_app.result }}' = 'success' ]; then
+            aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
+              --metric-name Success \
+              --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
+              --value 1.0
+          else
+            aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
+              --metric-name Success \
+              --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
+              --value 0.0
+          fi

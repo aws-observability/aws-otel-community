@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  otel:
+    image: amazon/aws-otel-collector:latest
+    command: --config /config/collector-config.yml
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+    volumes:
+      - .:/config
+    ports:
+      - '4317:4317'
+
+  app:
+    build: ../../${APP_PATH}
+    environment:
+      - INSTANCE_ID
+      - LISTEN_ADDRESS
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=aws-otel,service.name=${LANGUAGE}-sample-app
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel:4317
+      - AWS_REGION=us-west-2
+    ports:
+      - '8080:8080'
+
+  validator:
+    image: public.ecr.aws/aws-otel-test/aws-otel-test-validator:alpha
+    command: ${VALIDATOR_COMMAND}
+    depends_on:
+      - otel
+      - app
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_REGION=us-west-2
