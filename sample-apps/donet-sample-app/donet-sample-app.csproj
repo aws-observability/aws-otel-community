@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp7.0</TargetFramework>
-    <RootNamespace>donet_sample_app</RootNamespace>
+    <RootNamespace>dotnet_sample_app</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
