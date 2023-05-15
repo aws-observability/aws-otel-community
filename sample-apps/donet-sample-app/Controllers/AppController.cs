@@ -30,7 +30,7 @@ namespace dotnet_sample_app.Controllers
             _metricEmitter.updateTotalHeapSizeMetric(rand.Next(100,500));
             _metricEmitter.updateTotalThreadSizeMetric(rand.Next(1,20));
             _metricEmitter.updateCpuUsageMetric(rand.Next(1,100));
-            // _metricEmitter.updateTotalHeapMetric(rand.Next(1,100));
+
         }
 
         
@@ -78,7 +78,7 @@ namespace dotnet_sample_app.Controllers
 
         [HttpGet]
         [Route("/outgoing-sampleapp")]
-        public string Default2()
+        public string OutgoingSampleApp()
         {
             var port = 4567;
             

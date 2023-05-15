@@ -60,6 +60,11 @@ namespace dotnet_sample_app.Controllers
             string cpuUsageMetricName = API_CPU_USAGE;
 
 
+            new KeyValuePair<string, object>("signal", "metric"),
+            new KeyValuePair<string, object>("language", "dotnet"),
+            new KeyValuePair<string, object>("metricType", "request"));
+
+            totalThreadsObserver.Add(totalthreads++,
             string instanceId = Environment.GetEnvironmentVariable("INSTANCE_ID");
             if (instanceId != null && !instanceId.Trim().Equals(""))
             {
@@ -89,7 +94,8 @@ namespace dotnet_sample_app.Controllers
             meter.CreateObservableUpDownCounter(totalHeapSizeMetricName, () => { 
                     return new List<Measurement<long>>()
                     {
-                        new Measurement<long>(UpDowntick++ * 10),
+                        UpDowntick = (UpDowntick + 1) * 10,
+                        new Measurement<long>(UpDowntick),
                     };
                 }, 
                 "By",
@@ -131,19 +137,19 @@ namespace dotnet_sample_app.Controllers
         }
 
         public void apiRequestSentMetric(String apiName, String statusCode) {
-                apiRequestSent += 1;
+                this.apiRequestSent += 1;
                 Console.WriteLine("apiBs: "+ apiRequestSent);  
         } 
     
         public void updateTotalBytesSentMetric(int bytes, String apiName, String statusCode) {
-            totalBytesSent += bytes;
+            this.totalBytesSent += bytes;
             Console.WriteLine("Total amount of bytes sent while the application is alive:"+ totalBytesSent);
-            apiNameValue = apiName;
-            statusCodeValue = statusCode;
+            this.apiNameValue = apiName;
+            this.statusCodeValue = statusCode;
         }
 
         public void updateTotalHeapSizeMetric(int heapSize) {
-            totalHeapSize += heapSize;
+            this.totalHeapSize += heapSize;
             //totalHeapSizeObserver.Publish(totalheap);
         }
 
@@ -155,7 +161,7 @@ namespace dotnet_sample_app.Controllers
         }   
 
         public void updateCpuUsageMetric(int cpuUsage) {
-            cpuUsage += cpuUsage;
+            this.cpuUsage += cpuUsage;
         }
 
         public void updateTotalTimeMetric(int totaltime) {
