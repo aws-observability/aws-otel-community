@@ -19,7 +19,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("io.opentelemetry:opentelemetry-sdk")
 	implementation("io.opentelemetry:opentelemetry-api")
-	implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.24.0")
+	implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.26.0")
 	implementation("io.opentelemetry:opentelemetry-extension-aws")
 	implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 }
