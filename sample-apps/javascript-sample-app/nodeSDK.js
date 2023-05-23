@@ -28,7 +28,7 @@ const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc')
 const { AWSXRayPropagator } = require("@opentelemetry/propagator-aws-xray");
 const { AWSXRayIdGenerator } = require("@opentelemetry/id-generator-aws-xray");
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
-const { AwsInstrumentation } = require("opentelemetry-instrumentation-aws-sdk");
+const { AwsInstrumentation } = require("@opentelemetry/instrumentation-aws-sdk");
 
 const _resource = Resource.default().merge(new Resource({
         [SemanticResourceAttributes.SERVICE_NAME]: "js-sample-app",
