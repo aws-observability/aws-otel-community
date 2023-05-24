@@ -150,7 +150,6 @@ namespace dotnet_sample_app.Controllers
 
         public void updateTotalHeapSizeMetric(int heapSize) {
             this.totalHeapSize += heapSize;
-            //totalHeapSizeObserver.Publish(totalheap);
         }
 
         public void updateTotalThreadSizeMetric(int totalthreads) {
