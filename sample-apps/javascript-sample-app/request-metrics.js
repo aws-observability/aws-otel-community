@@ -17,7 +17,7 @@
 'use strict'
 
 const { SemanticAttributes } = require("@opentelemetry/semantic-conventions");
-const metricsApi = require('@opentelemetry/api-metrics');
+const api = require('@opentelemetry/api');
 
 const TOTAL_BYTES_SENT_METRIC = 'total_bytes_sent';
 const TOTAL_API_REQUESTS = 'total_api_requests';
@@ -27,8 +27,8 @@ let totalApiRequests = 0;
 
 const commmon_attributes = { signal: 'metric',  language: 'javascript', metricType: 'request' };
 
-// acquire meter 
-const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
+// acquire meter
+const meter = api.metrics.getMeter('js-sample-app-meter');
 var testingId = "";
 if (process.env.INSTANCE_ID) {
     testingId = "_" + process.env.INSTANCE_ID
