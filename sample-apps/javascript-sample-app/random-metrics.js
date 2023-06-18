@@ -17,7 +17,7 @@
 'use strict'
 
 const sdk = require("./nodeSDK");
-const metricsApi = require('@opentelemetry/api-metrics');
+const api = require('@opentelemetry/api');
 
 // config
 const create_cfg = require('./config');
@@ -35,7 +35,7 @@ let cpuUsage = 0;
 let totalHeapSize = 0;
 
 // acquire meter 
-const meter = metricsApi.metrics.getMeter('js-sample-app-meter');
+const meter = api.metrics.getMeter('js-sample-app-meter');
 var testingId = "";
 if (process.env.INSTANCE_ID) {
     testingId = "_" + process.env.INSTANCE_ID
