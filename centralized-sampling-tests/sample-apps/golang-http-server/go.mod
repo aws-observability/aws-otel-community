@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	go.opentelemetry.io/contrib/propagators/aws v1.15.0
-	go.opentelemetry.io/contrib/samplers/aws/xray v0.9.0
+	go.opentelemetry.io/contrib/samplers/aws/xray v0.11.0
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.16.0
 	go.opentelemetry.io/otel/sdk v1.16.0
