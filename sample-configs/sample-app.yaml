@@ -39,7 +39,7 @@ spec:
             - name: LISTEN_ADDRESS
               value: 0.0.0.0:4567
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://my-collector-collector:4317
+              value: http://my-collector-xray-collector:4317
             - name: OTEL_RESOURCE_ATTRIBUTES
               value: service.namespace=GettingStarted,service.name=GettingStartedService
           image: public.ecr.aws/aws-otel-test/aws-otel-java-spark:1.17.0
