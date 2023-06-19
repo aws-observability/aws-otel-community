@@ -1,9 +1,9 @@
 boto3==1.26.118
 Flask==2.3.2
-opentelemetry-distro==0.38b0
-opentelemetry-exporter-otlp==1.17.0
-opentelemetry-api==1.17.0
-opentelemetry-instrumentation-flask==0.38b0
+opentelemetry-distro==0.39b0
+opentelemetry-exporter-otlp==1.18.0
+opentelemetry-api==1.18.0
+opentelemetry-instrumentation-flask==0.39b0
 opentelemetry-instrumentation-requests==0.39b0
 opentelemetry-instrumentation-botocore==0.39b0
 opentelemetry-sdk-extension-aws==2.0.1
