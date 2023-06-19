@@ -3,7 +3,7 @@ Flask==2.2.5
 opentelemetry-distro==0.37b0
 opentelemetry-exporter-otlp==1.18.0
 opentelemetry-api==1.16.0
-opentelemetry-instrumentation-flask==0.37b0
+opentelemetry-instrumentation-flask==0.39b0
 opentelemetry-instrumentation-requests==0.37b0
 opentelemetry-instrumentation-botocore==0.37b0
 opentelemetry-sdk-extension-aws==2.0.1
