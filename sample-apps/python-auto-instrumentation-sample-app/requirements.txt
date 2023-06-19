@@ -8,6 +8,6 @@ opentelemetry-instrumentation-requests==0.39b0
 opentelemetry-instrumentation-botocore==0.39b0
 opentelemetry-sdk-extension-aws==2.0.1
 opentelemetry-propagator-aws-xray==1.0.1
-protobuf==3.20.2
+protobuf==4.23.3
 PyYAML==6.0
 requests==2.31.0
