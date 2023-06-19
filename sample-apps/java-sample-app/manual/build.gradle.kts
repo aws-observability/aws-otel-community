@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.23.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.27.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
@@ -57,11 +57,11 @@ dependencies {
     implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.27.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
-    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.23.0-alpha"))
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.27.0-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 
     // Opentelemetry OkHttp Library Instrumentation
-    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.23.0-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.27.0-alpha")
 
     implementation(project(":base"))
 
