@@ -17,7 +17,7 @@ rootProject.name = "java-sample-app"
 
 pluginManagement {
     plugins {
-        id("com.google.cloud.tools.jib") version "3.3.1"
+        id("com.google.cloud.tools.jib") version "3.3.2"
     }
 }
 
