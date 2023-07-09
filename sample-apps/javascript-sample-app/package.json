@@ -15,7 +15,7 @@
     "@opentelemetry/exporter-jaeger": "^1.14.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.40.0",
     "@opentelemetry/exporter-prometheus": "^0.40.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "^0.40.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.41.0",
     "@opentelemetry/id-generator-aws-xray": "^1.1.2",
     "@opentelemetry/instrumentation-http": "^0.40.0",
     "@opentelemetry/propagator-aws-xray": "^1.2.1",
