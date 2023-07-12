@@ -4,6 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "tuesday"
     groups:
       github-actions-deps:
         patterns:
@@ -12,7 +13,7 @@ updates:
     directory: "/sample-apps/go-sample-app"
     schedule:
       interval: "weekly"
-      day: sunday
+      day: "tuesday"
     groups:
       go-sample-app-deps:
         patterns:
@@ -21,7 +22,7 @@ updates:
     directory: "/sample-apps/java-sample-app"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       java-sample-app-deps:
         patterns:
@@ -30,7 +31,7 @@ updates:
     directory: '/sample-apps/javascript-sample-app'
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       js-sample-app-deps:
         patterns:
@@ -39,7 +40,7 @@ updates:
     directory: "/sample-apps/prometheus-sample-app"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       prom-sample-app-deps:
         patterns:
@@ -48,7 +49,7 @@ updates:
     directory: "/sample-apps/python-auto-instrumentation-sample-app"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       python-auto-sample-app-deps:
         patterns:
@@ -57,7 +58,7 @@ updates:
     directory: "/sample-apps/python-manual-instrumentation-sample-app"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       python-manual-sample-app-deps:
         patterns:
@@ -66,7 +67,7 @@ updates:
     directory: "/sample-apps/ruby-rails-sample-app"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       ruby-sample-app-deps:
         patterns:
@@ -75,7 +76,7 @@ updates:
     directory: "/centralized-sampling-tests/integration-tests"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       centralized-integration-deps:
         patterns:
@@ -84,7 +85,7 @@ updates:
     directory: "/centralized-sampling-tests/sample-apps/golang-http-server"
     schedule:
       interval: "weekly"
-      day: sunday
+      day: "tuesday"
     groups:
       centralized-golang-gomod-deps:
         patterns:
@@ -93,7 +94,7 @@ updates:
     directory: "/centralized-sampling-tests/sample-apps/golang-http-server"
     schedule:
       interval: "weekly"
-      day: sunday
+      day: "tuesday"
     groups:
       centralized-golang-docker-deps:
         patterns:
@@ -102,7 +103,7 @@ updates:
     directory: "/centralized-sampling-tests/sample-apps/spring-boot"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       centralized-spring-gradle-deps:
         patterns:
@@ -111,7 +112,7 @@ updates:
     directory: "/centralized-sampling-tests/sample-apps/spring-boot"
     schedule:
       interval: "weekly"
-      day: "sunday"
+      day: "tuesday"
     groups:
       centralized-spring-docker-deps:
         patterns:
