@@ -1,4 +1,4 @@
-FROM gradle:8.1.1-jdk11 as builder
+FROM gradle:8.2.0-jdk11 as builder
 
 WORKDIR /app
 COPY ./build.gradle ./build.gradle
@@ -12,7 +12,7 @@ ARG VER=1.0
 # assume app is already built since it will not build in docker container
 RUN tar -xvf build/distributions/spring-boot-${VER}.tar
 
-FROM amazoncorretto:11
+FROM amazoncorretto:20
 
 WORKDIR /app
 ARG VER=1.0
