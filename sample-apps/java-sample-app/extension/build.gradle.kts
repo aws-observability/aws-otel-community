@@ -13,8 +13,8 @@ dependencies {
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 
     compileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:1.28.0")
-    compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:1.27.0")
-    compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:1.27.0-alpha")
+    compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:1.28.0")
+    compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:1.28.0-alpha")
     compileOnly("io.opentelemetry:opentelemetry-semconv:1.28.0-alpha")
 }
 
