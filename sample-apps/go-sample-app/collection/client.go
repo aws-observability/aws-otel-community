@@ -83,7 +83,11 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(xray.Propagator{}) // Set AWS X-Ray propagator
 
-	exp, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure())
+	exp, err := otlpmetricgrpc.New(ctx,
+		otlpmetricgrpc.WithInsecure(),
+		otlpmetricgrpc.WithEndpoint(cfg.OTLPEndpointGRPC),
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +96,7 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 		metric.Stream{Aggregation: aggregation.ExplicitBucketHistogram{
 			Boundaries: []float64{100, 300, 500},
 		}},
-	)),)
+	)))
 
 	otel.SetMeterProvider(meterProvider)
 
@@ -116,7 +120,10 @@ func StartClient(ctx context.Context) (func(context.Context) error, error) {
 // setupTraceProvider configures a trace exporter and an AWS X-Ray ID Generator.
 func setupTraceProvider(ctx context.Context, res *resource.Resource) (*sdktrace.TracerProvider, error) {
 	// INSECURE !! NOT TO BE USED FOR ANYTHING IN PRODUCTION
-	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure())
+	traceExporter, err := otlptracegrpc.New(ctx,
+		otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithEndpoint(cfg.OTLPEndpointGRPC),
+	)
 
 	if err != nil {
 		return nil, err

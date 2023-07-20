@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Host                    string   `mapstructure:"Host"`
 	Port                    string   `mapstructure:"Port"`
+	OTLPEndpointGRPC        string   `mapstructure:"OTLPEndpointGRPC"`
 	TimeInterval            int64    `mapstructure:"TimeInterval"`
 	TimeAliveIncrementer    int64    `mapstructure:"RandomTimeAliveIncrementer"`
 	TotalHeapSizeUpperBound int64    `mapstructure:"RandomTotalHeapSizeUpperBound"`
@@ -21,6 +22,7 @@ func GetConfiguration() *Config {
 	var arr []string
 	viper.SetDefault("Host", "0.0.0.0")
 	viper.SetDefault("Port", "8080")
+	viper.SetDefault("OTLPEndpointGRPC", "localhost:4317")
 	viper.SetDefault("TimeInterval", 1)
 	viper.SetDefault("RandomTimeAliveIncrementer", 1)
 	viper.SetDefault("RandomTotalHeapSizeUpperBound", 100)
@@ -28,6 +30,8 @@ func GetConfiguration() *Config {
 	viper.SetDefault("RandomCpuUsageUpperBound", 100)
 	viper.SetDefault("SampleAppPorts", arr)
 
+	viper.AutomaticEnv()
+	viper.SetEnvPrefix("")
 	viper.SetConfigFile("config.yaml")
 	viper.ReadInConfig()
 
