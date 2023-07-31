@@ -53,15 +53,15 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.27.0-alpha")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.27.0")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.28.0-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.28.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
-    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.27.0-alpha"))
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.28.0-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 
     // Opentelemetry OkHttp Library Instrumentation
-    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.27.0-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.28.0-alpha")
 
     implementation(project(":base"))
 
