@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.13'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '2.7.14'
+    id 'io.spring.dependency-management' version '1.1.2'
     id 'java'
     id 'java-library'
     id 'application'
@@ -22,7 +22,7 @@ dependencies {
     implementation ("io.opentelemetry:opentelemetry-sdk")
     implementation("io.opentelemetry:opentelemetry-api")
     implementation ("io.opentelemetry:opentelemetry-exporter-otlp")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.27.0")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.28.0")
     implementation("io.opentelemetry:opentelemetry-extension-trace-propagators")
     implementation("io.opentelemetry:opentelemetry-extension-aws")
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
