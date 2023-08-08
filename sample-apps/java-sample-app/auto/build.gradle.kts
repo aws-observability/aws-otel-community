@@ -49,7 +49,7 @@ jib {
     container {
         ports = listOf("8080")
         jvmFlags = listOf(
-            "-javaagent:aws-opentelemetry-agent-1.27.0.jar",
+            "-javaagent:aws-opentelemetry-agent-1.28.1.jar",
             "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
     }
 }
@@ -67,7 +67,7 @@ dependencies {
 application {
     mainClass.set("software.amazon.adot.sampleapp.MainAuto")
     applicationDefaultJvmArgs = listOf(
-        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-1.27.0.jar", // Use the Java agent when the application is run
+        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-1.28.1.jar", // Use the Java agent when the application is run
         "-Dotel.service.name=java-sample-app",  // sets the name of the application in traces and metrics.
         "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
 }

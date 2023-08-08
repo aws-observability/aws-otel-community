@@ -36,6 +36,10 @@ updates:
       js-sample-app-deps:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "node-fetch"
+        update-types:
+          - "version-update:semver-major"
   - package-ecosystem: "gomod"
     directory: "/sample-apps/prometheus-sample-app"
     schedule:
