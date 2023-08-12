@@ -1,5 +1,5 @@
 # Stage 0 - Build Golang sample app
-FROM golang:1.20 as builder
+FROM golang:1.21 as builder
 
 WORKDIR /app
 COPY . .
