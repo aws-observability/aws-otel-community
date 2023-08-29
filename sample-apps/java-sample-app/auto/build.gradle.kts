@@ -59,7 +59,7 @@ dependencies {
     implementation(project(":base"))
 
     // Necessary to download the jar of the Java Agent
-    javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:1.28.1")
+    javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:1.29.0")
     javaagentDependency(project(":extension"))
 }
 
