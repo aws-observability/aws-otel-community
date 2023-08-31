@@ -19,51 +19,51 @@ namespace dotnet_sample_app.Controllers
     {
         private readonly AmazonS3Client s3Client = new AmazonS3Client();
         private readonly HttpClient httpClient = new HttpClient();
-        private readonly MetricEmitter _metricEmitter = new MetricEmitter();
         private static Random rand = new Random(DateTime.Now.Millisecond);
-        
 
-        public AppController()
-        {
-            //Random Metrics
-            _metricEmitter.updateTotalTimeMetric(rand.Next(10,30));
-            _metricEmitter.updateTotalHeapSizeMetric(rand.Next(100,500));
-            _metricEmitter.updateTotalThreadSizeMetric(rand.Next(1,20));
-            _metricEmitter.updateCpuUsageMetric(rand.Next(1,100));
+        public static readonly ActivitySource tracer = new(
+        "dotnet-sample-app");
 
-        }
-
+        public AppController() {}
         
         [HttpGet]
         [Route("/outgoing-http-call")]
         public string OutgoingHttp()
         {
-            var res = httpClient.GetAsync("https://aws.amazon.com").Result;
+            using var activity = tracer.StartActivity("outgoing-http-call");
+            activity?.SetTag("language", "dotnet");
+            activity?.SetTag("signal", "trace");
+            
+            var res = httpClient.GetAsync("https://aws.amazon.com/").Result;
             string statusCode = res.StatusCode.ToString();
             
             // Request Based Metrics
-            _metricEmitter.emitReturnTimeMetric(MimicLatency());
+            Startup.metricEmitter.emitReturnTimeMetric(MimicLatency());
             int loadSize = MimicPayLoadSize();
-            _metricEmitter.apiRequestSentMetric(Request.GetDisplayUrl(),statusCode);
-            _metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
+            Startup.metricEmitter.apiRequestSentMetric();
+            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
 
             
             return GetTraceId();
         }
 
         [HttpGet]
-        [Route("/get-aws-s3-bucket")]
+        [Route("/aws-sdk-call")]
         public string AWSSDKCall()
         {
+            using var activity = tracer.StartActivity("aws-sdk-call");
+            activity?.SetTag("language", "dotnet");
+            activity?.SetTag("signal", "trace");
+
             var res = s3Client.ListBucketsAsync().Result;
             string statusCode = res.HttpStatusCode.ToString();
             
             // Request Based Metrics
-            _metricEmitter.emitReturnTimeMetric(MimicLatency());
+            Startup.metricEmitter.emitReturnTimeMetric(MimicLatency());
             int loadSize = MimicPayLoadSize();
-            _metricEmitter.apiRequestSentMetric(Request.GetDisplayUrl(),statusCode);
-            _metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
-            _metricEmitter.totalTimeSentObserver.Add(3);
+            Startup.metricEmitter.apiRequestSentMetric();
+            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
+            Startup.metricEmitter.totalTimeSentObserver.Add(3);
 
 
             return GetTraceId();
@@ -80,8 +80,6 @@ namespace dotnet_sample_app.Controllers
         [Route("/outgoing-sampleapp")]
         public string OutgoingSampleApp()
         {
-            var port = 4567;
-            
             return "Application started!";
         }
 

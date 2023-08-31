@@ -8,11 +8,15 @@ using OpenTelemetry.Contrib.Extensions.AWSXRay.Trace;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System;
+using System.Diagnostics;
+using dotnet_sample_app.Controllers;
 
 namespace dotnet_sample_app
 {
     public class Startup
-    {
+    {        
+        public static MetricEmitter metricEmitter = new MetricEmitter();
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -27,19 +31,38 @@ namespace dotnet_sample_app
 
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            Sdk.CreateTracerProviderBuilder()
-                .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("adot-integ-test").AddTelemetrySdk())
-                .AddXRayTraceId()
-                .AddAWSInstrumentation()
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .AddOtlpExporter(options => 
-                {
-                    options.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"));
-                })
-                .Build();
-
+            if(!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("OTEL_RESOURCE_ATTRIBUTES"))) {
+                Sdk.CreateTracerProviderBuilder()
+                    .AddSource("dotnet-sample-app")
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddTelemetrySdk())
+                    .AddXRayTraceId()
+                    .AddAWSInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter(options => 
+                    {
+                        options.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"));
+                    })
+                    .Build();
+            }
+            else {
+                Sdk.CreateTracerProviderBuilder()
+                    .AddSource("dotnet-sample-app")
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName: "dotnet-sample-app").AddTelemetrySdk())
+                    .AddXRayTraceId()
+                    .AddAWSInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddOtlpExporter(options => 
+                    {
+                        options.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT"));
+                    })
+                    .Build();
+            }
+                
             Sdk.SetDefaultTextMapPropagator(new AWSXRayPropagator());
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +81,8 @@ namespace dotnet_sample_app
             {
                 endpoints.MapControllers();
             });
+
+            metricEmitter.UpdateRandomMetrics();
         }
     }
 }
