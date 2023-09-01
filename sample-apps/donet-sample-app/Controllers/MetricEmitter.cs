@@ -46,12 +46,7 @@ namespace dotnet_sample_app.Controllers
         
         public MetricEmitter()
         {
-            Meter meter = new Meter("adot", "1.0");
-            using var meterProvider = Sdk.CreateMeterProviderBuilder()
-                .AddMeter("adot")
-                .AddOtlpExporter()
-                .Build();
-            
+            Meter meter = new Meter("adot", "1.0");            
 
             string latencyMetricName = API_LATENCY_METRIC;
             string totalApiRequestSent = API_COUNTER_METRIC;

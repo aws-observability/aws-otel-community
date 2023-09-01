@@ -7,6 +7,7 @@ using OpenTelemetry;
 using OpenTelemetry.Contrib.Extensions.AWSXRay.Trace;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
 using System;
 using System.Diagnostics;
 using dotnet_sample_app.Controllers;
@@ -59,6 +60,11 @@ namespace dotnet_sample_app
                     })
                     .Build();
             }
+
+            Sdk.CreateMeterProviderBuilder()
+                .AddMeter("adot")
+                .AddOtlpExporter()
+                .Build();
                 
             Sdk.SetDefaultTextMapPropagator(new AWSXRayPropagator());
 
