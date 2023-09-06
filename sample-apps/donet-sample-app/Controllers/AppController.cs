@@ -41,8 +41,7 @@ namespace dotnet_sample_app.Controllers
             Startup.metricEmitter.emitReturnTimeMetric(MimicLatency());
             int loadSize = MimicPayLoadSize();
             Startup.metricEmitter.apiRequestSentMetric();
-            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
-
+            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize);
             
             return GetTraceId();
         }
@@ -62,9 +61,8 @@ namespace dotnet_sample_app.Controllers
             Startup.metricEmitter.emitReturnTimeMetric(MimicLatency());
             int loadSize = MimicPayLoadSize();
             Startup.metricEmitter.apiRequestSentMetric();
-            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize, Request.GetDisplayUrl(),statusCode);
+            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize);
             Startup.metricEmitter.totalTimeSentObserver.Add(3);
-
 
             return GetTraceId();
         }
@@ -80,7 +78,33 @@ namespace dotnet_sample_app.Controllers
         [Route("/outgoing-sampleapp")]
         public string OutgoingSampleApp()
         {
-            return "Application started!";
+            using var activity = tracer.StartActivity("outgoing-sampleapp");
+            activity?.SetTag("language", "dotnet");
+            activity?.SetTag("signal", "trace");
+            string statusCode = "";
+
+            if (Program.cfg.SampleAppPorts.Length == 0) {
+                var res = httpClient.GetAsync("https://aws.amazon.com/").Result;
+                statusCode = res.StatusCode.ToString();
+            }
+            else {
+                foreach (string port in Program.cfg.SampleAppPorts) {
+                    if (!String.IsNullOrEmpty(port)) {
+                        Console.WriteLine(port);
+                        string uri = "http://127.0.0.1:" + port + "/outgoing-sampleapp";
+                        var res = httpClient.GetAsync(uri).Result;
+                        statusCode = res.StatusCode.ToString();
+                    }
+                }
+            }
+            
+            // Request Based Metrics
+            Startup.metricEmitter.emitReturnTimeMetric(MimicLatency());
+            int loadSize = MimicPayLoadSize();
+            Startup.metricEmitter.apiRequestSentMetric();
+            Startup.metricEmitter.updateTotalBytesSentMetric(loadSize);
+            
+            return GetTraceId();
         }
 
         private string GetTraceId()

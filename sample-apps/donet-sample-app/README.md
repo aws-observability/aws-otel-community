@@ -1,10 +1,12 @@
-### Application interface
+## .NET Opentelemetry Sample App
 
-This .NET sample app will emit Traces and Metrics with Logs as experimental. There are two types of metrics emitted;
+### Description
+
+This .NET Sample App will emit Traces and Metrics. There are two types of metrics emitted;
 Request Based and Random Based.
 Metrics are generated as soon as the application is ran or deployed without any additional effort. These are considered the random based metrics which track a mock of TimeAlive, TotalHeapSize, ThreadsActive and CpuUsage. The boundaries for these metrics are standard and can be found in the configuration file (YAML) called config.yaml.
-Additionally, you can generate Traces and request based Metrics by making requests to the following exposed endpoints.
- 
+
+Additionally, you can generate Traces and request based Metrics by making requests to the following exposed endpoints:
 
 1. /
     1. Ensures the application is running
@@ -13,25 +15,36 @@ Additionally, you can generate Traces and request based Metrics by making reques
 3. /aws-sdk-call
     1. Makes a call to AWS S3 to list buckets for the account corresponding to the provided AWS credentials
 4. /outgoing-sampleapp
-    1. Makes a call to all other sample app ports configured at `<host>:<port>/outgoing-sampleapp`. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/) 
+    1. Makes a call to all other sample app ports configured at `<host>:<port>/outgoing-sampleapp`. If none available, makes a HTTP request to www.amazon.com (http://www.amazon.com/)
 
-### Requirements
+[Sample App Spec](../SampleAppSpec.md)
 
-* .NET 6.0
+* Non-conformance: This SDK language is not missing any features or extensions required other than Resource Detectors
+* Workarounds: No workarounds are being used in this application
 
-### Running the application
+### Getting Started:
 
+#### Running the application (local)
 
 In order to run the application
 
 - Clone the repository
 `git clone https://github.com/aws-observability/aws-otel-community.git`
 - Switch into the directory
-`cd sample-apps/dotnet-sample-app`
-- Run the .NET server
-`docker-compose up`
+`cd sample-apps/donet-sample-app`
+- Install dependencies
+`dotnet build`
+- Run the javascript server
+`dotnet run`
 Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
 
-### Non conformance
+#### Docker
 
-None
+In order to build the Docker image and run it in a container
+
+- Build the image
+`docker build -t dotnet-sample-app .`
+- Run the image in a container
+`docker run -p 8080:8080 dotnet-sample-app`
+
+

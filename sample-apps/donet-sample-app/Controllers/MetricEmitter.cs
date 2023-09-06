@@ -27,20 +27,14 @@ namespace dotnet_sample_app.Controllers
         public ObservableUpDownCounter<long> totalHeapSizeObserver;
         public UpDownCounter<int> totalThreadsObserver;
 
-        public long apiRequestSent = 0;
+        private long apiRequestSent = 0;
         private long totalBytesSent = 0;
-        long totalHeapSize  = 0;
-        int cpuUsage = 0;
-        int totalTime = 1;
-        int totalThreads = 0;
-        bool threadsBool = true;
-        int UpDowntick = 1;
-        int returnTime = 100;
-
-        // The below API name and status code dimensions are currently shared by all metrics observer in
-        // this class.
-        string apiNameValue = "";
-        string statusCodeValue = "";
+        private long totalHeapSize  = 0;
+        private int cpuUsage = 0;
+        private int totalTime = 1;
+        private int totalThreads = 0;
+        private bool threadsBool = true;
+        private int returnTime = 100;
 
         private static Random rand = new Random(DateTime.Now.Millisecond);
         
@@ -146,11 +140,9 @@ namespace dotnet_sample_app.Controllers
             Console.WriteLine("apiBs: "+ this.apiRequestSent);  
         } 
     
-        public void updateTotalBytesSentMetric(int bytes, String apiName, String statusCode) {
+        public void updateTotalBytesSentMetric(int bytes) {
             totalBytesSent += bytes;
             Console.WriteLine("Total amount of bytes sent while the application is alive:"+ totalBytesSent);
-            this.apiNameValue = apiName;
-            this.statusCodeValue = statusCode;
         }
 
         public void updateTotalHeapSizeMetric() {
