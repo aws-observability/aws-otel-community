@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.29.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
@@ -53,8 +53,8 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.28.0-alpha")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.28.0")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.29.0-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.29.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.29.0-alpha"))
@@ -73,7 +73,7 @@ dependencies {
 
     implementation("org.apache.logging.log4j:log4j-api:2.20.0")
     implementation("org.apache.logging.log4j:log4j-core:2.20.0")
-    implementation("org.slf4j:slf4j-simple:2.0.7")
+    implementation("org.slf4j:slf4j-simple:2.0.9")
 }
 
 
