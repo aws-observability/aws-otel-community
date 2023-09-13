@@ -31,7 +31,7 @@ In order to run the application
 - Clone the repository
 `git clone https://github.com/aws-observability/aws-otel-community.git`
 - Switch into the directory
-`cd sample-apps/donet-sample-app`
+`cd sample-apps/dotnet-sample-app`
 - Install dependencies
 `dotnet build`
 - Run the javascript server
