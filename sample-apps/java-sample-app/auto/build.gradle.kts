@@ -54,12 +54,15 @@ jib {
     }
 }
 
+val javaAgent = "software.amazon.opentelemetry:aws-opentelemetry-agent:1.30.0"
+val javaAgentVersion = javaAgent.split(":").get(2)
+
 dependencies {
     // Base application
     implementation(project(":base"))
 
     // Necessary to download the jar of the Java Agent
-    javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:1.30.0")
+    javaagentDependency(javaAgent)
     javaagentDependency(project(":extension"))
 }
 
@@ -67,7 +70,7 @@ dependencies {
 application {
     mainClass.set("software.amazon.adot.sampleapp.MainAuto")
     applicationDefaultJvmArgs = listOf(
-        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-1.29.0.jar", // Use the Java agent when the application is run
+        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-${javaAgentVersion}.jar", // Use the Java agent when the application is run
         "-Dotel.service.name=java-sample-app",  // sets the name of the application in traces and metrics.
         "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
 }
