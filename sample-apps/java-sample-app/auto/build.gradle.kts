@@ -32,6 +32,10 @@ repositories {
     mavenCentral()
 }
 
+
+val javaAgent = "software.amazon.opentelemetry:aws-opentelemetry-agent:1.30.0"
+val javaAgentVersion = javaAgent.split(":").get(2)
+
 jib {
     from {
         image= "eclipse-temurin:17"
@@ -49,7 +53,7 @@ jib {
     container {
         ports = listOf("8080")
         jvmFlags = listOf(
-            "-javaagent:aws-opentelemetry-agent-1.29.0.jar",
+            "-javaagent:aws-opentelemetry-agent-${javaAgentVersion}.jar",
             "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
     }
 }
@@ -59,7 +63,7 @@ dependencies {
     implementation(project(":base"))
 
     // Necessary to download the jar of the Java Agent
-    javaagentDependency("software.amazon.opentelemetry:aws-opentelemetry-agent:1.30.0")
+    javaagentDependency(javaAgent)
     javaagentDependency(project(":extension"))
 }
 
@@ -67,7 +71,7 @@ dependencies {
 application {
     mainClass.set("software.amazon.adot.sampleapp.MainAuto")
     applicationDefaultJvmArgs = listOf(
-        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-1.29.0.jar", // Use the Java agent when the application is run
+        "-javaagent:$buildDir/javaagent/aws-opentelemetry-agent-${javaAgentVersion}.jar", // Use the Java agent when the application is run
         "-Dotel.service.name=java-sample-app",  // sets the name of the application in traces and metrics.
         "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
 }
