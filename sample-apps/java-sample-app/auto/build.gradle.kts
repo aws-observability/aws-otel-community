@@ -32,6 +32,10 @@ repositories {
     mavenCentral()
 }
 
+
+val javaAgent = "software.amazon.opentelemetry:aws-opentelemetry-agent:1.30.0"
+val javaAgentVersion = javaAgent.split(":").get(2)
+
 jib {
     from {
         image= "eclipse-temurin:17"
@@ -49,13 +53,10 @@ jib {
     container {
         ports = listOf("8080")
         jvmFlags = listOf(
-            "-javaagent:aws-opentelemetry-agent-1.29.0.jar",
+            "-javaagent:aws-opentelemetry-agent-${javaAgentVersion}.jar",
             "-Dotel.javaagent.extensions=${buildDir}/javaagent/extension.jar")
     }
 }
-
-val javaAgent = "software.amazon.opentelemetry:aws-opentelemetry-agent:1.30.0"
-val javaAgentVersion = javaAgent.split(":").get(2)
 
 dependencies {
     // Base application
