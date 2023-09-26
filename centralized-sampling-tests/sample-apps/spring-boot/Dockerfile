@@ -12,7 +12,7 @@ ARG VER=1.0
 # assume app is already built since it will not build in docker container
 RUN tar -xvf build/distributions/spring-boot-${VER}.tar
 
-FROM amazoncorretto:20
+FROM amazoncorretto:21
 
 WORKDIR /app
 ARG VER=1.0
