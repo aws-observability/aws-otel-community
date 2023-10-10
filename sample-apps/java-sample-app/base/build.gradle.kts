@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     // Used to have access to the APIs
-    api("io.opentelemetry:opentelemetry-api:1.30.1")
+    api("io.opentelemetry:opentelemetry-api:1.31.0")
 
     // Third party libraries used in this application
     // Exposed to dependent modules
