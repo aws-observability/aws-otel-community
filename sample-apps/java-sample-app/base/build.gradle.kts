@@ -23,13 +23,13 @@ repositories {
 
 dependencies {
     // Used to have access to the APIs
-    api("io.opentelemetry:opentelemetry-api:1.30.1")
+    api("io.opentelemetry:opentelemetry-api:1.31.0")
 
     // Third party libraries used in this application
     // Exposed to dependent modules
     api("com.sparkjava:spark-core:2.9.4")
     api("com.squareup.okhttp3:okhttp:4.11.0")
-    api(platform("software.amazon.awssdk:bom:2.20.152"))
+    api(platform("software.amazon.awssdk:bom:2.20.162"))
     api("software.amazon.awssdk:s3")
 
     // Not exposed to dependent modules

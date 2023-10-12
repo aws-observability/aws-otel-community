@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.1"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.31.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
