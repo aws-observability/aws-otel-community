@@ -47,8 +47,6 @@ import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.services.s3.S3Client;
 import spark.Response;
 
-import java.util.List;
-
 public class ManualApp extends BaseApp {
 
     private static final String REQUEST_OTEL_SCOPE = "requestOtelContext";

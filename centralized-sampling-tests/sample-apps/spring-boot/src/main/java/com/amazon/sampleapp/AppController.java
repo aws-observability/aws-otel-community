@@ -12,7 +12,7 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import java.time.Duration;
 
-import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_NAME;
+import io.opentelemetry.semconv.ResourceAttributes;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +36,7 @@ public class AppController {
     }
 
     Resource resource = Resource.builder()
-            .put(SERVICE_NAME, serviceName)
+            .put(ResourceAttributes.SERVICE_NAME, serviceName)
             .build();
 
     OpenTelemetry openTelemetry =
