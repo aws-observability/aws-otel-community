@@ -53,7 +53,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.30.0-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.31.0-alpha")
     implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.30.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
