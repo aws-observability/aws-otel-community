@@ -28,14 +28,14 @@ dependencies {
     // Third party libraries used in this application
     // Exposed to dependent modules
     api("com.sparkjava:spark-core:2.9.4")
-    api("com.squareup.okhttp3:okhttp:4.11.0")
-    api(platform("software.amazon.awssdk:bom:2.20.162"))
+    api("com.squareup.okhttp3:okhttp:4.12.0")
+    api(platform("software.amazon.awssdk:bom:2.21.11"))
     api("software.amazon.awssdk:s3")
 
     // Not exposed to dependent modules
     implementation("org.yaml:snakeyaml:2.2")
-    implementation("org.apache.logging.log4j:log4j-api:2.20.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.20.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.21.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.21.1")
     implementation("org.slf4j:slf4j-simple:2.0.9")
 
 }

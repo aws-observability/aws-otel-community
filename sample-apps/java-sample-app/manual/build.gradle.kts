@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.30.1"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.31.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
@@ -53,26 +53,26 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.30.0-alpha")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.30.0")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.31.0-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.31.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
-    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.30.0-alpha"))
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.31.0-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 
     // Opentelemetry OkHttp Library Instrumentation
-    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.30.0-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.31.0-alpha")
 
     implementation(project(":base"))
 
     constraints {
-        implementation("com.fasterxml.jackson:jackson-bom:2.15.2") {
+        implementation("com.fasterxml.jackson:jackson-bom:2.15.3") {
             because("bom used upstream is problematic. https://github.com/FasterXML/jackson-bom/issues/52#issuecomment-1292883281")
         }
     }
 
-    implementation("org.apache.logging.log4j:log4j-api:2.20.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.20.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.21.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.21.1")
     implementation("org.slf4j:slf4j-simple:2.0.9")
 }
 
