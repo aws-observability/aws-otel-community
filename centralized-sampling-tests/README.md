@@ -24,7 +24,7 @@ example-collector-config file. Clone the ADOT Collector repo and start the Colle
     docker run --rm -p 2000:2000 -p 55680:55680 -p 8889:8888 \
       -e AWS_REGION=us-west-2 \
       -e AWS_PROFILE=default \
-      -v ~/.aws:/root/.aws \
+      -v ~/.aws:/home/aoc/.aws \
       -v "${PWD}/examples/docker/config-test.yaml":/otel-local-config.yaml \
       --name awscollector public.ecr.aws/aws-observability/aws-otel-collector:latest \
       --config otel-local-config.yaml;
