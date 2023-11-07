@@ -13,7 +13,7 @@
     "@opentelemetry/api-metrics": "^0.33.0",
     "@opentelemetry/auto-instrumentations-node": "^0.39.4",
     "@opentelemetry/exporter-jaeger": "^1.17.1",
-    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.44.0",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.45.0",
     "@opentelemetry/exporter-prometheus": "^0.44.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.44.0",
     "@opentelemetry/id-generator-aws-xray": "^1.2.1",
