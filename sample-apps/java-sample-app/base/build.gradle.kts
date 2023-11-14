@@ -28,7 +28,7 @@ dependencies {
     // Third party libraries used in this application
     // Exposed to dependent modules
     api("com.sparkjava:spark-core:2.9.4")
-    api("com.squareup.okhttp3:okhttp:4.11.0")
+    api("com.squareup.okhttp3:okhttp:4.12.0")
     api(platform("software.amazon.awssdk:bom:2.20.162"))
     api("software.amazon.awssdk:s3")
 
