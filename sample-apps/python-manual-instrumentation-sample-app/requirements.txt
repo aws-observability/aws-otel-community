@@ -2,7 +2,7 @@ boto3==1.28.52
 Flask==2.3.3
 opentelemetry-distro==0.41b0
 opentelemetry-exporter-otlp==1.20.0
-opentelemetry-api==1.20.0
+opentelemetry-api==1.21.0
 opentelemetry-instrumentation-flask==0.41b0
 opentelemetry-instrumentation-requests==0.41b0
 opentelemetry-instrumentation-botocore==0.41b0
