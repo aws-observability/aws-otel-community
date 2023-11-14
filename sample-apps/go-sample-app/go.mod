@@ -3,8 +3,8 @@ module github.com/aws-otel-commnunity/sample-apps/go-sample-app
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go v1.45.24
-	github.com/gorilla/mux v1.8.0
+	github.com/aws/aws-sdk-go v1.47.11
+	github.com/gorilla/mux v1.8.1
 	github.com/spf13/viper v1.17.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.37.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
@@ -46,8 +46,8 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/net v0.15.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/genproto v0.0.0-20230913181813-007df8e322eb // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb // indirect
