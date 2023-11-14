@@ -58,6 +58,10 @@ updates:
       python-auto-sample-app-deps:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "Flask"
+        update-types:
+          - "version-update:semver-major"
   - package-ecosystem: "pip"
     directory: "/sample-apps/python-manual-instrumentation-sample-app"
     schedule:
@@ -67,6 +71,10 @@ updates:
       python-manual-sample-app-deps:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "Flask"
+        update-types:
+          - "version-update:semver-major"
   - package-ecosystem: "bundler"
     directory: "/sample-apps/ruby-rails-sample-app"
     schedule:
