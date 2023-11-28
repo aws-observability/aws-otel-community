@@ -11,7 +11,7 @@
   "dependencies": {
     "@opentelemetry/api": "^1.7.0",
     "@opentelemetry/api-metrics": "^0.33.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.40.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.40.1",
     "@opentelemetry/exporter-jaeger": "^1.18.1",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.45.1",
     "@opentelemetry/exporter-prometheus": "^0.45.1",
@@ -25,11 +25,11 @@
     "@opentelemetry/sdk-trace-base": "^1.18.1",
     "@opentelemetry/sdk-trace-node": "^1.18.1",
     "@opentelemetry/semantic-conventions": "^1.18.1",
-    "aws-sdk": "^2.1500.0",
+    "aws-sdk": "^2.1505.0",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
     "node-fetch": "~2.7.0",
-    "@opentelemetry/instrumentation-aws-sdk": "^0.36.2",
+    "@opentelemetry/instrumentation-aws-sdk": "^0.37.0",
     "process": "^0.11.10"
   }
 }
