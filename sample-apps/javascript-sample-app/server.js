@@ -18,7 +18,7 @@
 
 const http = require('http');
 const AWS = require('aws-sdk');
-const fetch = require ("node-fetch");
+const axios = require('axios');
 
 // config
 const create_cfg = require('./config');
@@ -118,15 +118,15 @@ function mimicPayLoadSize() {
 }
 
 async function httpCall(url) {
-    try {
-        const response = await fetch(url); 
-        console.log(`made a request to ${url}`);
-        if (!response.ok) {
+    axios.get(url)
+    .then(response => {
+        if (response.statusText != "OK") {
             throw new Error(`Error! status: ${response.status}`);
         }
-    } catch (err) {
-        throw new Error(`Error while fetching the ${url}`, err);
-    }
+    })
+    .catch(error => {
+        throw new Error(`Error while fetching the ${url}`, error);
+    });
 }
 
 async function instrumentRequest(spanName, _callback) {
