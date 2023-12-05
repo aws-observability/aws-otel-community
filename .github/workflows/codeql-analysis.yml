@@ -46,7 +46,7 @@ jobs:
       if: matrix.language == 'go'
       uses: github/codeql-action/autobuild@v2
     - if: matrix.language == 'java' 
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: 11
         distribution: corretto
