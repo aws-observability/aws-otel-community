@@ -26,7 +26,7 @@
     "@opentelemetry/sdk-trace-base": "^1.18.1",
     "@opentelemetry/sdk-trace-node": "^1.18.1",
     "@opentelemetry/semantic-conventions": "^1.18.1",
-    "aws-sdk": "^2.1509.0",
+    "aws-sdk": "^2.1511.0",
     "axios": "^1.6.2",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
