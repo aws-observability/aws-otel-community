@@ -17,7 +17,7 @@ from opentelemetry import trace, metrics
 
 from typing import Iterable
 from flask import Flask, request
-
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
 from opentelemetry.metrics import CallbackOptions, Observation
 
@@ -26,6 +26,7 @@ tracer = trace.get_tracer(__name__)
 meter = metrics.get_meter(__name__)
 
 app = Flask(__name__)
+FlaskInstrumentor().instrument_app(app)
 
 cfg = create_config('config.yaml')
 
