@@ -66,7 +66,7 @@ dependencies {
     implementation(project(":base"))
 
     constraints {
-        implementation("com.fasterxml.jackson:jackson-bom:2.16.0") {
+        implementation("com.fasterxml.jackson:jackson-bom:2.16.1") {
             because("bom used upstream is problematic. https://github.com/FasterXML/jackson-bom/issues/52#issuecomment-1292883281")
         }
     }
