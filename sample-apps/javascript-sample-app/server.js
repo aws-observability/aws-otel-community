@@ -120,7 +120,7 @@ function mimicPayLoadSize() {
 async function httpCall(url) {
     axios.get(url)
     .then(response => {
-        if (response.statusText != "OK") {
+        if (response.status != "200") {
             throw new Error(`Error! status: ${response.status}`);
         }
     })

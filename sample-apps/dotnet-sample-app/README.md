@@ -34,7 +34,7 @@ In order to run the application
 `cd sample-apps/dotnet-sample-app`
 - Install dependencies
 `dotnet build`
-- Run the javascript server
+- Run the .NET server
 `dotnet run`
 Now the application is ran and the endpoints can be called at `0.0.0.0:8080/<one-of-4-endpoints>`.
 
