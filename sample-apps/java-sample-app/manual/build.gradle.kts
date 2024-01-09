@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.33.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.34.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
@@ -73,7 +73,7 @@ dependencies {
 
     implementation("org.apache.logging.log4j:log4j-api:2.22.1")
     implementation("org.apache.logging.log4j:log4j-core:2.22.1")
-    implementation("org.slf4j:slf4j-simple:2.0.10")
+    implementation("org.slf4j:slf4j-simple:2.0.11")
 }
 
 
