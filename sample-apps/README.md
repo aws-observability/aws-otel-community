@@ -56,7 +56,7 @@ Each of these standardized sample apps comes with a README attached inside the r
 
 |Sample App                   |Location                                                                                                                                    |App functionality                                                                                                                              |
 |-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-|Ruby-manual-instrumentation  |[aws-otel-ruby](https://github.com/aws-observability/aws-otel-ruby/tree/main/sample-apps/manual-instrumentation/ruby-on-rails)              |Cotinuous integration of ADOT X-Ray components and X-Ray service. Manual Instrumentation using OpenTelemetry Ruby                              |
+|Ruby-manual-instrumentation  |[aws-otel-community](https://github.com/aws-observability/aws-otel-community/tree/master/sample-apps/ruby-rails-sample-app)              |Continuous integration of ADOT X-Ray components and X-Ray service. Manual Instrumentation using OpenTelemetry Ruby                              |
 
 # Sample App Specification
 
