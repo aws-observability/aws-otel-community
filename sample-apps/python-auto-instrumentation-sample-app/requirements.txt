@@ -1,4 +1,4 @@
-boto3==1.34.30
+boto3==1.34.45
 Flask==2.3.3
 opentelemetry-distro==0.43b0
 opentelemetry-exporter-otlp==1.22.0
@@ -8,6 +8,6 @@ opentelemetry-instrumentation-requests==0.43b0
 opentelemetry-instrumentation-botocore==0.43b0
 opentelemetry-sdk-extension-aws==2.0.1
 opentelemetry-propagator-aws-xray==1.0.1
-protobuf==4.25.2
+protobuf==4.25.3
 PyYAML==6.0.1
 requests==2.31.0
