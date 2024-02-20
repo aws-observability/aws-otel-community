@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.32.0-alpha"))
+    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.1.0-alpha"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter")
@@ -27,7 +27,7 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-extension-aws")
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
-    implementation ("com.jayway.jsonpath:json-path:2.8.0")
+    implementation ("com.jayway.jsonpath:json-path:2.9.0")
 
 }
 
