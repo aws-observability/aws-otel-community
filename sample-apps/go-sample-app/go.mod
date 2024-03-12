@@ -3,7 +3,7 @@ module github.com/aws-otel-commnunity/sample-apps/go-sample-app
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go v1.50.21
+	github.com/aws/aws-sdk-go v1.50.36
 	github.com/gorilla/mux v1.8.1
 	github.com/spf13/viper v1.18.2
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.37.0
