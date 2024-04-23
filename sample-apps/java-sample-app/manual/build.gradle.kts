@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.33.0"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.37.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
@@ -53,27 +53,27 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.32.0-alpha")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.32.0")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.35.0-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.35.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
-    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:1.32.0-alpha"))
+    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.3.0-alpha"))
     implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2")
 
     // Opentelemetry OkHttp Library Instrumentation
-    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:1.32.0-alpha")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-okhttp-3.0:2.3.0-alpha")
 
     implementation(project(":base"))
 
     constraints {
-        implementation("com.fasterxml.jackson:jackson-bom:2.16.1") {
+        implementation("com.fasterxml.jackson:jackson-bom:2.17.0") {
             because("bom used upstream is problematic. https://github.com/FasterXML/jackson-bom/issues/52#issuecomment-1292883281")
         }
     }
 
-    implementation("org.apache.logging.log4j:log4j-api:2.22.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.22.1")
-    implementation("org.slf4j:slf4j-simple:2.0.10")
+    implementation("org.apache.logging.log4j:log4j-api:2.23.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.23.1")
+    implementation("org.slf4j:slf4j-simple:2.0.13")
 }
 
 
