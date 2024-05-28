@@ -33,7 +33,7 @@ repositories {
 }
 
 
-val javaAgent = "software.amazon.opentelemetry:aws-opentelemetry-agent:1.32.0"
+val javaAgent = "software.amazon.opentelemetry:aws-opentelemetry-agent:1.32.2"
 val javaAgentVersion = javaAgent.split(":").get(2)
 
 jib {
