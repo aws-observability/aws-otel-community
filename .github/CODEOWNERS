@@ -1,3 +1,4 @@
-* @aws-observability/adot-collector-maintainers @aws-observability/aws-application-signals-maintainers
+* @aws-observability/adot-collector-maintainers
 
+sample-apps                           @aws-observability/aws-application-signals-maintainers
 sample-apps/prometheus-sample-app     @aws-observability/adot-collector-maintainers
