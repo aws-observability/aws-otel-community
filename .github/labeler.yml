@@ -5,4 +5,4 @@
 - all:
   - changed-files:
     - any-glob-to-any-file: ['sample-apps/**/*']
-    - any-glob-to-any-file: ['!sample-apps/prometheus-sample-app/**/*']
+    - any-globs-to-any-files: ['!sample-apps/prometheus-sample-app/**/*']
