@@ -1,0 +1,7 @@
+# This is used with the label workflow which will triage pull requests and apply a label based on the paths that are
+# modified in the pull request. For more information, see: https://github.com/actions/labeler
+
+'InstrumentationSampleApp':
+  - changed-files:
+      - any-glob-to-any-file: ['sample-apps/**/*']
+      - all-glob-to-all-file: ['sample-apps/prometheus-sample-app/**/*']
