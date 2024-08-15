@@ -61,4 +61,3 @@ Each of these standardized sample apps comes with a README attached inside the r
 # Sample App Specification
 
 [Sample App Spec](SampleAppSpec.md)
-
