@@ -9,7 +9,7 @@ data:
       prometheus:
         config:
           scrape_configs:
-          - job_name: "otel-collector"
+          - job_name: "otel-collector"d
             kubernetes_sd_configs:
             - role: pod
             relabel_configs:
