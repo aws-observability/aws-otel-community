@@ -77,7 +77,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.SDK_SAMPLE_APP_METRICS_ROLE_ARN }}
-          aws-region: us-west-2
+          aws-region: us-east-1
 
       - name: Publish CI status
         run: |
