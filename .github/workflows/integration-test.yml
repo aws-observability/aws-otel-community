@@ -51,7 +51,7 @@ jobs:
           ./gradlew jibDockerBuild
       - name: Run test containers (java)
         if: ${{ contains(matrix.app-language, 'java-') }}
-        run: docker-compose -f docker-compose-java.yml up --abort-on-container-exit
+        run: docker compose -f docker-compose-java.yml up --abort-on-container-exit
         working-directory: .github/collector
         env:
           INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
@@ -61,7 +61,7 @@ jobs:
           VALIDATOR_COMMAND: -c standard-otel-trace-metric-validation.yml --testcase standard_otlp_metric_trace --endpoint http://app:8080 --metric-namespace aws-otel/${{ matrix.app-language }}-sample-app -t ${{ github.run_id }}-${{ github.run_number }} --language ${{ matrix.app-language }}
       - name: Run test containers (non-java)
         if: ${{ !contains(matrix.app-language, 'java-') }}
-        run: docker-compose -f docker-compose.yml up --abort-on-container-exit
+        run: docker compose -f docker-compose.yml up --abort-on-container-exit
         working-directory: .github/collector
         env:
           INSTANCE_ID: ${{ github.run_id }}-${{ github.run_number }}
