@@ -83,12 +83,12 @@ jobs:
         run: |
           if [ '${{ needs.publish_and_test_app.result }}' = 'success' ]; then
             aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
-              --metric-name Success \
-              --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
-              --value 1.0
-          else
-            aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
-              --metric-name Success \
+              --metric-name Failure \
               --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
               --value 0.0
+          else
+            aws cloudwatch put-metric-data --namespace 'ADOT/GitHubActions' \
+              --metric-name Failure \
+              --dimensions repository=${{ github.repository }},branch=${{ github.ref_name }},workflow=integration-test \
+              --value 1.0
           fi
