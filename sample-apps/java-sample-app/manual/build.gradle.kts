@@ -45,7 +45,7 @@ jib {
 dependencies {
 
     // OpenTelemetry APIs and SDKs
-    implementation(platform("io.opentelemetry:opentelemetry-bom:1.44.1"))
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.45.0"))
     implementation("io.opentelemetry:opentelemetry-api")
     implementation("io.opentelemetry:opentelemetry-sdk")
 
@@ -53,8 +53,8 @@ dependencies {
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 
     // OpenTelemetry Aws Xray dependencies
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.40.0-alpha")
-    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.40.0")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator:1.42.0-alpha")
+    implementation("io.opentelemetry.contrib:opentelemetry-aws-xray:1.42.0")
 
     // OpenTelemetry AWS SDK Library Instrumentation
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.10.0-alpha"))
@@ -66,13 +66,13 @@ dependencies {
     implementation(project(":base"))
 
     constraints {
-        implementation("com.fasterxml.jackson:jackson-bom:2.18.1") {
+        implementation("com.fasterxml.jackson:jackson-bom:2.18.2") {
             because("bom used upstream is problematic. https://github.com/FasterXML/jackson-bom/issues/52#issuecomment-1292883281")
         }
     }
 
-    implementation("org.apache.logging.log4j:log4j-api:2.24.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.24.1")
+    implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+    implementation("org.apache.logging.log4j:log4j-core:2.24.3")
     implementation("org.slf4j:slf4j-simple:2.0.16")
 }
 
