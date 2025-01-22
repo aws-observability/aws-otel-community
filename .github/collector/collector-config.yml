@@ -8,8 +8,8 @@ processors:
   batch:
 
 exporters:
-  logging:
-    loglevel: info
+  debug:
+    verbosity: normal
   awsxray:
     region: us-west-2
   awsemf:
@@ -26,7 +26,7 @@ service:
       processors:
         - batch
       exporters:
-        - logging
+        - debug
         - awsxray
     metrics:
       receivers:
@@ -34,5 +34,5 @@ service:
       processors:
         - batch
       exporters:
-        - logging
+        - debug
         - awsemf
