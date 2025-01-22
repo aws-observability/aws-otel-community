@@ -18,14 +18,14 @@ data:
               action: keep
     processors:
     exporters:
-      logging:
-        loglevel: debug
+      debug:
+        verbosity: debug
     service:
       pipelines:
         metrics:
           receivers: [prometheus]
           processors: []
-          exporters: [logging]
+          exporters: [debug]
 ---
 apiVersion: apps/v1
 kind: Deployment

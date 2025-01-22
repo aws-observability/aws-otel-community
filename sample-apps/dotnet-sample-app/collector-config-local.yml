@@ -5,8 +5,8 @@ receivers:
         endpoint: 0.0.0.0:4317
 
 exporters:
-  logging:
-    loglevel: debug
+  debug:
+    verbosity: detailed
   awsxray:
     region: us-west-2
   awsemf:
@@ -18,11 +18,11 @@ service:
       receivers:
         - otlp
       exporters:
-        - logging
+        - debug
         - awsxray
     metrics:
       receivers:
         - otlp
       exporters:
-        - logging
+        - debug
         - awsemf
