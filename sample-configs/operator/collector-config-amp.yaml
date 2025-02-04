@@ -288,7 +288,7 @@ spec:
               target_label: __address__
             - action: labelmap
               regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
-              replacement: __param_$1
+              replacement: __param_$$1
             - action: labelmap
               regex: __meta_kubernetes_pod_label_(.+)
             - action: replace
