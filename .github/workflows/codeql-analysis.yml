@@ -52,7 +52,7 @@ jobs:
         distribution: corretto
     - if: matrix.language == 'java' 
       name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+      uses: gradle/gradle-build-action@v3
     - if: matrix.language == 'java' 
       name: Build Java
       working-directory: sample-apps/java-sample-app
