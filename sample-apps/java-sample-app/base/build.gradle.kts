@@ -23,19 +23,19 @@ repositories {
 
 dependencies {
     // Used to have access to the APIs
-    api("io.opentelemetry:opentelemetry-api:1.44.1")
+    api("io.opentelemetry:opentelemetry-api:1.47.0")
 
     // Third party libraries used in this application
     // Exposed to dependent modules
     api("com.sparkjava:spark-core:2.9.4")
     api("com.squareup.okhttp3:okhttp:4.12.0")
-    api(platform("software.amazon.awssdk:bom:2.29.16"))
+    api(platform("software.amazon.awssdk:bom:2.30.22"))
     api("software.amazon.awssdk:s3")
 
     // Not exposed to dependent modules
-    implementation("org.yaml:snakeyaml:2.3")
-    implementation("org.apache.logging.log4j:log4j-api:2.24.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.24.1")
+    implementation("org.yaml:snakeyaml:2.4")
+    implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+    implementation("org.apache.logging.log4j:log4j-core:2.24.3")
     implementation("org.slf4j:slf4j-simple:2.0.16")
 
 }
