@@ -25,15 +25,15 @@ jobs:
       APP_PATH: sample-apps/${{ matrix.app-language }}-sample-app
     steps:
       - name: Checkout This Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup Java
         if: ${{ contains(matrix.app-language, 'java-') }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN }}
           aws-region: us-west-2
@@ -74,7 +74,7 @@ jobs:
     if: always()
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.SDK_SAMPLE_APP_METRICS_ROLE_ARN }}
           aws-region: us-east-1
