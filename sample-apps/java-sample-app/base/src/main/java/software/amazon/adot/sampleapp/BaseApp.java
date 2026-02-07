@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Base sample application class with the common code that is sed for auto instrumentation and for manual
+ * Base sample application class with the common code that is used for auto instrumentation and for manual
  * instrumentation.
  */
 public abstract class BaseApp {
