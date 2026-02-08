@@ -4,7 +4,7 @@
 
 This Java sample app will emit Traces and Metrics. There are two types of metrics emitted;
 Request Based and Random Based.
-Metrics are generated as soon as the application is ran or deployed without any additional effort. These are considered the random based metrics which track a mock of TimeAlive, TotalHeapSize, ThreadsActive and CpuUsage. The boundaries for these metrics are standard and can be found in the configuration file (YAML) called config.yaml.
+Metrics are generated as soon as the application is run or deployed without any additional effort. These are considered the random based metrics which track a mock of TimeAlive, TotalHeapSize, ThreadsActive and CpuUsage. The boundaries for these metrics are standard and can be found in the configuration file (YAML) called config.yaml.
 
 Additionally, you can generate Traces and request based Metrics by making requests to the following exposed endpoints:
 
