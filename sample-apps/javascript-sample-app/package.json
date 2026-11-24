@@ -4,7 +4,7 @@
   "description": "sample-app for javascript SDK",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node server.test.js"
   },
   "author": "",
   "license": "ISC",

@@ -87,7 +87,7 @@ async function outgoingSampleApp (req, res) {
         let port = cfg.SampleAppPorts[i];
             let uri = `http://127.0.0.1:${port}/outgoing-sampleapp`;
             traceid = await instrumentRequest('/outgoing-sampleapp', () => { 
-                httpCall('https://aws.amazon.com')
+                httpCall(uri)
             });
         }
     }
